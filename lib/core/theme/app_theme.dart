@@ -10,16 +10,17 @@ class AppTheme {
   AppTheme._();
 
   static ThemeData fromTokens(AppTokens t) {
-    final base = t.isDark ? ThemeData.dark() : ThemeData.light();
+    final base = t.isDark
+        ? ThemeData.dark(useMaterial3: true)
+        : ThemeData.light(useMaterial3: true);
     final textTheme = GoogleFonts.interTextTheme(base.textTheme).apply(
       bodyColor: t.ink,
       displayColor: t.ink,
     );
 
-    final colorScheme = (t.isDark
-            ? const ColorScheme.dark()
-            : const ColorScheme.light())
-        .copyWith(
+    final colorScheme =
+        (t.isDark ? const ColorScheme.dark() : const ColorScheme.light())
+            .copyWith(
       primary: t.brand,
       onPrimary: t.brandFG,
       secondary: t.uma,
@@ -31,7 +32,6 @@ class AppTheme {
     );
 
     return base.copyWith(
-      useMaterial3: true,
       scaffoldBackgroundColor: t.bg,
       colorScheme: colorScheme,
       textTheme: textTheme,

@@ -5,7 +5,9 @@ import '../../../../core/utils/formatters.dart';
 import '../../data/bank.dart';
 
 class ConnectedBanks extends StatelessWidget {
-  const ConnectedBanks({super.key});
+  const ConnectedBanks({required this.banks, super.key});
+
+  final List<Bank> banks;
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +16,13 @@ class ConnectedBanks extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: kBanks.length + 1,
+        itemCount: banks.length + 1,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
-          if (i == kBanks.length) {
-            return _AddBankCard();
+          if (i == banks.length) {
+            return const _AddBankCard();
           }
-          return _BankCard(bank: kBanks[i]);
+          return _BankCard(bank: banks[i]);
         },
       ),
     );
@@ -96,6 +98,8 @@ class _BankCard extends StatelessWidget {
 }
 
 class _AddBankCard extends StatelessWidget {
+  const _AddBankCard();
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -115,8 +119,7 @@ class _AddBankCard extends StatelessWidget {
         children: [
           Icon(Icons.add, color: t.muted, size: 20),
           const SizedBox(height: 6),
-          Text('Connect bank',
-              style: TextStyle(fontSize: 12, color: t.muted)),
+          Text('Connect bank', style: TextStyle(fontSize: 12, color: t.muted)),
         ],
       ),
     );

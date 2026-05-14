@@ -1,116 +1,272 @@
 # Mimari
 
-Tek doc — klasor yapisi, paralel calisma, yeni feature ekleme.
+Bu dokuman, Vera'nin hackathon urun vizyonunu destekleyecek Flutter mimarisini
+ve ekip calisma kurallarini tanimlar.
 
-## Felsefe: feature-first
+## 1. Mimari hedef
 
-Her ekran bir feature klasoru. Bir feature **kendi modeli, state'i, ekrani** ile birlikte tek yerde durur. Sen `wealth/`'da, arkadasin `credit/`'de calisirsa **hicbir dosyada bulusmazsiniz** → merge conflict yok.
+Amacimiz sadece ekran cizen bir mobil uygulama degil; AI destekli finans
+modullerinin birbirine baglandigi, aciklanabilir ve kontrollu bir urun
+omurgasi kurmak.
 
-## Klasor yapisi
+Bu nedenle mimari su 4 ihtiyaci ayni anda karsilamali:
 
+- Hizli demo gelistirme
+- Feature bazli paralel ekip calismasi
+- Mock veriden yarin gercek entegrasyona gecise uygunluk
+- Her AI davranisinin repository ve policy katmaninda izole edilmesi
+
+## 2. Ana prensip: feature-first + AI module boundaries
+
+Her urun alani kendi feature klasoru icinde yasamali:
+
+- `home`
+- `wealth`
+- `credit`
+- `security`
+- `uma_chat`
+- `subscriptions` (eklenecek)
+- `profile_settings`
+
+Her feature mumkun oldugunca su parcali yapida ilerlemeli:
+
+```text
+features/<feature>/
+  domain/        -> saf veri modelleri, entity, enum, policy
+  data/          -> repository, mock source, DTO, mapper
+  state/         -> Riverpod controller / state object
+  presentation/  -> screen, sheet, widget
 ```
+
+## 3. Klasor yapisi
+
+```text
 lib/
-├── main.dart                       # Giris noktasi
-├── app.dart                        # MaterialApp + tema + router
-│
-├── core/                           # ORTAK ALTYAPI (dokunurken konus)
-│   ├── theme/                      # Renk, font, tweaks (palette/mood/vibe)
-│   ├── routing/                    # go_router config
-│   ├── services/                   # Disariya cikan tek dokunma noktalari (Gemini)
-│   ├── config/                     # .env okuma
-│   └── utils/                      # fmtTL gibi kucuk yardimcilar
-│
-├── shared/widgets/                 # Birden fazla feature'da kullanilan widget
-│   ├── app_shell.dart              # Bottom nav + FAB
-│   ├── vera_card.dart, pill.dart, ...
-│
-└── features/<feature>/             # Her feature izole
-    ├── domain/                     # (opsiyonel) Saf veri modelleri
-    ├── data/                       # (opsiyonel) Repository / mock data
-    ├── state/                      # (opsiyonel) Riverpod controller
-    └── presentation/
-        ├── <feature>_screen.dart   # Ekranin kendisi
-        └── widgets/                # Sadece o ekrana ait BUYUK parçalar
+|-- main.dart
+|-- app.dart
+|
+|-- core/
+|   |-- config/         # env, runtime config, feature flags
+|   |-- routing/        # routes ve shell
+|   |-- services/       # Gemini gibi dis bagimliliklar
+|   |-- theme/          # palette, tokens, vibe, theme
+|   `-- utils/          # formatter ve kucuk yardimcilar
+|
+|-- shared/
+|   `-- widgets/        # tekrar kullanilan UI primitifleri
+|
+`-- features/
+    |-- home/
+    |-- wealth/
+    |-- credit/
+    |-- security/
+    |-- uma_chat/
+    |-- profile_settings/
+    `-- subscriptions/  # planlanan yeni feature
 ```
 
-`domain/`, `data/`, `state/`, `widgets/` **opsiyonel** — basit feature'da sadece `presentation/<feature>_screen.dart` yeterli.
+## 4. AI odakli katmanlama
 
-## Dosya bolme kurali (en cok karistirilan kisim)
+Hackathon hedefi nedeniyle AI mantigi widget icinde kalmamali. Asagidaki akisi
+koru:
 
-Bir ekran widget'ini ne zaman ayri dosyaya cikar?
-
-**Ayri dosya** olsun:
-- Birden fazla yerde kullaniliyor → `shared/widgets/`
-- Cidden buyuk/karmasik (custom paint, kendi state'i, 150+ satir gercek logic)
-- Kendi data/repository'si var (ornek: `connected_banks` Bank modelini tasiyor)
-
-**Ayni dosyada** kalsin:
-- Sadece o ekrana ozgu, kucuk UI parcasi → ekran dosyasi icinde **private class** (`_Header`, `_StatChip`) olarak yaz.
-
-Ornek: `wealth_screen.dart` 380 satir, icinde `_Header`, `_ActivityRow`, `_SmallBtn` private class'lari var. Sadece `portfolio_donut.dart` (custom SVG painter) ayri dosyada.
-
-Hedef: bir ekran dosyasi 250-400 satir bandinda olsun. 500+ ise gercekten parcala.
-
-## Paralel calisma
-
-| Bolge | Kim dokunabilir | Kural |
-|---|---|---|
-| `lib/features/<X>/` | O feature'i alan kisi | Once paylasin: sen `wealth`, arkadasin `credit` |
-| `lib/core/`, `lib/shared/` | Herkes | Once mesajlas ("ben app_shell'a tab ekliyorum") |
-| `pubspec.yaml` | Herkes | Once mesajlas |
-
-Git ile her feature kendi branch'inde, PR ile merge → conflict riski sifira yakin.
-
-## Yeni feature nasil eklenir
-
-Diyelim `notifications` ekliyorsun.
-
-**1.** Klasor: `lib/features/notifications/presentation/notifications_screen.dart`. Karmasiksa `domain/`, `data/`, `state/` ekle.
-
-**2.** Rota: `lib/core/routing/routes.dart`'a sabit ekle, `app_router.dart`'taki `ShellRoute` icine `GoRoute` ekle.
-
-**3.** (Bottom nav'a girecekse) `lib/shared/widgets/app_shell.dart`'taki `_tabs` listesine ekle. Modal/sheet olarak acilacaksa atla — `showModalBottomSheet` yeter (ornek: `profile_settings_sheet`).
-
-**4.** State varsa Riverpod controller olustur. Patern `lib/features/uma_chat/state/uma_controller.dart`'ta — kopyala.
-
-## State management: Riverpod
-
-- Sayfa state'i → `StateNotifierProvider<XController, XState>`
-- Tek deger → `StateProvider<T>`
-- Read-only servis → `Provider<T>`
-
-Widget'ta:
-
-```dart
-class FooScreen extends ConsumerWidget {
-  Widget build(BuildContext ctx, WidgetRef ref) {
-    final state = ref.watch(fooControllerProvider);          // izle
-    final ctrl  = ref.read(fooControllerProvider.notifier);  // metod cagir
-  }
-}
+```text
+UI -> Controller -> Repository -> GeminiService / Rule Engine / Mock Data
 ```
 
-## Tema (tweaks)
+Bu zincirde sorumluluklar:
 
-Renk/spacing **hardcode etme**. `context.tokens` kullan:
+- Widget:
+  - input alir
+  - state render eder
+  - repository veya service bilmez
+- Controller:
+  - ekran akislarini yonetir
+  - loading, toast, expand, selection gibi UI state'leri tutar
+- Repository:
+  - prompt kurar
+  - kural bazli karar verir
+  - mock / AI / rule engine arasinda secim yapar
+- Service:
+  - dis API cagrisi yapar
 
-```dart
-final t = context.tokens;
-Container(color: t.card, padding: EdgeInsets.all(t.vibe.cardPadding));
+## 5. AI sistemleri nasil yerlestirilecek
+
+### 5.1 Home intelligence
+
+- `features/home/domain/`
+  - `account.dart`
+  - `normalized_transaction.dart`
+  - `cashflow_summary.dart`
+- `features/home/data/`
+  - `accounts_repository.dart`
+  - `transaction_classifier.dart`
+  - `cashflow_insight_repository.dart`
+- `features/home/state/`
+  - `home_controller.dart`
+
+### 5.2 Wealth autonomy
+
+- `features/wealth/domain/`
+  - `portfolio_allocation.dart`
+  - `autonomy_policy.dart`
+  - `rebalance_action.dart`
+- `features/wealth/data/`
+  - `wealth_repository.dart`
+  - `rebalance_engine.dart`
+  - `wealth_explanation_repository.dart`
+
+### 5.3 Credit engine
+
+- `features/credit/domain/`
+  - `loan_application.dart`
+  - `credit_decision.dart`
+  - `risk_factor.dart`
+- `features/credit/data/`
+  - `credit_repository.dart`
+  - `credit_rule_engine.dart`
+  - `credit_explanation_repository.dart`
+
+### 5.4 Security / fraud
+
+- `features/security/domain/`
+  - `fraud_event.dart`
+  - `fraud_signal.dart`
+  - `review_decision.dart`
+- `features/security/data/`
+  - `fraud_repository.dart`
+  - `fraud_scoring_engine.dart`
+  - `fraud_explanation_repository.dart`
+
+### 5.5 Uma orchestration
+
+- `features/uma_chat/domain/`
+  - `uma_intent.dart`
+  - `uma_action.dart`
+  - `approval_policy.dart`
+- `features/uma_chat/data/`
+  - `uma_repository.dart`
+  - `intent_router.dart`
+  - `tool_registry.dart`
+
+## 6. Dosya bolme kurali
+
+Bir widget ne zaman ayri dosya olur?
+
+Ayri dosya yap:
+
+- Baska yerde de kullaniliyorsa
+- 150+ satirlik gercek logic tasiyorsa
+- Kendi painter, animation veya local state'i varsa
+- Kendi test dosyasini hak ediyorsa
+
+Ayni dosyada kalabilir:
+
+- Sadece o ekrana ozel kucuk parca ise
+- Birkac satirlik private render widget ise
+
+## 7. Riverpod kullanimi
+
+Tercih sirası:
+
+- `Provider<T>` -> repository, service, read-only dependency
+- `StateNotifierProvider<C, S>` -> ekran state'i ve akis yonetimi
+- `StateProvider<T>` -> cok kucuk ve lokal ihtiyaclar
+
+Controller sorumluluklari:
+
+- async islem baslatmak
+- loading ve error state'lerini tutmak
+- user action'lari kaydetmek
+- optimistic update veya fallback akisi yonetmek
+
+## 8. Theme ve design tokens
+
+Hardcoded renk ve spacing kullanma. `context.tokens` kullan.
+
+Ozellikle:
+
+- `card`, `bg`, `ink`, `muted`, `line`
+- `brand`, `uma`, `green`, `red`, `gold`
+- `vibe.radius`, `vibe.cardPadding`
+
+Hackathon demoda ekranlar arasi kalite hissi en cok burada kazanilir.
+
+## 9. Mock veri standardi
+
+Mock kullanmak serbest, ama su kurallarla:
+
+- Her mock veri bir repository arkasinda olsun
+- Mock data urun senaryosuna inandirici hizmet etsin
+- Sadece sayi gostermek yerine karar nedeni de uretilsin
+- "neden bu sonucu gordum?" sorusuna UI cevabi olsun
+
+Yanlis ornek:
+
+- Ekranda rastgele skor
+- AI kartinda sabit lorem ipsum
+
+Dogru ornek:
+
+- Kredi skoru + nedeni + alternatif teklif
+- Fraud event + risk sinyali + kullaniciya aksiyon secimi
+
+## 10. Paralel ekip calisma kurali
+
+Guvenli paralel bolunme:
+
+- Kisi 1 -> `home` + `subscriptions`
+- Kisi 2 -> `wealth`
+- Kisi 3 -> `credit`
+- Kisi 4 -> `security`
+- Kisi 5 -> `uma_chat`
+- Ortak alanlar -> `core`, `shared`, `pubspec.yaml`
+
+`core/`, `shared/` ve route degisiklikleri once haberlesilerek yapilmali.
+
+## 11. Yeni feature ekleme checklist
+
+1. `features/<name>/` klasorunu ac
+2. Domain modellerini yaz
+3. Mock repository olustur
+4. Riverpod controller ekle
+5. Screen veya sheet bagla
+6. Route / bottom nav entegrasyonu yap
+7. Empty, loading, error state ekle
+8. Gerekirse Uma ile bag kur
+9. README ve TODO dokumanina feature'i isle
+
+## 12. Hackathon icin zorunlu teknik cizgiler
+
+- Her AI karari bir aciklama satiri tasimali
+- Kullanici adina para etkili aksiyonlar confirmation ile gitmeli
+- Tek bir `GeminiService` uzerinden AI cagrisi yapilmali
+- AI fail olursa deterministic fallback olmasi tercih edilmeli
+- Demo kritik alanlarda state replay edilebilir olmali
+
+## 13. Orta vadeli klasor eklemeleri
+
+Eklenmesi onerilen yeni yapilar:
+
+```text
+lib/features/subscriptions/
+lib/features/credit/domain/
+lib/features/credit/data/
+lib/features/credit/state/
+lib/features/wealth/domain/
+lib/features/wealth/data/
+lib/features/security/domain/
+lib/features/security/state/
+lib/features/home/state/
 ```
 
-Token icerigi: `brand`, `uma`, `bg`, `card`, `ink`, `muted`, `line`, `green/red/blue/gold`, `vibe.radius`, ... Palette/mood/vibe degisince hepsi otomatik guncellenir.
+## 14. Commit oncesi minimum kontrol
 
-Istisna — hardcoded kalmasi GEREKEN renkler:
-- Banka logosu (Garanti yesili, Akbank kirmizisi) — gercek marka rengi
-- Kategori ikonu (groceries amber, food brown) — semantik kimlik
-- Credit gauge segment renkleri — skor anlami
+```bash
+dart format lib/ docs/
+flutter analyze
+flutter test
+```
 
-## Kisa kurallar
-
-- `Color(0xFF...)` veya magic number gorursen `core/theme/`'e tasimaya bak.
-- `BuildContext`'i async sonrasi kullanirken `if (!context.mounted) return;`.
-- `ConsumerWidget` tercih et, `ConsumerStatefulWidget` sadece local state varsa.
-- Commit oncesi: `flutter analyze && dart format lib/`.
-
-Gemini icin → [GEMINI.md](GEMINI.md).
+Bu mimari, bugunku hackathon demosunu hizlandirirken yarin daha ciddi bir urun
+temeline gecisi de mumkun kilar.

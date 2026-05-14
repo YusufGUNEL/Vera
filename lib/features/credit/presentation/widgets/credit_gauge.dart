@@ -7,6 +7,7 @@ import '../../../../core/theme/app_tokens.dart';
 class CreditGauge extends StatelessWidget {
   const CreditGauge({
     required this.score,
+    required this.bandLabel,
     this.min = 300,
     this.max = 850,
     this.size = 200,
@@ -14,6 +15,7 @@ class CreditGauge extends StatelessWidget {
   });
 
   final int score;
+  final String bandLabel;
   final int min;
   final int max;
   final double size;
@@ -52,13 +54,15 @@ class CreditGauge extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text('EXCELLENT',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: t.muted,
-                      letterSpacing: 0.5,
-                      fontWeight: FontWeight.w500,
-                    )),
+                Text(
+                  bandLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: t.muted,
+                    letterSpacing: 0.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -106,12 +110,6 @@ class _GaugePainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
         ..strokeCap = StrokeCap.round;
-      // We're going clockwise from a0 toward a1, but a0 > a1 in our pi->0 walk.
-      // Convert to canvas coordinates: angle 0 = right, pi = left.
-      // Canvas drawArc uses startAngle measured from 3 o'clock, sweeping clockwise.
-      // Our coordinate uses 0 at right (3 o'clock) and pi at left (9 o'clock).
-      // To draw from a0 down to a1 (a0 > a1), we go counterclockwise visually.
-      // In canvas, "above" the center is negative Y so startAngle = -a0 (degrees CCW positive).
       final startAngle = -a0;
       final sweep = a0 - a1;
       canvas.drawArc(
@@ -123,9 +121,8 @@ class _GaugePainter extends CustomPainter {
       );
     }
 
-    // Needle
     final t = (score - min) / (max - min);
-    final ang = math.pi - t * math.pi; // pi -> 0
+    final ang = math.pi - t * math.pi;
     final needlePaint = Paint()
       ..color = ink
       ..strokeWidth = 2.5

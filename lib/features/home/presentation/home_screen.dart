@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/widgets/section_title.dart';
-import '../state/balance_controller.dart';
+import '../state/home_controller.dart';
 import 'widgets/connected_banks.dart';
 import 'widgets/net_worth_card.dart';
 import 'widgets/top_bar.dart';
@@ -14,23 +14,39 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final balance = ref.watch(balanceProvider);
+    final state = ref.watch(homeControllerProvider);
+
     return SafeArea(
       bottom: false,
-      child: ListView(
-        padding: const EdgeInsets.only(top: 6, bottom: 130),
-        children: [
-          const TopBar(),
-          NetWorthCard(balance: balance),
-          const SectionTitle(title: 'Connected accounts', actionLabel: 'Manage'),
-          const ConnectedBanks(),
-          const UmaInsightStrip(
-            text:
-                'You spent ₺312 less on dining out this week. Want me to move it to savings?',
-          ),
-          const SectionTitle(title: 'Recent transactions', actionLabel: 'See all'),
-          const TransactionList(),
-        ],
+      child: RefreshIndicator(
+        onRefresh: () => ref.read(homeControllerProvider.notifier).refresh(),
+        child: ListView(
+          padding: const EdgeInsets.only(top: 6, bottom: 130),
+          children: [
+            const TopBar(),
+            NetWorthCard(
+              balance: state.banks.isEmpty
+                  ? 0
+                  : state.banks
+                      .fold<double>(0, (sum, bank) => sum + bank.balance),
+              lastUpdatedLabel: state.refreshedLabel,
+              refreshing: state.refreshing,
+            ),
+            SectionTitle(
+              title: 'Connected accounts',
+              actionLabel: state.refreshing ? 'Syncing...' : 'Refresh',
+              onAction: () =>
+                  ref.read(homeControllerProvider.notifier).refresh(),
+            ),
+            ConnectedBanks(banks: state.banks),
+            UmaInsightStrip(text: state.insight),
+            SectionTitle(
+              title: 'Recent transactions',
+              actionLabel: '${state.transactions.length} items',
+            ),
+            TransactionList(transactions: state.transactions),
+          ],
+        ),
       ),
     );
   }

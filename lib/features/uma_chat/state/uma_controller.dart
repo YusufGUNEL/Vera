@@ -12,7 +12,7 @@ class UmaState {
       UmaMessage(
         role: UmaRole.uma,
         text:
-            'Hi Mert — I noticed gold is up 1.8% today. Want me to look at your rebalance options, or is there something else on your mind?',
+            'Hi Mert. Gold is up 1.8% today. I can help you rebalance, pay a card bill, or move money into savings.',
       ),
     ],
     this.thinking = false,
@@ -67,21 +67,24 @@ class UmaController extends StateNotifier<UmaState> {
     final card = msg.card;
     if (card == null || card.status != OrderStatus.review) return;
 
-    _ref.read(balanceProvider.notifier).debit(card.amount);
-    final updated = msg.copyWith(card: card.copyWith(status: OrderStatus.confirmed));
+    if (card.balanceDelta < 0) {
+      _ref.read(balanceProvider.notifier).debit(card.balanceDelta.abs());
+    } else if (card.balanceDelta > 0) {
+      _ref.read(balanceProvider.notifier).credit(card.balanceDelta);
+    }
+
+    final updated =
+        msg.copyWith(card: card.copyWith(status: OrderStatus.confirmed));
     final list = [...state.messages]..[messageIndex] = updated;
     state = state.copyWith(
       messages: list,
-      toast: 'Gold purchase confirmed · ₺${card.amount.toStringAsFixed(0)}',
+      toast: '${card.title} confirmed · ${card.amount.toStringAsFixed(0)} TL',
     );
 
     final newBalance = _ref.read(balanceProvider);
     Future.delayed(const Duration(milliseconds: 500), () {
-      final confirm = _repository.purchaseConfirmation(
-        grams: card.grams,
-        rate: card.ratePerGram,
-        newBalance: newBalance,
-      );
+      final confirm =
+          _repository.actionConfirmation(card: card, newBalance: newBalance);
       state = state.copyWith(messages: [...state.messages, confirm]);
     });
 
@@ -94,7 +97,8 @@ class UmaController extends StateNotifier<UmaState> {
     final msg = state.messages[messageIndex];
     final card = msg.card;
     if (card == null || card.status != OrderStatus.review) return;
-    final updated = msg.copyWith(card: card.copyWith(status: OrderStatus.cancelled));
+    final updated =
+        msg.copyWith(card: card.copyWith(status: OrderStatus.cancelled));
     final list = [...state.messages]..[messageIndex] = updated;
     state = state.copyWith(messages: list);
   }

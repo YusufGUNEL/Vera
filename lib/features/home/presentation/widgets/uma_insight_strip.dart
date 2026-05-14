@@ -28,7 +28,7 @@ class UmaInsightStrip extends StatelessWidget {
             decoration: BoxDecoration(
               color: t.umaSoft,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: t.uma.withOpacity(0.13)),
+              border: Border.all(color: t.uma.withValues(alpha: 0.13)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

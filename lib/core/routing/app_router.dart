@@ -1,30 +1,59 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/domain/auth_session.dart';
+import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/state/auth_controller.dart';
 import '../../features/credit/presentation/credit_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/security/presentation/security_screen.dart';
+import '../../features/subscriptions/presentation/subscriptions_screen.dart';
 import '../../features/wealth/presentation/wealth_screen.dart';
 import '../../shared/widgets/app_shell.dart';
 import 'routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final auth = ref.watch(authControllerProvider);
+
   return GoRouter(
     initialLocation: Routes.home,
     debugLogDiagnostics: false,
+    redirect: (context, state) {
+      final isLogin = state.uri.path == Routes.login;
+
+      if (auth.status == AuthStatus.loading) return null;
+
+      if (auth.status == AuthStatus.signedOut) {
+        return isLogin ? null : Routes.login;
+      }
+
+      if (auth.status == AuthStatus.signedIn && isLogin) {
+        return Routes.home;
+      }
+
+      return null;
+    },
     routes: [
+      GoRoute(
+        path: Routes.login,
+        pageBuilder: (_, __) => const NoTransitionPage(child: LoginScreen()),
+      ),
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           GoRoute(
             path: Routes.home,
-            pageBuilder: (_, __) =>
-                const NoTransitionPage(child: HomeScreen()),
+            pageBuilder: (_, __) => const NoTransitionPage(child: HomeScreen()),
           ),
           GoRoute(
             path: Routes.wealth,
             pageBuilder: (_, __) =>
                 const NoTransitionPage(child: WealthScreen()),
+          ),
+          GoRoute(
+            path: Routes.subscriptions,
+            pageBuilder: (_, __) =>
+                const NoTransitionPage(child: SubscriptionsScreen()),
           ),
           GoRoute(
             path: Routes.credit,

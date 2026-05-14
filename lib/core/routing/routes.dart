@@ -2,8 +2,10 @@
 class Routes {
   Routes._();
 
+  static const String login = '/login';
   static const String home = '/';
   static const String wealth = '/wealth';
+  static const String subscriptions = '/subscriptions';
   static const String credit = '/credit';
   static const String security = '/security';
 

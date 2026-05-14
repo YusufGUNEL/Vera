@@ -7,9 +7,9 @@ class BalanceController extends StateNotifier<double> {
 
   void debit(double amount) => state -= amount;
   void credit(double amount) => state += amount;
+  void setBalance(double amount) => state = amount;
 }
 
-final balanceProvider =
-    StateNotifierProvider<BalanceController, double>((ref) {
+final balanceProvider = StateNotifierProvider<BalanceController, double>((ref) {
   return BalanceController();
 });

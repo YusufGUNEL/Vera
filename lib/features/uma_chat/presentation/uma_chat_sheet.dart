@@ -79,21 +79,21 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
                     itemCount: state.messages.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (_, i) {
-                      final m = state.messages[i];
+                      final message = state.messages[i];
                       return Column(
-                        crossAxisAlignment: m.role == UmaRole.user
+                        crossAxisAlignment: message.role == UmaRole.user
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.start,
                         children: [
-                          UmaMessageBubble(message: m),
-                          if (m.card != null)
+                          UmaMessageBubble(message: message),
+                          if (message.card != null)
                             ConstrainedBox(
                               constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width *
-                                    0.78,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.78,
                               ),
                               child: UmaOrderCard(
-                                card: m.card!,
+                                card: message.card!,
                                 onConfirm: () => ref
                                     .read(umaControllerProvider.notifier)
                                     .confirmOrder(i),
@@ -121,6 +121,17 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
               controller: _inputController,
               onSubmit: _send,
               busy: state.thinking,
+              onUseMicHint: () {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Voice command UI is next on the roadmap. For now, try one of the quick actions.',
+                      ),
+                    ),
+                  );
+              },
             ),
           ],
         ),
@@ -181,20 +192,23 @@ class _Header extends StatelessWidget {
               ),
             ),
             alignment: Alignment.center,
-            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+            child:
+                const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Uma',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: t.ink,
-                      letterSpacing: -0.3,
-                    )),
+                Text(
+                  'Uma',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: t.ink,
+                    letterSpacing: -0.3,
+                  ),
+                ),
                 Row(
                   children: [
                     Container(
@@ -206,8 +220,10 @@ class _Header extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Text('AI assistant · online',
-                        style: TextStyle(fontSize: 11, color: t.green)),
+                    Text(
+                      'AI assistant · online',
+                      style: TextStyle(fontSize: 11, color: t.green),
+                    ),
                   ],
                 ),
               ],
@@ -217,8 +233,7 @@ class _Header extends StatelessWidget {
             onPressed: onToggleSettings,
             icon: Icon(Icons.settings_outlined, color: t.ink2, size: 19),
             style: IconButton.styleFrom(
-              backgroundColor:
-                  showSettings ? t.bgSoft : Colors.transparent,
+              backgroundColor: showSettings ? t.bgSoft : Colors.transparent,
               shape: const CircleBorder(),
             ),
           ),
@@ -248,18 +263,27 @@ class _SettingsDrawer extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('TRADE EXECUTION',
-              style: TextStyle(
-                  fontSize: 11,
-                  color: t.muted,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4)),
+          Text(
+            'TRADE EXECUTION',
+            style: TextStyle(
+              fontSize: 11,
+              color: t.muted,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.4,
+            ),
+          ),
           const SizedBox(height: 10),
           for (final option in const [
-            (AutoExecMode.auto, 'Auto-Execute Trades',
-                'Uma acts without asking, within guardrails'),
-            (AutoExecMode.confirm, 'Require My Confirmation',
-                'Always show a confirmation card first'),
+            (
+              AutoExecMode.auto,
+              'Auto-execute actions',
+              'Uma acts without asking, within guardrails'
+            ),
+            (
+              AutoExecMode.confirm,
+              'Require my confirmation',
+              'Always show a confirmation card first'
+            ),
           ])
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -268,8 +292,8 @@ class _SettingsDrawer extends ConsumerWidget {
                     .read(umaControllerProvider.notifier)
                     .setAutoExec(option.$1),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: t.card,
                     borderRadius: BorderRadius.circular(12),
@@ -290,10 +314,11 @@ class _SettingsDrawer extends ConsumerWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color: state.autoExec == option.$1
-                                  ? t.uma
-                                  : const Color(0xFFC8C3B8),
-                              width: 2),
+                            color: state.autoExec == option.$1
+                                ? t.uma
+                                : const Color(0xFFC8C3B8),
+                            width: 2,
+                          ),
                           color: state.autoExec == option.$1
                               ? t.uma
                               : Colors.transparent,
@@ -309,16 +334,19 @@ class _SettingsDrawer extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(option.$2,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: t.ink,
-                                  fontWeight: FontWeight.w500,
-                                )),
+                            Text(
+                              option.$2,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: t.ink,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                             const SizedBox(height: 1),
-                            Text(option.$3,
-                                style: TextStyle(
-                                    color: t.muted, fontSize: 12)),
+                            Text(
+                              option.$3,
+                              style: TextStyle(color: t.muted, fontSize: 12),
+                            ),
                           ],
                         ),
                       ),
@@ -339,10 +367,11 @@ class _SuggestionStrip extends StatelessWidget {
   final bool disabled;
 
   static const _suggestions = [
-    'Buy 10g of Gold',
-    'Analyze my spending',
+    'Buy 10g gold',
     'Pay my credit card',
-    'Best place for ₺10k?',
+    'Show my subscriptions',
+    'Move 2500 TL to savings',
+    'Analyze my spending',
   ];
 
   @override
@@ -357,12 +386,12 @@ class _SuggestionStrip extends StatelessWidget {
           itemCount: _suggestions.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (_, i) {
-            final s = _suggestions[i];
+            final suggestion = _suggestions[i];
             return Material(
               color: t.card,
               borderRadius: BorderRadius.circular(999),
               child: InkWell(
-                onTap: disabled ? null : () => onTap(s),
+                onTap: disabled ? null : () => onTap(suggestion),
                 borderRadius: BorderRadius.circular(999),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -374,12 +403,14 @@ class _SuggestionStrip extends StatelessWidget {
                     children: [
                       Icon(Icons.auto_awesome, size: 12, color: t.uma),
                       const SizedBox(width: 5),
-                      Text(s,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: t.ink2,
-                            fontWeight: FontWeight.w500,
-                          )),
+                      Text(
+                        suggestion,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: t.ink2,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -397,11 +428,13 @@ class _Input extends StatelessWidget {
     required this.controller,
     required this.onSubmit,
     required this.busy,
+    required this.onUseMicHint,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onSubmit;
   final bool busy;
+  final VoidCallback onUseMicHint;
 
   @override
   Widget build(BuildContext context) {
@@ -416,13 +449,18 @@ class _Input extends StatelessWidget {
           border: Border(top: BorderSide(color: t.line)),
         ),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 4, 6, 4),
+          padding: const EdgeInsets.fromLTRB(10, 4, 6, 4),
           decoration: BoxDecoration(
             color: t.bgSoft,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Row(
             children: [
+              IconButton(
+                onPressed: busy ? null : onUseMicHint,
+                icon: Icon(Icons.mic_none_rounded, color: t.ink2, size: 18),
+                tooltip: 'Voice command',
+              ),
               Expanded(
                 child: TextField(
                   controller: controller,
@@ -433,7 +471,8 @@ class _Input extends StatelessWidget {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
-                    hintText: busy ? 'Uma is thinking…' : 'Ask Uma anything…',
+                    hintText:
+                        busy ? 'Uma is thinking...' : 'Ask Uma anything...',
                     hintStyle: TextStyle(color: t.muted, fontSize: 15),
                   ),
                 ),
@@ -445,7 +484,7 @@ class _Input extends StatelessWidget {
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: busy ? t.brand.withOpacity(0.4) : t.brand,
+                    color: busy ? t.brand.withValues(alpha: 0.4) : t.brand,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -483,7 +522,7 @@ class _Toast extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: t.brand.withOpacity(0.35),
+            color: t.brand.withValues(alpha: 0.35),
             blurRadius: 30,
             offset: const Offset(0, 10),
           ),

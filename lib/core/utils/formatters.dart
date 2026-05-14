@@ -1,4 +1,4 @@
-/// Tasarima ozel TL formati: bin ayraci nokta. Ornek: ₺347.240
+/// Design-specific TL format with dot thousands separators.
 String fmtTL(num value) {
   final n = value.round().abs();
   final s = n.toString();
@@ -7,5 +7,5 @@ String fmtTL(num value) {
     if (i != 0 && (s.length - i) % 3 == 0) buf.write('.');
     buf.write(s[i]);
   }
-  return '₺${buf.toString()}';
+  return 'TL ${buf.toString()}';
 }

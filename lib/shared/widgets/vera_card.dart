@@ -28,7 +28,7 @@ class VeraCard extends StatelessWidget {
         border: Border.all(color: t.line),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(t.isDark ? 0.3 : 0.02),
+            color: Colors.black.withValues(alpha: t.isDark ? 0.3 : 0.02),
             offset: const Offset(0, 1),
             blurRadius: 0,
           ),

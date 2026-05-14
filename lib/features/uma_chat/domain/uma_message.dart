@@ -2,29 +2,43 @@ enum UmaRole { uma, user }
 
 enum OrderStatus { review, confirmed, cancelled }
 
+enum UmaActionType { buyGold, payCreditCard, moveToSavings }
+
 class OrderCard {
   const OrderCard({
+    required this.type,
+    required this.title,
     required this.from,
     required this.to,
-    required this.grams,
     required this.amount,
-    required this.ratePerGram,
+    required this.balanceDelta,
+    required this.successMessage,
+    this.detailLabel,
+    this.detailValue,
     this.status = OrderStatus.review,
   });
 
+  final UmaActionType type;
+  final String title;
   final String from;
   final String to;
-  final int grams;
   final double amount;
-  final double ratePerGram;
+  final double balanceDelta;
+  final String successMessage;
+  final String? detailLabel;
+  final String? detailValue;
   final OrderStatus status;
 
   OrderCard copyWith({OrderStatus? status}) => OrderCard(
+        type: type,
+        title: title,
         from: from,
         to: to,
-        grams: grams,
         amount: amount,
-        ratePerGram: ratePerGram,
+        balanceDelta: balanceDelta,
+        successMessage: successMessage,
+        detailLabel: detailLabel,
+        detailValue: detailValue,
         status: status ?? this.status,
       );
 }

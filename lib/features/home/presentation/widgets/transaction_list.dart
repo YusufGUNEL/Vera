@@ -6,23 +6,107 @@ import '../../../../shared/widgets/vera_card.dart';
 import '../../data/transaction.dart';
 
 class TransactionList extends StatelessWidget {
-  const TransactionList({super.key});
+  const TransactionList({required this.transactions, super.key});
+
+  final List<Txn> transactions;
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
+    final groups = _groupTransactions(transactions);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       child: VeraCard(
         child: Column(
           children: [
-            for (var i = 0; i < kTransactions.length; i++) ...[
-              if (i != 0) Divider(height: 1, color: t.line),
-              _TxnTile(txn: kTransactions[i]),
+            for (var i = 0; i < groups.length; i++) ...[
+              if (i != 0) const SizedBox(height: 8),
+              _TransactionGroup(group: groups[i], isFirst: i == 0),
             ],
           ],
         ),
       ),
+    );
+  }
+}
+
+class _TransactionGroup extends StatelessWidget {
+  const _TransactionGroup({
+    required this.group,
+    required this.isFirst,
+  });
+
+  final _TxnGroup group;
+  final bool isFirst;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final spent = group.transactions
+        .where((txn) => !txn.isCredit)
+        .fold<double>(0, (sum, txn) => sum + txn.amount.abs());
+    final income = group.transactions
+        .where((txn) => txn.isCredit)
+        .fold<double>(0, (sum, txn) => sum + txn.amount.abs());
+    final net = income - spent;
+
+    return Column(
+      children: [
+        if (!isFirst) Divider(height: 1, color: t.line),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  group.label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+              Text(
+                '${group.transactions.length} items',
+                style: TextStyle(fontSize: 12, color: t.muted),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                net >= 0 ? '+${fmtTL(net)}' : '-${fmtTL(net.abs())}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: net >= 0 ? t.green : t.ink,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+          child: Row(
+            children: [
+              _SummaryPill(
+                label: 'Spent ${fmtTL(spent)}',
+                color: t.ink2,
+                background: t.bgSoft,
+              ),
+              const SizedBox(width: 8),
+              _SummaryPill(
+                label: 'In ${fmtTL(income)}',
+                color: t.green,
+                background: t.green.withValues(alpha: 0.08),
+              ),
+            ],
+          ),
+        ),
+        for (var i = 0; i < group.transactions.length; i++) ...[
+          if (i != 0) Divider(height: 1, color: t.line),
+          _TxnTile(txn: group.transactions[i]),
+        ],
+      ],
     );
   }
 }
@@ -43,7 +127,7 @@ class _TxnTile extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: txn.color.withOpacity(0.10),
+              color: txn.color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
@@ -65,7 +149,7 @@ class _TxnTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  '${txn.category} · ${txn.when}',
+                  '${txn.category} · ${_timeLabel(txn.when)}',
                   style: TextStyle(fontSize: 12, color: t.muted),
                 ),
               ],
@@ -84,4 +168,67 @@ class _TxnTile extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SummaryPill extends StatelessWidget {
+  const _SummaryPill({
+    required this.label,
+    required this.color,
+    required this.background,
+  });
+
+  final String label;
+  final Color color;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+class _TxnGroup {
+  const _TxnGroup({
+    required this.label,
+    required this.transactions,
+  });
+
+  final String label;
+  final List<Txn> transactions;
+}
+
+List<_TxnGroup> _groupTransactions(List<Txn> transactions) {
+  final ordered = <String, List<Txn>>{};
+  for (final txn in transactions) {
+    final key = _groupLabel(txn.when);
+    ordered.putIfAbsent(key, () => []).add(txn);
+  }
+
+  return ordered.entries
+      .map((entry) => _TxnGroup(label: entry.key, transactions: entry.value))
+      .toList();
+}
+
+String _groupLabel(String rawWhen) {
+  final normalized = rawWhen.split(',').first.trim();
+  return normalized;
+}
+
+String _timeLabel(String rawWhen) {
+  if (!rawWhen.contains(',')) return rawWhen;
+  return rawWhen.split(',').skip(1).join(',').trim();
 }

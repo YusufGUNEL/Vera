@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_tokens.dart';
+import '../../../auth/state/auth_controller.dart';
 import '../../../profile_settings/presentation/profile_settings_sheet.dart';
 
-class TopBar extends StatelessWidget {
+class TopBar extends ConsumerWidget {
   const TopBar({super.key});
 
   void _openProfile(BuildContext context) {
@@ -11,14 +13,18 @@ class TopBar extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.45),
+      barrierColor: Colors.black.withValues(alpha: 0.45),
       builder: (_) => const ProfileSettingsSheet(),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final auth = ref.watch(authControllerProvider);
+    final name = auth.displayName ?? 'Vera User';
+    final initials = auth.initials;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
       child: Row(
@@ -38,7 +44,7 @@ class TopBar extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: Text(
-                'MA',
+                initials,
                 style: TextStyle(
                   color: t.brandFG,
                   fontWeight: FontWeight.w600,
@@ -53,10 +59,12 @@ class TopBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hello,',
-                    style: TextStyle(fontSize: 12, color: t.muted, height: 1.2)),
                 Text(
-                  'Mert Aksoy',
+                  'Hello,',
+                  style: TextStyle(fontSize: 12, color: t.muted, height: 1.2),
+                ),
+                Text(
+                  name,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,

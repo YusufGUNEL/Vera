@@ -20,6 +20,8 @@ class UmaOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final spec = _specFor(card.type, t);
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(14),
@@ -29,9 +31,10 @@ class UmaOrderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 14,
-              offset: const Offset(0, 4)),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -42,24 +45,28 @@ class UmaOrderCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: t.gold.withOpacity(0.13),
+                  color: spec.softColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.savings_outlined, color: t.gold, size: 15),
+                child: Icon(spec.icon, color: spec.color, size: 15),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text('Buy ${card.grams}g of Gold',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: t.ink,
-                    )),
+                child: Text(
+                  card.title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: t.ink,
+                  ),
+                ),
               ),
               switch (card.status) {
-                OrderStatus.confirmed => Pill(label: 'CONFIRMED', color: t.green),
-                OrderStatus.cancelled => Pill(label: 'CANCELLED', color: t.muted),
+                OrderStatus.confirmed =>
+                  Pill(label: 'CONFIRMED', color: t.green),
+                OrderStatus.cancelled =>
+                  Pill(label: 'CANCELLED', color: t.muted),
                 OrderStatus.review => Pill(label: 'REVIEW', color: t.uma),
               },
             ],
@@ -77,7 +84,8 @@ class UmaOrderCard extends StatelessWidget {
               children: [
                 _Row(k: 'From', v: card.from),
                 _Row(k: 'To', v: card.to),
-                _Row(k: 'Rate', v: '${fmtTL(card.ratePerGram)}/g'),
+                if (card.detailLabel != null && card.detailValue != null)
+                  _Row(k: card.detailLabel!, v: card.detailValue!),
                 _Row(k: 'Amount', v: fmtTL(card.amount), bold: true),
               ],
             ),
@@ -113,8 +121,10 @@ class UmaOrderCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(t.vibe.radiusSmall),
                       ),
                     ),
-                    child: const Text('Confirm',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    child: const Text(
+                      'Confirm',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
               ],
@@ -124,7 +134,7 @@ class UmaOrderCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Text(
-                'Receipt sent to your email.',
+                'Receipt saved to your activity log.',
                 style: TextStyle(fontSize: 12, color: t.muted),
               ),
             ),
@@ -150,15 +160,49 @@ class _Row extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(k, style: TextStyle(color: t.muted, fontSize: 13)),
-          Text(v,
-              style: TextStyle(
-                color: t.ink,
-                fontSize: 13,
-                fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
-                letterSpacing: bold ? -0.3 : 0,
-              )),
+          Text(
+            v,
+            style: TextStyle(
+              color: t.ink,
+              fontSize: 13,
+              fontWeight: bold ? FontWeight.w600 : FontWeight.w500,
+              letterSpacing: bold ? -0.3 : 0,
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class _ActionSpec {
+  const _ActionSpec({
+    required this.icon,
+    required this.color,
+    required this.softColor,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color softColor;
+}
+
+_ActionSpec _specFor(UmaActionType type, AppTokens t) {
+  return switch (type) {
+    UmaActionType.buyGold => _ActionSpec(
+        icon: Icons.savings_outlined,
+        color: t.gold,
+        softColor: t.gold.withValues(alpha: 0.13),
+      ),
+    UmaActionType.payCreditCard => _ActionSpec(
+        icon: Icons.credit_card_outlined,
+        color: t.brand,
+        softColor: t.brand.withValues(alpha: 0.12),
+      ),
+    UmaActionType.moveToSavings => _ActionSpec(
+        icon: Icons.account_balance_wallet_outlined,
+        color: t.green,
+        softColor: t.green.withValues(alpha: 0.12),
+      ),
+  };
 }

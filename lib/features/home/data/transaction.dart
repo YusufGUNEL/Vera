@@ -20,6 +20,50 @@ class Txn {
   final Color color;
 
   bool get isCredit => amount > 0;
+
+  Txn copyWith({
+    int? id,
+    String? name,
+    String? category,
+    IconData? icon,
+    double? amount,
+    String? when,
+    Color? color,
+  }) {
+    return Txn(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      icon: icon ?? this.icon,
+      amount: amount ?? this.amount,
+      when: when ?? this.when,
+      color: color ?? this.color,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'category': category,
+      'icon': icon.codePoint,
+      'amount': amount,
+      'when': when,
+      'color': color.toARGB32(),
+    };
+  }
+
+  factory Txn.fromMap(Map<String, dynamic> map) {
+    return Txn(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      category: map['category'] as String,
+      icon: IconData(map['icon'] as int, fontFamily: 'MaterialIcons'),
+      amount: (map['amount'] as num).toDouble(),
+      when: map['when'] as String,
+      color: Color(map['color'] as int),
+    );
+  }
 }
 
 const kTransactions = <Txn>[
@@ -34,7 +78,7 @@ const kTransactions = <Txn>[
   ),
   Txn(
     id: 2,
-    name: 'Aksoy Yazılım',
+    name: 'Aksoy Yazilim',
     category: 'Salary',
     icon: Icons.work_outline,
     amount: 48500,
@@ -43,11 +87,11 @@ const kTransactions = <Txn>[
   ),
   Txn(
     id: 3,
-    name: 'Kahve Dünyası',
+    name: 'Kahve Dunyasi',
     category: 'Food & Drink',
     icon: Icons.local_cafe_outlined,
     amount: -125,
-    when: 'Yesterday',
+    when: 'Yesterday, 18:40',
     color: Color(0xFF8E5A3C),
   ),
   Txn(
@@ -56,7 +100,7 @@ const kTransactions = <Txn>[
     category: 'Subscriptions',
     icon: Icons.movie_outlined,
     amount: -149.99,
-    when: 'Yesterday',
+    when: 'Yesterday, 09:10',
     color: Color(0xFFC03A2B),
   ),
   Txn(
@@ -65,7 +109,7 @@ const kTransactions = <Txn>[
     category: 'Transfer',
     icon: Icons.send_outlined,
     amount: -1500,
-    when: 'May 11',
+    when: 'May 11, 16:08',
     color: Color(0xFF2D5FB0),
   ),
   Txn(
@@ -74,7 +118,7 @@ const kTransactions = <Txn>[
     category: 'Groceries',
     icon: Icons.shopping_cart_outlined,
     amount: -312.40,
-    when: 'May 11',
+    when: 'May 11, 10:14',
     color: Color(0xFFE67E22),
   ),
 ];

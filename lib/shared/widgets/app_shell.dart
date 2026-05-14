@@ -6,18 +6,42 @@ import '../../core/routing/routes.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../features/uma_chat/presentation/uma_chat_sheet.dart';
 
-/// Bottom nav + Uma FAB cutout.
-/// 4 tab: Home, Wealth, [FAB merkez], Credit, Security
 class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
 
   final Widget child;
 
   static const _tabs = [
-    _Tab(route: Routes.home, label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home_rounded),
-    _Tab(route: Routes.wealth, label: 'Wealth', icon: Icons.show_chart, activeIcon: Icons.show_chart),
-    _Tab(route: Routes.credit, label: 'Credit', icon: Icons.credit_card_outlined, activeIcon: Icons.credit_card),
-    _Tab(route: Routes.security, label: 'Security', icon: Icons.shield_outlined, activeIcon: Icons.shield),
+    _Tab(
+      route: Routes.home,
+      label: 'Home',
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+    ),
+    _Tab(
+      route: Routes.wealth,
+      label: 'Wealth',
+      icon: Icons.show_chart,
+      activeIcon: Icons.show_chart,
+    ),
+    _Tab(
+      route: Routes.subscriptions,
+      label: 'Plans',
+      icon: Icons.subscriptions_outlined,
+      activeIcon: Icons.subscriptions,
+    ),
+    _Tab(
+      route: Routes.credit,
+      label: 'Credit',
+      icon: Icons.credit_card_outlined,
+      activeIcon: Icons.credit_card,
+    ),
+    _Tab(
+      route: Routes.security,
+      label: 'Security',
+      icon: Icons.shield_outlined,
+      activeIcon: Icons.shield,
+    ),
   ];
 
   int _index(String location) {
@@ -30,7 +54,7 @@ class AppShell extends ConsumerWidget {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      barrierColor: Colors.black.withOpacity(0.45),
+      barrierColor: Colors.black.withValues(alpha: 0.45),
       builder: (_) => const UmaChatSheet(),
     );
   }
@@ -92,30 +116,49 @@ class _BottomBar extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Bar
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              padding: EdgeInsets.fromLTRB(8, 8, 8, 22 + mq.padding.bottom * 0.4),
+              padding:
+                  EdgeInsets.fromLTRB(8, 8, 8, 22 + mq.padding.bottom * 0.4),
               decoration: BoxDecoration(
-                color: t.card.withOpacity(0.92),
+                color: t.card.withValues(alpha: 0.92),
                 border: Border(top: BorderSide(color: t.line)),
               ),
               child: Row(
                 children: [
-                  _NavBtn(tab: tabs[0], active: current == 0, onTap: () => onTap(0)),
-                  _NavBtn(tab: tabs[1], active: current == 1, onTap: () => onTap(1)),
+                  _NavBtn(
+                    tab: tabs[0],
+                    active: current == 0,
+                    onTap: () => onTap(0),
+                  ),
+                  _NavBtn(
+                    tab: tabs[1],
+                    active: current == 1,
+                    onTap: () => onTap(1),
+                  ),
                   const SizedBox(width: 64),
-                  _NavBtn(tab: tabs[2], active: current == 2, onTap: () => onTap(2)),
-                  _NavBtn(tab: tabs[3], active: current == 3, onTap: () => onTap(3)),
+                  _NavBtn(
+                    tab: tabs[2],
+                    active: current == 2,
+                    onTap: () => onTap(2),
+                  ),
+                  _NavBtn(
+                    tab: tabs[3],
+                    active: current == 3,
+                    onTap: () => onTap(3),
+                  ),
+                  _NavBtn(
+                    tab: tabs[4],
+                    active: current == 4,
+                    onTap: () => onTap(4),
+                  ),
                 ],
               ),
             ),
           ),
-
-          // FAB - Uma
           Positioned(
             left: 0,
             right: 0,
@@ -137,12 +180,12 @@ class _BottomBar extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: t.uma.withOpacity(0.45),
+                            color: t.uma.withValues(alpha: 0.45),
                             blurRadius: 24,
                             offset: const Offset(0, 8),
                           ),
                           BoxShadow(
-                            color: t.uma.withOpacity(0.3),
+                            color: t.uma.withValues(alpha: 0.3),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -156,13 +199,16 @@ class _BottomBar extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.35),
+                                color: Colors.white.withValues(alpha: 0.35),
                                 width: 1.5,
                               ),
                             ),
                           ),
-                          const Icon(Icons.auto_awesome,
-                              size: 26, color: Colors.white),
+                          const Icon(
+                            Icons.auto_awesome,
+                            size: 26,
+                            color: Colors.white,
+                          ),
                         ],
                       ),
                     ),
@@ -188,7 +234,11 @@ class _BottomBar extends StatelessWidget {
 }
 
 class _NavBtn extends StatelessWidget {
-  const _NavBtn({required this.tab, required this.active, required this.onTap});
+  const _NavBtn({
+    required this.tab,
+    required this.active,
+    required this.onTap,
+  });
 
   final _Tab tab;
   final bool active;
@@ -198,6 +248,7 @@ class _NavBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final color = active ? t.brand : t.muted;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -212,7 +263,7 @@ class _NavBtn extends StatelessWidget {
               Text(
                 tab.label,
                 style: TextStyle(
-                  fontSize: 10.5,
+                  fontSize: 10.2,
                   color: color,
                   fontWeight: active ? FontWeight.w600 : FontWeight.w500,
                   letterSpacing: 0.2,

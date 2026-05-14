@@ -6,9 +6,16 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/pill.dart';
 
 class NetWorthCard extends StatelessWidget {
-  const NetWorthCard({required this.balance, super.key});
+  const NetWorthCard({
+    required this.balance,
+    required this.lastUpdatedLabel,
+    required this.refreshing,
+    super.key,
+  });
 
   final double balance;
+  final String lastUpdatedLabel;
+  final bool refreshing;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +35,7 @@ class NetWorthCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: t.brand.withOpacity(0.22),
+              color: t.brand.withValues(alpha: 0.22),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -36,7 +43,6 @@ class NetWorthCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Decorative circles
             Positioned(
               right: -40,
               top: -40,
@@ -44,7 +50,7 @@ class NetWorthCard extends StatelessWidget {
                 width: 180,
                 height: 180,
                 decoration: BoxDecoration(
-                  color: t.uma.withOpacity(0.12),
+                  color: t.uma.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -56,7 +62,7 @@ class NetWorthCard extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Colors.white.withValues(alpha: 0.04),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -70,16 +76,16 @@ class NetWorthCard extends StatelessWidget {
                     Text(
                       'TOTAL NET WORTH',
                       style: TextStyle(
-                        color: t.brandFG.withOpacity(0.7),
+                        color: t.brandFG.withValues(alpha: 0.7),
                         fontSize: 11,
                         letterSpacing: 0.4,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Pill(
-                      label: '4 BANKS · LIVE',
+                      label: refreshing ? 'SYNCING' : 'LIVE FEED',
                       color: t.brandFG,
-                      background: Colors.white.withOpacity(0.10),
+                      background: Colors.white.withValues(alpha: 0.10),
                       fontSize: 10,
                     ),
                   ],
@@ -101,7 +107,7 @@ class NetWorthCard extends StatelessWidget {
                     Icon(Icons.trending_up, color: t.accentPop, size: 14),
                     const SizedBox(width: 6),
                     Text(
-                      '+₺12.480',
+                      '+TL 12.480',
                       style: TextStyle(
                         color: t.accentPop,
                         fontSize: 13,
@@ -112,24 +118,30 @@ class NetWorthCard extends StatelessWidget {
                     Text(
                       'this month',
                       style: TextStyle(
-                        color: t.brandFG.withOpacity(0.7),
+                        color: t.brandFG.withValues(alpha: 0.7),
                         fontSize: 13,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 22),
-                Row(
-                  children: const [
+                const SizedBox(height: 8),
+                Text(
+                  lastUpdatedLabel,
+                  style: TextStyle(
+                    color: t.brandFG.withValues(alpha: 0.76),
+                    fontSize: 11.5,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Row(
+                  children: [
                     _QuickAction(icon: Icons.send_outlined, label: 'Send'),
                     SizedBox(width: 8),
-                    _QuickAction(
-                        icon: Icons.south_west, label: 'Request'),
+                    _QuickAction(icon: Icons.south_west, label: 'Request'),
                     SizedBox(width: 8),
                     _QuickAction(icon: Icons.add, label: 'Top up'),
                     SizedBox(width: 8),
-                    _QuickAction(
-                        icon: Icons.north_east, label: 'Pay'),
+                    _QuickAction(icon: Icons.north_east, label: 'Pay'),
                   ],
                 ),
               ],
@@ -154,7 +166,7 @@ class _QuickAction extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.10),
+          color: Colors.white.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(t.vibe.radiusSmall + 2),
         ),
         child: Column(
@@ -164,7 +176,7 @@ class _QuickAction extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: t.brandFG.withOpacity(0.9),
+                color: t.brandFG.withValues(alpha: 0.9),
                 fontSize: 11,
               ),
             ),

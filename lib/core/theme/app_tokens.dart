@@ -90,7 +90,7 @@ class AppTokens {
       ink2: dark ? const Color(0xFFCCC6BA) : const Color(0xFF3A3D42),
       muted: dark ? const Color(0xFF7E796F) : const Color(0xFF8A857C),
       line: dark ? const Color(0xFF262A33) : p.lineLight,
-      umaSoft: dark ? p.uma.withOpacity(0.14) : p.umaSoft,
+      umaSoft: dark ? p.uma.withValues(alpha: 0.14) : p.umaSoft,
       pageShellBg: dark ? const Color(0xFF3A3933) : const Color(0xFFE8E4DC),
       green: dark ? const Color(0xFF5BCC85) : const Color(0xFF2F8B5C),
       red: dark ? const Color(0xFFE55A4B) : const Color(0xFFC03A2B),
