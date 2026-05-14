@@ -71,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Demo session, profile preferences, and AI actions stay on this device until you sign out.',
+                'Demo session identity is protected in the device vault, while profile preferences and AI actions stay local until you sign out.',
                 style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
               ),
               const SizedBox(height: 24),
@@ -108,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Next step: real auth, secure session storage, connected bank identity, and biometric relock.',
+                'Next step: real auth, connected bank identity, and biometric relock.',
                 style: TextStyle(fontSize: 12, color: t.muted, height: 1.45),
               ),
               const Spacer(),

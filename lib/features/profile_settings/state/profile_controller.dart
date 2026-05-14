@@ -1,92 +1,56 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../auth/state/auth_controller.dart';
-
-enum AiTone { concise, coach, proactive }
-
-class ProfileState {
-  const ProfileState({
-    this.notificationsEnabled = true,
-    this.faceIdEnabled = true,
-    this.fraudAlertsEnabled = true,
-    this.aiTone = AiTone.coach,
-  });
-
-  final bool notificationsEnabled;
-  final bool faceIdEnabled;
-  final bool fraudAlertsEnabled;
-  final AiTone aiTone;
-
-  ProfileState copyWith({
-    bool? notificationsEnabled,
-    bool? faceIdEnabled,
-    bool? fraudAlertsEnabled,
-    AiTone? aiTone,
-  }) {
-    return ProfileState(
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-      faceIdEnabled: faceIdEnabled ?? this.faceIdEnabled,
-      fraudAlertsEnabled: fraudAlertsEnabled ?? this.fraudAlertsEnabled,
-      aiTone: aiTone ?? this.aiTone,
-    );
-  }
-}
-
-const _kNotificationsKey = 'profile.notifications';
-const _kFaceIdKey = 'profile.face_id';
-const _kFraudAlertsKey = 'profile.fraud_alerts';
-const _kAiToneKey = 'profile.ai_tone';
+import '../data/profile_repository.dart';
+import '../domain/profile_state.dart';
 
 class ProfileController extends StateNotifier<ProfileState> {
-  ProfileController() : super(const ProfileState()) {
+  ProfileController(this._repository) : super(const ProfileState()) {
     _restore();
   }
 
+  final ProfileRepository _repository;
+
   Future<void> _restore() async {
-    final prefs = await SharedPreferences.getInstance();
-    state = ProfileState(
-      notificationsEnabled: prefs.getBool(_kNotificationsKey) ?? true,
-      faceIdEnabled: prefs.getBool(_kFaceIdKey) ?? true,
-      fraudAlertsEnabled: prefs.getBool(_kFraudAlertsKey) ?? true,
-      aiTone: _toneByName(prefs.getString(_kAiToneKey)),
-    );
+    state = await _repository.load();
+  }
+
+  Future<void> _save(ProfileState nextState) async {
+    state = nextState;
+    await _repository.save(nextState);
   }
 
   Future<void> setNotifications(bool value) async {
-    state = state.copyWith(notificationsEnabled: value);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kNotificationsKey, value);
+    await _save(state.copyWith(notificationsEnabled: value));
   }
 
   Future<void> setFaceId(bool value) async {
-    state = state.copyWith(faceIdEnabled: value);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kFaceIdKey, value);
+    await _save(state.copyWith(faceIdEnabled: value));
   }
 
   Future<void> setFraudAlerts(bool value) async {
-    state = state.copyWith(fraudAlertsEnabled: value);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kFraudAlertsKey, value);
+    await _save(state.copyWith(fraudAlertsEnabled: value));
+  }
+
+  Future<void> setDailyBriefing(bool value) async {
+    await _save(state.copyWith(dailyBriefingEnabled: value));
   }
 
   Future<void> setAiTone(AiTone tone) async {
-    state = state.copyWith(aiTone: tone);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kAiToneKey, tone.name);
+    await _save(state.copyWith(aiTone: tone));
   }
-}
 
-AiTone _toneByName(String? name) {
-  for (final tone in AiTone.values) {
-    if (tone.name == name) return tone;
+  Future<void> setDataSyncMode(DataSyncMode mode) async {
+    await _save(state.copyWith(dataSyncMode: mode));
   }
-  return AiTone.coach;
+
+  Future<void> setAutoApproveLimit(int limit) async {
+    await _save(state.copyWith(autoApproveLimit: limit));
+  }
 }
 
 final profileControllerProvider =
     StateNotifierProvider<ProfileController, ProfileState>((ref) {
   ref.watch(authControllerProvider);
-  return ProfileController();
+  return ProfileController(ref.watch(profileRepositoryProvider));
 });

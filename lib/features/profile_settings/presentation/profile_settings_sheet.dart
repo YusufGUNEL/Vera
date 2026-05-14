@@ -5,7 +5,11 @@ import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/palette.dart';
 import '../../../core/theme/tweaks_controller.dart';
 import '../../../core/theme/vibe.dart';
+import '../../../core/utils/formatters.dart';
+import '../../auth/domain/auth_session.dart';
 import '../../auth/state/auth_controller.dart';
+import '../../home/data/bank.dart';
+import '../domain/profile_state.dart';
 import '../state/profile_controller.dart';
 
 class ProfileSettingsSheet extends ConsumerWidget {
@@ -43,7 +47,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                 ),
               ),
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 16, 12),
               child: Row(
                 children: [
@@ -76,6 +80,8 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     email: auth.email ?? 'demo@vera.app',
                     aiTone: profile.aiTone,
                   ),
+                  const SizedBox(height: 12),
+                  _SessionVaultCard(auth: auth, profile: profile),
                   const SizedBox(height: 24),
                   const _SectionLabel(label: 'APPEARANCE & THEMING'),
                   const SizedBox(height: 8),
@@ -119,6 +125,37 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _ToggleTile(
+                    icon: Icons.wb_twilight_outlined,
+                    label: 'Daily AI briefing',
+                    subtitle:
+                        'Start the day with account health, suspicious activity, and savings prompts',
+                    value: profile.dailyBriefingEnabled,
+                    onChanged: profileCtrl.setDailyBriefing,
+                  ),
+                  const SizedBox(height: 12),
+                  _SegmentedSelector<DataSyncMode>(
+                    label: 'Live data sync',
+                    selected: profile.dataSyncMode,
+                    options: const [
+                      (DataSyncMode.live, 'Live'),
+                      (DataSyncMode.balanced, 'Balanced'),
+                      (DataSyncMode.saver, 'Saver'),
+                    ],
+                    onChange: profileCtrl.setDataSyncMode,
+                  ),
+                  const SizedBox(height: 12),
+                  _SegmentedSelector<int>(
+                    label: 'Auto-approve limit',
+                    selected: profile.autoApproveLimit,
+                    options: const [
+                      (0, 'Off'),
+                      (2500, 'TL 2.500'),
+                      (10000, 'TL 10.000'),
+                    ],
+                    onChange: profileCtrl.setAutoApproveLimit,
+                  ),
+                  const SizedBox(height: 12),
+                  _ToggleTile(
                     icon: Icons.notifications_outlined,
                     label: 'Smart notifications',
                     subtitle:
@@ -145,6 +182,10 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     onChanged: profileCtrl.setFraudAlerts,
                   ),
                   const SizedBox(height: 24),
+                  const _SectionLabel(label: 'CONNECTED INSTITUTIONS'),
+                  const SizedBox(height: 8),
+                  const _ConnectedInstitutionsCard(),
+                  const SizedBox(height: 24),
                   const _SectionLabel(label: 'ACCOUNT'),
                   const SizedBox(height: 8),
                   _AccountTile(
@@ -157,15 +198,22 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     label: 'Email',
                     value: auth.email ?? 'demo@vera.app',
                   ),
-                  const _AccountTile(
+                  _AccountTile(
                     icon: Icons.lock_outline,
                     label: 'Security & PIN',
-                    value: 'Managed locally',
+                    value: profile.faceIdEnabled
+                        ? 'Session vault + Face ID'
+                        : 'Session vault only',
                   ),
-                  const _AccountTile(
+                  _AccountTile(
+                    icon: Icons.storage_outlined,
+                    label: 'Storage policy',
+                    value: _syncModeLabel(profile.dataSyncMode),
+                  ),
+                  _AccountTile(
                     icon: Icons.help_outline,
                     label: 'Help & support',
-                    value: 'Priority demo support',
+                    value: auth.authMethod,
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -266,7 +314,7 @@ class _ProfileCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'AI TONE · ${_aiToneLabel(aiTone).toUpperCase()}',
+                    'AI TONE / ${_aiToneLabel(aiTone).toUpperCase()}',
                     style: TextStyle(
                       color: t.uma,
                       fontSize: 10,
@@ -284,8 +332,155 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
+class _SessionVaultCard extends StatelessWidget {
+  const _SessionVaultCard({
+    required this.auth,
+    required this.profile,
+  });
+
+  final AuthSession auth;
+  final ProfileState profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(t.vibe.radius),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: t.bgSoft,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.verified_user_outlined, color: t.uma),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Protected session vault',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Identity is persisted separately from local preferences.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: t.muted,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _VaultStat(
+                  label: 'Sign-in',
+                  value: auth.authMethod,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _VaultStat(
+                  label: 'Protected since',
+                  value: _signedInLabel(auth.signedInAt),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _VaultStat(
+                  label: 'Sync mode',
+                  value: _syncModeLabel(profile.dataSyncMode),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _VaultStat(
+                  label: 'Approval guardrail',
+                  value: profile.autoApproveLimit == 0
+                      ? 'Manual only'
+                      : fmtTL(profile.autoApproveLimit),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VaultStat extends StatelessWidget {
+  const _VaultStat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: t.muted,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: t.ink,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel({required this.label});
+
   final String label;
 
   @override
@@ -308,6 +503,7 @@ class _SectionLabel extends StatelessWidget {
 
 class _PaletteSelector extends StatelessWidget {
   const _PaletteSelector({required this.selected, required this.onChange});
+
   final PaletteId selected;
   final ValueChanged<PaletteId> onChange;
 
@@ -334,7 +530,7 @@ class _PaletteSelector extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Vera × Uma',
+            'Vera x Uma',
             style: TextStyle(
               fontSize: 16,
               color: t.ink,
@@ -345,13 +541,13 @@ class _PaletteSelector extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              for (final p in Palette.all)
+              for (final palette in Palette.all)
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: _Swatch(
-                    palette: p,
-                    selected: p.id == selected,
-                    onTap: () => onChange(p.id),
+                    palette: palette,
+                    selected: palette.id == selected,
+                    onTap: () => onChange(palette.id),
                   ),
                 ),
             ],
@@ -455,17 +651,18 @@ class _SegmentedSelector<T> extends StatelessWidget {
             ),
             child: Row(
               children: [
-                for (final o in options)
+                for (final option in options)
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => onChange(o.$1),
+                      onTap: () => onChange(option.$1),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          color: o.$1 == selected ? t.card : Colors.transparent,
+                          color:
+                              option.$1 == selected ? t.card : Colors.transparent,
                           borderRadius: BorderRadius.circular(9),
-                          boxShadow: o.$1 == selected
+                          boxShadow: option.$1 == selected
                               ? [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.06),
@@ -477,11 +674,11 @@ class _SegmentedSelector<T> extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          o.$2,
+                          option.$2,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: o.$1 == selected ? t.ink : t.muted,
+                            color: option.$1 == selected ? t.ink : t.muted,
                           ),
                         ),
                       ),
@@ -566,6 +763,117 @@ class _ToggleTile extends StatelessWidget {
   }
 }
 
+class _ConnectedInstitutionsCard extends StatelessWidget {
+  const _ConnectedInstitutionsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(t.vibe.radius),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${kBanks.length} connected institutions',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: t.ink,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Live balances refresh through the current sync policy and feed cache.',
+            style: TextStyle(
+              fontSize: 12,
+              color: t.muted,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 14),
+          for (final bank in kBanks) ...[
+            _InstitutionTile(bank: bank),
+            if (bank != kBanks.last) const SizedBox(height: 8),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InstitutionTile extends StatelessWidget {
+  const _InstitutionTile({required this.bank});
+
+  final Bank bank;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: bank.color.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              bank.shortCode,
+              style: TextStyle(
+                color: bank.color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  bank.name,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Account ${bank.last4}',
+                  style: TextStyle(fontSize: 12, color: t.muted),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            fmtTL(bank.balance),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: t.ink,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AccountTile extends StatelessWidget {
   const _AccountTile({
     required this.icon,
@@ -620,8 +928,10 @@ class _AccountTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(value,
-                          style: TextStyle(fontSize: 12, color: t.muted)),
+                      Text(
+                        value,
+                        style: TextStyle(fontSize: 12, color: t.muted),
+                      ),
                     ],
                   ),
                 ),
@@ -641,4 +951,19 @@ String _aiToneLabel(AiTone tone) {
     AiTone.coach => 'Coach',
     AiTone.proactive => 'Proactive',
   };
+}
+
+String _syncModeLabel(DataSyncMode mode) {
+  return switch (mode) {
+    DataSyncMode.live => 'Live sync',
+    DataSyncMode.balanced => 'Balanced sync',
+    DataSyncMode.saver => 'Battery saver sync',
+  };
+}
+
+String _signedInLabel(DateTime? date) {
+  if (date == null) return 'This device';
+  final hour = date.hour.toString().padLeft(2, '0');
+  final minute = date.minute.toString().padLeft(2, '0');
+  return '${date.day}.${date.month} $hour:$minute';
 }
