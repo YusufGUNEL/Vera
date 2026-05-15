@@ -54,7 +54,22 @@ class WealthController extends StateNotifier<WealthState> {
   final WealthRepository _repository;
 
   void setAutonomous(bool enabled) {
-    final policy = state.policy.copyWith(enabled: enabled);
+    _updatePolicy(state.policy.copyWith(enabled: enabled));
+  }
+
+  void setRiskProfile(String riskProfile) {
+    _updatePolicy(state.policy.copyWith(riskProfile: riskProfile));
+  }
+
+  void setMonthlyMoveLimit(double limit) {
+    _updatePolicy(state.policy.copyWith(monthlyMoveLimit: limit));
+  }
+
+  void setApprovalMode(ApprovalMode mode) {
+    _updatePolicy(state.policy.copyWith(approvalMode: mode));
+  }
+
+  void _updatePolicy(AutonomyPolicy policy) {
     state = state.copyWith(
       policy: policy,
       insight: _repository.insightFor(policy, state.actions),

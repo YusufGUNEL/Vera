@@ -8,6 +8,7 @@ import '../../statement_import/presentation/statement_import_sheet.dart';
 import '../../uma_chat/presentation/uma_chat_sheet.dart';
 import '../data/upcoming_bill.dart';
 import '../state/home_controller.dart';
+import 'widgets/add_bank_sheet.dart';
 import 'widgets/connected_banks.dart';
 import 'widgets/credit_summary_card.dart';
 import 'widgets/net_worth_card.dart';
@@ -37,6 +38,16 @@ class HomeScreen extends ConsumerWidget {
       isScrollControlled: true,
       barrierColor: Colors.black.withValues(alpha: 0.45),
       builder: (_) => const ReceiptScanSheet(),
+    );
+  }
+
+  void _openAddBank(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const AddBankSheet(),
     );
   }
 
@@ -108,7 +119,7 @@ class HomeScreen extends ConsumerWidget {
             ConnectedBanks(
               banks: state.banks,
               onBankTap: (bank) => _showSoon(context, bank.name),
-              onAddBankTap: () => _showSoon(context, l10n.connectBank),
+              onAddBankTap: () => _openAddBank(context),
             ),
             UmaInsightStrip(
               text: state.insight,

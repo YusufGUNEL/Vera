@@ -6,6 +6,8 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
+import '../../home/data/imported_transactions_store.dart';
+import '../../home/state/home_controller.dart';
 import '../domain/parsed_statement.dart';
 import '../state/statement_controller.dart';
 
@@ -336,9 +338,24 @@ class StatementImportSheet extends ConsumerWidget {
             const SizedBox(width: 10),
             Expanded(
               child: FilledButton(
-                onPressed: () {
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final txns = s.toTxns();
+                  if (txns.isEmpty) {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.statementNoTransactions),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    return;
+                  }
+                  await ref
+                      .read(homeControllerProvider.notifier)
+                      .addImportedTransactions(txns);
+                  if (!context.mounted) return;
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(l10n.statementImported),
                       behavior: SnackBarBehavior.floating,

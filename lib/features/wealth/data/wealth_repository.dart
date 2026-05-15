@@ -10,7 +10,7 @@ class WealthRepository {
   AutonomyPolicy initialPolicy() {
     return const AutonomyPolicy(
       enabled: true,
-      riskProfile: 'Balanced growth',
+      riskProfile: 'Dengeli',
       monthlyMoveLimit: 25000,
       approvalMode: ApprovalMode.confirmLargeMoves,
     );
@@ -19,25 +19,25 @@ class WealthRepository {
   List<PortfolioAllocation> portfolio() {
     return const [
       PortfolioAllocation(
-        label: 'Stocks',
+        label: 'Hisse',
         amount: 167400,
         weight: 48,
         paletteKey: 'brand',
       ),
       PortfolioAllocation(
-        label: 'Gold',
+        label: 'Altın',
         amount: 94200,
         weight: 27,
         paletteKey: 'gold',
       ),
       PortfolioAllocation(
-        label: 'Cash',
+        label: 'Nakit',
         amount: 55800,
         weight: 16,
         paletteKey: 'blueSoft',
       ),
       PortfolioAllocation(
-        label: 'Crypto',
+        label: 'Kripto',
         amount: 31400,
         weight: 9,
         paletteKey: 'uma',
@@ -50,33 +50,33 @@ class WealthRepository {
       RebalanceAction(
         id: 'gold-shift',
         type: WealthActionType.rebalance,
-        title: 'Moved TL 2.000 to Gold',
-        detail: 'Tax-advantaged rebalance',
+        title: 'Altına 2.000 TL aktarıldı',
+        detail: 'Vergi avantajlı rebalans',
         why:
-            'Cash weight drifted 3 points above target, so Uma redirected idle balance into a defensive gold position.',
-        when: 'Today, 11:42',
+            'Nakit ağırlığı hedefin 3 puan üstüne sapmıştı, Uma boş bakiyeyi savunma amaçlı altın pozisyonuna yönlendirdi.',
+        when: 'Bugün, 11:42',
         amount: 2000,
         undoable: true,
       ),
       RebalanceAction(
         id: 'thyao-dca',
         type: WealthActionType.buyEquity,
-        title: 'Bought THYAO TL 5.000',
-        detail: 'DCA scheduled buy',
+        title: 'THYAO 5.000 TL alındı',
+        detail: 'DCA planlı alım',
         why:
-            'Your equity bucket was slightly below target after last week\'s market move, so Uma kept the scheduled accumulation plan.',
-        when: 'Yesterday',
+            'Geçen haftaki piyasa hareketinden sonra hisse kovan biraz hedefin altındaydı; Uma planlı birikim alımını sürdürdü.',
+        when: 'Dün',
         amount: 5000,
         undoable: false,
       ),
       RebalanceAction(
         id: 'cash-reserve',
         type: WealthActionType.topUpCash,
-        title: 'Topped up cash reserve',
-        detail: 'From idle Akbank balance',
+        title: 'Nakit rezervi takviye edildi',
+        detail: 'Boş Akbank bakiyesinden',
         why:
-            'Uma increased your liquid reserve to maintain 3 months of runway ahead of upcoming card and subscription payments.',
-        when: 'May 10',
+            'Yaklaşan kart ve abonelik ödemeleri öncesi Uma 3 aylık likit rezervi korumak için bakiyeyi artırdı.',
+        when: '10 Mayıs',
         amount: 3500,
         undoable: false,
       ),
@@ -87,10 +87,10 @@ class WealthRepository {
     final activeActions = actions.where((action) => !action.undone).length;
 
     if (!policy.enabled) {
-      return 'Autonomous mode is paused. Vera is still monitoring drift, but it will wait for your confirmation before moving money.';
+      return 'Otonom mod duraklatıldı. Vera sapmayı izliyor ama para hareketi için onayını bekleyecek.';
     }
 
-    return 'Uma is active under a ${policy.riskProfile.toLowerCase()} policy. It has executed or prepared $activeActions portfolio adjustments while respecting your monthly move limit of TL ${policy.monthlyMoveLimit.round()}.';
+    return 'Uma "${policy.riskProfile.toLowerCase()}" politikasıyla aktif. Aylık ${policy.monthlyMoveLimit.round()} TL limitine sadık kalarak $activeActions portföy ayarlaması yaptı veya hazırladı.';
   }
 }
 

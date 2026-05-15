@@ -42,6 +42,16 @@ class AppStrings {
   String itemsCount(int n) => _t('itemsCount').replaceAll('{n}', '$n');
   String get itemsVisible => _t('itemsVisible');
   String get connectBank => _t('connectBank');
+  String get addBankTitle => _t('addBankTitle');
+  String get addBankSubtitle => _t('addBankSubtitle');
+  String get addBankName => _t('addBankName');
+  String get addBankLast4 => _t('addBankLast4');
+  String get addBankBalance => _t('addBankBalance');
+  String get addBankColor => _t('addBankColor');
+  String get addBankSave => _t('addBankSave');
+  String get addBankNameRequired => _t('addBankNameRequired');
+  String bankAdded(String name) =>
+      _t('bankAdded').replaceAll('{name}', name);
   String get umaInsight => _t('umaInsight');
   String get spent => _t('spent');
   String get incoming => _t('incoming');
@@ -118,6 +128,7 @@ class AppStrings {
   String get scanAgain => _t('scanAgain');
   String get addToTransactions => _t('addToTransactions');
   String get addedToTransactions => _t('addedToTransactions');
+  String get scanNoTotal => _t('scanNoTotal');
   String get parsedByAi => _t('parsedByAi');
   String get parsedFallback => _t('parsedFallback');
 
@@ -144,6 +155,7 @@ class AppStrings {
       _t('detectedTransactions').replaceAll('{n}', '$n');
   String get statementImportAgain => _t('statementImportAgain');
   String get statementImported => _t('statementImported');
+  String get statementNoTransactions => _t('statementNoTransactions');
   String get importToVera => _t('importToVera');
 
   // ---- UMA forward to bank ----
@@ -197,6 +209,30 @@ class AppStrings {
   String get accountTileSecurity => _t('accountTileSecurity');
   String get accountTileStorage => _t('accountTileStorage');
   String get accountTileHelp => _t('accountTileHelp');
+  String get infoDisplayName => _t('infoDisplayName');
+  String get infoMember => _t('infoMember');
+  String get infoMemberDescription => _t('infoMemberDescription');
+  String get infoEmailLabel => _t('infoEmailLabel');
+  String get infoEmailUsage => _t('infoEmailUsage');
+  String get infoEmailDescription => _t('infoEmailDescription');
+  String get infoSessionVault => _t('infoSessionVault');
+  String get infoSessionVaultDescription => _t('infoSessionVaultDescription');
+  String get infoFaceId => _t('infoFaceId');
+  String get infoFaceIdOn => _t('infoFaceIdOn');
+  String get infoFaceIdOff => _t('infoFaceIdOff');
+  String get infoFraudAlerts => _t('infoFraudAlerts');
+  String get infoFraudAlertsOn => _t('infoFraudAlertsOn');
+  String get infoFraudAlertsOff => _t('infoFraudAlertsOff');
+  String get infoSyncMode => _t('infoSyncMode');
+  String get infoLocalData => _t('infoLocalData');
+  String get infoLocalDataDescription => _t('infoLocalDataDescription');
+  String get helpFaqQ1 => _t('helpFaqQ1');
+  String get helpFaqA1 => _t('helpFaqA1');
+  String get helpFaqQ2 => _t('helpFaqQ2');
+  String get helpFaqA2 => _t('helpFaqA2');
+  String get helpFaqQ3 => _t('helpFaqQ3');
+  String get helpFaqA3 => _t('helpFaqA3');
+  String get helpContact => _t('helpContact');
   String get demoUser => _t('demoUser');
 
   // ---- UMA chat misc ----
@@ -238,6 +274,16 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} işlem',
     'itemsVisible': 'görünür',
     'connectBank': 'Banka ekle',
+    'addBankTitle': 'Banka ekle',
+    'addBankSubtitle':
+        'Vera bankaya bağlanmıyor — sen ekliyorsun, bakiyeyi takip ediyor.',
+    'addBankName': 'Banka adı',
+    'addBankLast4': 'Son 4 hane',
+    'addBankBalance': 'Bakiye (TL)',
+    'addBankColor': 'Renk',
+    'addBankSave': 'Bankayı ekle',
+    'addBankNameRequired': 'Banka adı gerekli.',
+    'bankAdded': '{name} eklendi',
     'umaInsight': 'UMA İÇGÖRÜ',
     'spent': 'Harcanan',
     'incoming': 'Gelen',
@@ -302,6 +348,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanAgain': 'Yeniden tara',
     'addToTransactions': 'İşlemlerime ekle',
     'addedToTransactions': 'İşlemlerine eklendi',
+    'scanNoTotal': 'Tutar okunamadı, fişi tekrar tara.',
     'parsedByAi': 'AI',
     'parsedFallback': 'DEMO',
     'savingsStoryLabel': 'BU AY TASARRUF',
@@ -320,6 +367,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'detectedTransactions': '{n} işlem tespit edildi',
     'statementImportAgain': 'Yeniden yükle',
     'statementImported': 'Ekstre işlemlerine eklendi',
+    'statementNoTransactions': 'Ekstreden işlem çıkarılamadı.',
     'importToVera': "Vera'ya aktar",
     'openBankApp': '{bank} uygulamasını aç',
     'umaForwardNote': 'İşlem bankanda tamamlanır. Vera SMS veya ekstreyle sonucu yakalar.',
@@ -355,6 +403,40 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': 'Güvenlik & PIN',
     'accountTileStorage': 'Veri saklama',
     'accountTileHelp': 'Yardım & destek',
+    'infoDisplayName': 'Görünen ad',
+    'infoMember': 'Üyelik',
+    'infoMemberDescription':
+        'Vera demo hesabı. Backend bağlandığında gerçek üyelik tarihi ve plan bilgisi burada görünür.',
+    'infoEmailLabel': 'E-posta adresi',
+    'infoEmailUsage': 'Nerede kullanılır',
+    'infoEmailDescription':
+        'Demo oturumu için kullanılıyor. Veriler cihazda kalır, sunucuya gönderilmez.',
+    'infoSessionVault': 'Oturum kasası',
+    'infoSessionVaultDescription':
+        'Oturum verisi flutter_secure_storage ile cihazda şifreli saklanır. Yalnızca bu cihazda erişilebilir.',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn':
+        'Etkin · oturum açıldığında biyometrik doğrulama istenir.',
+    'infoFaceIdOff': 'Kapalı · sadece şifre / demo girişi yeterli.',
+    'infoFraudAlerts': 'Fraud uyarıları',
+    'infoFraudAlertsOn':
+        'Etkin · şüpheli işlem tespit edilince yerel bildirim gönderir.',
+    'infoFraudAlertsOff':
+        'Kapalı · uyarılar sadece uygulama içinde görünür.',
+    'infoSyncMode': 'Senkron modu',
+    'infoLocalData': 'Yerel veri',
+    'infoLocalDataDescription':
+        'OCR fişleri ve banka eklemeleri SharedPreferences\'ta tutuluyor. "Verileri dışa aktar" P1 backlog\'unda.',
+    'helpFaqQ1': 'Vera bankama bağlanır mı?',
+    'helpFaqA1':
+        'Hayır. Vera AISP/PSP lisansı taşımıyor. Veriyi sen getiriyorsun: PDF ekstre, fiş fotoğrafı, ekran görüntüsü ya da manuel giriş. Vera AI ile birleştirip yorumluyor ve doğru bankaya yönlendiriyor.',
+    'helpFaqQ2': 'Verim nerede saklanıyor?',
+    'helpFaqA2':
+        'Hassas oturum bilgisi flutter_secure_storage ile şifreli yerel kasada; OCR ve ekleme işlemleri SharedPreferences\'ta. Sunucu yok, üçüncü tarafa veri gitmiyor.',
+    'helpFaqQ3': 'Gemini API key yoksa ne olur?',
+    'helpFaqA3':
+        'OCR ve ekstre import deterministic fallback ile çalışır (DEMO rozeti görünür). UMA chat heuristic intent router ile cevap verir. Tüm akış çalışır, sadece AI parsing canlı değildir.',
+    'helpContact': 'İletişim',
     'demoUser': 'Demo kullanıcı',
     'umaThinking': 'Uma düşünüyor...',
     'umaAskHint': "Uma'ya sor...",
@@ -389,6 +471,16 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} items',
     'itemsVisible': 'visible',
     'connectBank': 'Connect bank',
+    'addBankTitle': 'Add a bank',
+    'addBankSubtitle':
+        "Vera doesn't connect to banks — you add them and track the balance.",
+    'addBankName': 'Bank name',
+    'addBankLast4': 'Last 4 digits',
+    'addBankBalance': 'Balance (TL)',
+    'addBankColor': 'Color',
+    'addBankSave': 'Add bank',
+    'addBankNameRequired': 'Bank name is required.',
+    'bankAdded': '{name} added',
     'umaInsight': 'UMA INSIGHT',
     'spent': 'Spent',
     'incoming': 'In',
@@ -453,6 +545,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanAgain': 'Scan again',
     'addToTransactions': 'Add to transactions',
     'addedToTransactions': 'Added to your transactions',
+    'scanNoTotal': "Couldn't read the amount, scan again.",
     'parsedByAi': 'AI',
     'parsedFallback': 'DEMO',
     'savingsStoryLabel': 'SAVED THIS MONTH',
@@ -471,6 +564,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'detectedTransactions': '{n} transactions detected',
     'statementImportAgain': 'Import again',
     'statementImported': 'Added to your transactions',
+    'statementNoTransactions': 'No transactions could be extracted.',
     'importToVera': 'Import to Vera',
     'openBankApp': 'Open {bank}',
     'umaForwardNote': 'The action completes inside your bank app. Vera tracks the outcome via SMS or statement.',
@@ -506,6 +600,41 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': 'Security & PIN',
     'accountTileStorage': 'Storage policy',
     'accountTileHelp': 'Help & support',
+    'infoDisplayName': 'Display name',
+    'infoMember': 'Membership',
+    'infoMemberDescription':
+        'Vera demo account. Once a backend is wired in, real membership date and plan show up here.',
+    'infoEmailLabel': 'Email address',
+    'infoEmailUsage': 'Where it is used',
+    'infoEmailDescription':
+        'Used for the demo session. Data stays on device; nothing is sent to a server.',
+    'infoSessionVault': 'Session vault',
+    'infoSessionVaultDescription':
+        'Session data is encrypted via flutter_secure_storage and stored locally on this device only.',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn':
+        'On — biometric verification is requested when you sign in.',
+    'infoFaceIdOff':
+        'Off — password / demo sign-in is enough.',
+    'infoFraudAlerts': 'Fraud alerts',
+    'infoFraudAlertsOn':
+        'On — sends a local notification when a suspicious event is detected.',
+    'infoFraudAlertsOff':
+        'Off — alerts only show inside the app.',
+    'infoSyncMode': 'Sync mode',
+    'infoLocalData': 'Local data',
+    'infoLocalDataDescription':
+        'OCR receipts and added banks live in SharedPreferences. "Export your data" is in the P1 backlog.',
+    'helpFaqQ1': 'Does Vera connect to my bank?',
+    'helpFaqA1':
+        'No. Vera does not hold an AISP/PSP license. You bring the data: PDF statements, receipt photos, screenshots, or manual entries. Vera combines and interprets it with AI and forwards real actions to your bank app.',
+    'helpFaqQ2': 'Where is my data stored?',
+    'helpFaqA2':
+        'Sensitive session info goes to flutter_secure_storage (encrypted, on-device). OCR and add-bank entries go to SharedPreferences. No server, no third-party data sharing.',
+    'helpFaqQ3': 'What if I do not have a Gemini API key?',
+    'helpFaqA3':
+        'OCR and statement import run a deterministic fallback (DEMO badge appears). UMA chat replies via a heuristic intent router. The whole flow still works — only the live AI parsing is off.',
+    'helpContact': 'Contact',
     'demoUser': 'Demo user',
     'umaThinking': 'Uma is thinking...',
     'umaAskHint': 'Ask Uma anything...',
@@ -540,6 +669,16 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} Einträge',
     'itemsVisible': 'sichtbar',
     'connectBank': 'Bank verbinden',
+    'addBankTitle': 'Bank hinzufügen',
+    'addBankSubtitle':
+        'Vera verbindet sich nicht — du fügst hinzu, der Saldo wird mitgeführt.',
+    'addBankName': 'Bankname',
+    'addBankLast4': 'Letzte 4 Ziffern',
+    'addBankBalance': 'Saldo (TL)',
+    'addBankColor': 'Farbe',
+    'addBankSave': 'Bank hinzufügen',
+    'addBankNameRequired': 'Bankname erforderlich.',
+    'bankAdded': '{name} hinzugefügt',
     'umaInsight': 'UMA EINBLICK',
     'spent': 'Ausgegeben',
     'incoming': 'Eingang',
@@ -603,6 +742,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanTotalLabel': 'Summe',
     'scanAgain': 'Erneut scannen',
     'addToTransactions': 'Zu Buchungen',
+    'scanNoTotal': 'Betrag nicht erkannt, bitte erneut scannen.',
     'addedToTransactions': 'Hinzugefügt',
     'parsedByAi': 'KI',
     'parsedFallback': 'DEMO',
@@ -621,6 +761,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'closingBalance': 'Schlussbestand',
     'detectedTransactions': '{n} Buchungen erkannt',
     'statementImportAgain': 'Erneut importieren',
+    'statementNoTransactions': 'Keine Buchungen erkannt.',
     'statementImported': 'Zu deinen Buchungen hinzugefügt',
     'importToVera': 'Zu Vera importieren',
     'openBankApp': '{bank} öffnen',
@@ -657,6 +798,41 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': 'Sicherheit & PIN',
     'accountTileStorage': 'Datenspeicherung',
     'accountTileHelp': 'Hilfe & Support',
+    'infoDisplayName': 'Anzeigename',
+    'infoMember': 'Mitgliedschaft',
+    'infoMemberDescription':
+        'Vera-Demo-Konto. Sobald ein Backend angeschlossen ist, erscheinen hier echtes Beitrittsdatum und Plan.',
+    'infoEmailLabel': 'E-Mail-Adresse',
+    'infoEmailUsage': 'Wofür sie verwendet wird',
+    'infoEmailDescription':
+        'Für die Demo-Sitzung verwendet. Daten bleiben auf dem Gerät, nichts geht an einen Server.',
+    'infoSessionVault': 'Session-Vault',
+    'infoSessionVaultDescription':
+        'Sitzungsdaten werden via flutter_secure_storage verschlüsselt und nur lokal auf diesem Gerät gespeichert.',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn':
+        'An — beim Anmelden wird biometrische Bestätigung verlangt.',
+    'infoFaceIdOff':
+        'Aus — Passwort / Demo-Login genügt.',
+    'infoFraudAlerts': 'Fraud-Warnungen',
+    'infoFraudAlertsOn':
+        'An — sendet eine lokale Benachrichtigung bei verdächtigen Ereignissen.',
+    'infoFraudAlertsOff':
+        'Aus — Warnungen erscheinen nur in der App.',
+    'infoSyncMode': 'Sync-Modus',
+    'infoLocalData': 'Lokale Daten',
+    'infoLocalDataDescription':
+        'OCR-Belege und hinzugefügte Banken liegen in SharedPreferences. "Daten exportieren" ist im P1-Backlog.',
+    'helpFaqQ1': 'Verbindet Vera sich mit meiner Bank?',
+    'helpFaqA1':
+        'Nein. Vera hat keine AISP/PSP-Lizenz. Du bringst die Daten: PDF-Auszüge, Belegfotos, Screenshots oder manuelle Einträge. Vera fügt sie mit KI zusammen und leitet reale Aktionen an deine Bank-App weiter.',
+    'helpFaqQ2': 'Wo werden meine Daten gespeichert?',
+    'helpFaqA2':
+        'Sensible Sitzungsdaten im flutter_secure_storage (verschlüsselt, auf dem Gerät). OCR und Bankeinträge in SharedPreferences. Kein Server, keine Datenweitergabe an Dritte.',
+    'helpFaqQ3': 'Was passiert ohne Gemini API-Key?',
+    'helpFaqA3':
+        'OCR und Statement-Import laufen mit deterministischem Fallback (DEMO-Badge erscheint). UMA-Chat antwortet über einen heuristischen Intent-Router. Der gesamte Flow funktioniert — nur das Live-AI-Parsing ist aus.',
+    'helpContact': 'Kontakt',
     'demoUser': 'Demo-Nutzer',
     'umaThinking': 'Uma denkt nach...',
     'umaAskHint': 'Frag Uma...',
@@ -691,6 +867,15 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} عناصر',
     'itemsVisible': 'مرئية',
     'connectBank': 'ربط بنك',
+    'addBankTitle': 'إضافة بنك',
+    'addBankSubtitle': 'Vera لا تتصل بالبنوك — تضيفها وتتابع الرصيد.',
+    'addBankName': 'اسم البنك',
+    'addBankLast4': 'آخر 4 أرقام',
+    'addBankBalance': 'الرصيد (TL)',
+    'addBankColor': 'اللون',
+    'addBankSave': 'إضافة بنك',
+    'addBankNameRequired': 'اسم البنك مطلوب.',
+    'bankAdded': 'تمت إضافة {name}',
     'umaInsight': 'رؤية UMA',
     'spent': 'منفق',
     'incoming': 'وارد',
@@ -754,6 +939,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanTotalLabel': 'الإجمالي',
     'scanAgain': 'مسح مجددًا',
     'addToTransactions': 'أضف إلى المعاملات',
+    'scanNoTotal': 'تعذرت قراءة المبلغ، أعد المسح.',
     'addedToTransactions': 'تمت الإضافة',
     'parsedByAi': 'ذكاء',
     'parsedFallback': 'تجريبي',
@@ -772,6 +958,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'closingBalance': 'الرصيد الختامي',
     'detectedTransactions': 'تم اكتشاف {n} معاملة',
     'statementImportAgain': 'استيراد مجددًا',
+    'statementNoTransactions': 'لم يتم استخراج أي معاملات.',
     'statementImported': 'تمت الإضافة إلى معاملاتك',
     'importToVera': 'استيراد إلى Vera',
     'openBankApp': 'فتح {bank}',
@@ -808,6 +995,39 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': 'الأمان وPIN',
     'accountTileStorage': 'سياسة التخزين',
     'accountTileHelp': 'مساعدة ودعم',
+    'infoDisplayName': 'الاسم المعروض',
+    'infoMember': 'العضوية',
+    'infoMemberDescription':
+        'حساب تجريبي في Vera. عند ربط الواجهة الخلفية ستظهر هنا بيانات العضوية الحقيقية والخطة.',
+    'infoEmailLabel': 'البريد الإلكتروني',
+    'infoEmailUsage': 'مكان الاستخدام',
+    'infoEmailDescription':
+        'يُستخدم في الجلسة التجريبية. البيانات تبقى على الجهاز ولا تُرسل لأي خادم.',
+    'infoSessionVault': 'خزينة الجلسة',
+    'infoSessionVaultDescription':
+        'بيانات الجلسة مشفّرة عبر flutter_secure_storage وتُحفظ محلياً على هذا الجهاز فقط.',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn':
+        'مفعل · يُطلب التحقق البيومتري عند تسجيل الدخول.',
+    'infoFaceIdOff': 'مغلق · يكفي كلمة المرور / الدخول التجريبي.',
+    'infoFraudAlerts': 'تنبيهات الاحتيال',
+    'infoFraudAlertsOn':
+        'مفعل · يرسل إشعاراً محلياً عند رصد عملية مشبوهة.',
+    'infoFraudAlertsOff': 'مغلق · التنبيهات تظهر داخل التطبيق فقط.',
+    'infoSyncMode': 'وضع المزامنة',
+    'infoLocalData': 'البيانات المحلية',
+    'infoLocalDataDescription':
+        'فواتير OCR والبنوك المُضافة تُحفظ في SharedPreferences. "تصدير البيانات" ضمن خطط P1.',
+    'helpFaqQ1': 'هل تتصل Vera بمصرفي؟',
+    'helpFaqA1':
+        'لا. Vera لا تحمل ترخيص AISP/PSP. أنت تجلب البيانات: كشوف PDF، صور إيصالات، لقطات شاشة، أو إدخال يدوي. Vera تجمعها بالذكاء الاصطناعي وتمرر الإجراءات إلى تطبيق مصرفك.',
+    'helpFaqQ2': 'أين تُحفظ بياناتي؟',
+    'helpFaqA2':
+        'بيانات الجلسة الحساسة في flutter_secure_storage (مشفّرة، على الجهاز). إدخالات OCR والبنوك في SharedPreferences. لا خادم ولا مشاركة مع أطراف ثالثة.',
+    'helpFaqQ3': 'ماذا يحدث بدون مفتاح Gemini API؟',
+    'helpFaqA3':
+        'OCR واستيراد الكشوف يعملان عبر بدائل ثابتة (شارة DEMO تظهر). UMA يرد عبر موجه نوايا استدلالي. كل التدفق يعمل — فقط التحليل المباشر بالذكاء الاصطناعي معطل.',
+    'helpContact': 'تواصل',
     'demoUser': 'مستخدم تجريبي',
     'umaThinking': 'Uma تفكر...',
     'umaAskHint': 'اسأل Uma...',
@@ -842,6 +1062,16 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} операций',
     'itemsVisible': 'видно',
     'connectBank': 'Подключить банк',
+    'addBankTitle': 'Добавить банк',
+    'addBankSubtitle':
+        'Vera не подключается к банкам — вы добавляете и отслеживаете баланс.',
+    'addBankName': 'Название банка',
+    'addBankLast4': 'Последние 4 цифры',
+    'addBankBalance': 'Баланс (TL)',
+    'addBankColor': 'Цвет',
+    'addBankSave': 'Добавить банк',
+    'addBankNameRequired': 'Название банка обязательно.',
+    'bankAdded': '{name} добавлен',
     'umaInsight': 'ИНСАЙТ UMA',
     'spent': 'Расход',
     'incoming': 'Доход',
@@ -905,6 +1135,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanTotalLabel': 'Итого',
     'scanAgain': 'Сканировать снова',
     'addToTransactions': 'Добавить к операциям',
+    'scanNoTotal': 'Сумма не распознана, отсканируйте снова.',
     'addedToTransactions': 'Добавлено',
     'parsedByAi': 'ИИ',
     'parsedFallback': 'DEMO',
@@ -923,6 +1154,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'closingBalance': 'Остаток',
     'detectedTransactions': 'Найдено {n} операций',
     'statementImportAgain': 'Импорт ещё раз',
+    'statementNoTransactions': 'Не удалось извлечь операции.',
     'statementImported': 'Добавлено в ваши операции',
     'importToVera': 'Импорт в Vera',
     'openBankApp': 'Открыть {bank}',
@@ -959,6 +1191,41 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': 'Безопасность и PIN',
     'accountTileStorage': 'Политика хранения',
     'accountTileHelp': 'Помощь и поддержка',
+    'infoDisplayName': 'Отображаемое имя',
+    'infoMember': 'Членство',
+    'infoMemberDescription':
+        'Демо-аккаунт Vera. После подключения бэкенда здесь появятся дата регистрации и план.',
+    'infoEmailLabel': 'Адрес электронной почты',
+    'infoEmailUsage': 'Где используется',
+    'infoEmailDescription':
+        'Используется для демо-сессии. Данные остаются на устройстве, на сервер ничего не отправляется.',
+    'infoSessionVault': 'Хранилище сессии',
+    'infoSessionVaultDescription':
+        'Данные сессии шифруются через flutter_secure_storage и хранятся только на этом устройстве.',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn':
+        'Вкл. — при входе требуется биометрическая проверка.',
+    'infoFaceIdOff':
+        'Выкл. — достаточно пароля / демо-входа.',
+    'infoFraudAlerts': 'Оповещения о мошенничестве',
+    'infoFraudAlertsOn':
+        'Вкл. — при подозрительной операции отправляется локальное уведомление.',
+    'infoFraudAlertsOff':
+        'Выкл. — оповещения показываются только в приложении.',
+    'infoSyncMode': 'Режим синхронизации',
+    'infoLocalData': 'Локальные данные',
+    'infoLocalDataDescription':
+        'OCR-чеки и добавленные банки хранятся в SharedPreferences. "Экспорт данных" — в P1-бэклоге.',
+    'helpFaqQ1': 'Vera подключается к моему банку?',
+    'helpFaqA1':
+        'Нет. У Vera нет лицензии AISP/PSP. Данные приносите вы: PDF-выписки, фото чеков, скриншоты или ручной ввод. Vera объединяет их с помощью ИИ и направляет действия в ваше банковское приложение.',
+    'helpFaqQ2': 'Где хранятся мои данные?',
+    'helpFaqA2':
+        'Чувствительные данные сессии — flutter_secure_storage (шифрование, на устройстве). OCR и записи о банках — SharedPreferences. Сервера нет, третьим лицам данные не передаются.',
+    'helpFaqQ3': 'Что если нет ключа Gemini API?',
+    'helpFaqA3':
+        'OCR и импорт выписок работают через детерминированный fallback (появляется бейдж DEMO). UMA отвечает через эвристический intent-роутер. Весь поток работает — отключён только live-парсинг ИИ.',
+    'helpContact': 'Контакт',
     'demoUser': 'Демо-пользователь',
     'umaThinking': 'Uma думает...',
     'umaAskHint': 'Спросите Uma...',
@@ -993,6 +1260,15 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'itemsCount': '{n} 笔',
     'itemsVisible': '显示',
     'connectBank': '连接银行',
+    'addBankTitle': '添加银行',
+    'addBankSubtitle': 'Vera 不连接银行——你来添加并跟踪余额。',
+    'addBankName': '银行名称',
+    'addBankLast4': '最后4位',
+    'addBankBalance': '余额 (TL)',
+    'addBankColor': '颜色',
+    'addBankSave': '添加银行',
+    'addBankNameRequired': '请填写银行名称。',
+    'bankAdded': '已添加 {name}',
     'umaInsight': 'UMA 洞察',
     'spent': '支出',
     'incoming': '收入',
@@ -1056,6 +1332,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'scanTotalLabel': '合计',
     'scanAgain': '重新扫描',
     'addToTransactions': '加入交易',
+    'scanNoTotal': '无法读取金额，请重新扫描。',
     'addedToTransactions': '已加入您的交易',
     'parsedByAi': 'AI',
     'parsedFallback': '演示',
@@ -1074,6 +1351,7 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'closingBalance': '期末余额',
     'detectedTransactions': '识别到 {n} 笔交易',
     'statementImportAgain': '重新导入',
+    'statementNoTransactions': '未能提取交易。',
     'statementImported': '已加入您的交易',
     'importToVera': '导入到 Vera',
     'openBankApp': '打开 {bank}',
@@ -1110,6 +1388,34 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'accountTileSecurity': '安全和 PIN',
     'accountTileStorage': '数据存储',
     'accountTileHelp': '帮助与支持',
+    'infoDisplayName': '显示名称',
+    'infoMember': '会员',
+    'infoMemberDescription': 'Vera 演示账号。后端接入后，这里将显示真实的注册日期和套餐。',
+    'infoEmailLabel': '电子邮箱',
+    'infoEmailUsage': '用途',
+    'infoEmailDescription': '用于演示会话。数据保存在本地设备，不会上传到服务器。',
+    'infoSessionVault': '会话保险箱',
+    'infoSessionVaultDescription': '会话数据通过 flutter_secure_storage 加密，仅在本机存储。',
+    'infoFaceId': 'Face ID',
+    'infoFaceIdOn': '启用 · 登录时需要生物识别验证。',
+    'infoFaceIdOff': '关闭 · 仅需密码 / 演示登录。',
+    'infoFraudAlerts': '欺诈提醒',
+    'infoFraudAlertsOn': '启用 · 检测到可疑活动时发送本地通知。',
+    'infoFraudAlertsOff': '关闭 · 提醒仅在应用内显示。',
+    'infoSyncMode': '同步模式',
+    'infoLocalData': '本地数据',
+    'infoLocalDataDescription':
+        'OCR 收据和已添加的银行保存在 SharedPreferences。"导出数据"已列入 P1 计划。',
+    'helpFaqQ1': 'Vera 会连接我的银行吗？',
+    'helpFaqA1':
+        '不会。Vera 没有 AISP/PSP 许可证。数据由你提供：PDF 账单、收据照片、截图或手动输入。Vera 用 AI 进行整合并把真实操作转发到你的银行 App。',
+    'helpFaqQ2': '我的数据保存在哪里？',
+    'helpFaqA2':
+        '敏感会话信息存储于 flutter_secure_storage（设备端加密）。OCR 和银行记录存储于 SharedPreferences。无服务器，无第三方共享。',
+    'helpFaqQ3': '没有 Gemini API key 会怎样？',
+    'helpFaqA3':
+        'OCR 和账单导入使用确定性回退（出现 DEMO 标签）。UMA 通过启发式意图路由器回复。整套流程仍可运行——仅关闭实时 AI 解析。',
+    'helpContact': '联系',
     'demoUser': '演示用户',
     'umaThinking': 'Uma 思考中...',
     'umaAskHint': '问 Uma 任何事...',

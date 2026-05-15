@@ -12,35 +12,38 @@ class SubscriptionsRepository {
 
   final RecurringTransactionParser _parser;
 
-  List<SubscriptionItem> getSubscriptions() {
+  List<SubscriptionItem> getSubscriptions({List<Txn> userTxns = const []}) {
+    // Merge user transactions with the seeded sample so the catalog matching
+    // still works in a totally fresh install.
+    final allTxns = [...userTxns, ...kTransactions];
     final detectedVendors =
-        _parser.detectVendors(kTransactions.map((txn) => txn.name).toList());
+        _parser.detectVendors(allTxns.map((txn) => txn.name).toList());
 
     final items = <SubscriptionItem>[
       SubscriptionItem(
         id: 'netflix',
         name: 'Netflix Premium',
         vendor: 'Netflix',
-        category: 'Entertainment',
+        category: 'Eğlence',
         monthlyPrice: 150,
         previousPrice: detectedVendors.contains('Netflix') ? 129 : 150,
-        renewalLabel: 'Renews in 2 days',
-        lastUsedLabel: 'Last watched 18 days ago',
+        renewalLabel: '2 gün içinde yenilenir',
+        lastUsedLabel: '18 gündür izlenmedi',
         status: SubscriptionStatus.priceIncreased,
-        recommendation: 'Downgrade one tier or pause until next month.',
+        recommendation: 'Bir alt pakete düş veya bu ay dondur.',
         icon: Icons.movie_outlined,
       ),
       const SubscriptionItem(
         id: 'spotify',
-        name: 'Spotify Family',
+        name: 'Spotify Aile',
         vendor: 'Spotify',
-        category: 'Music',
+        category: 'Müzik',
         monthlyPrice: 100,
         previousPrice: 100,
-        renewalLabel: 'Renews in 12 days',
-        lastUsedLabel: 'Used this morning',
+        renewalLabel: '12 gün içinde yenilenir',
+        lastUsedLabel: 'Bu sabah kullanıldı',
         status: SubscriptionStatus.healthy,
-        recommendation: 'Keep active. High usage across your household.',
+        recommendation: 'Aktif kalsın. Tüm hane sıkı kullanıyor.',
         icon: Icons.headphones_outlined,
       ),
       const SubscriptionItem(
@@ -50,11 +53,11 @@ class SubscriptionsRepository {
         category: 'Video',
         monthlyPrice: 58,
         previousPrice: 58,
-        renewalLabel: 'Renews tomorrow',
-        lastUsedLabel: 'No activity in 27 days',
+        renewalLabel: 'Yarın yenilenir',
+        lastUsedLabel: '27 gündür aktivite yok',
         status: SubscriptionStatus.unused,
         recommendation:
-            'Freeze this plan and save monthly without losing history.',
+            'Bu planı dondur, geçmişini kaybetmeden aylık tasarruf et.',
         icon: Icons.smart_display_outlined,
         canFreeze: true,
       ),
@@ -62,17 +65,27 @@ class SubscriptionsRepository {
         id: 'icloud',
         name: 'iCloud+ 200 GB',
         vendor: 'Apple',
-        category: 'Storage',
+        category: 'Depolama',
         monthlyPrice: 40,
         previousPrice: 40,
-        renewalLabel: 'Renews in 5 days',
-        lastUsedLabel: 'Storage 92% full',
+        renewalLabel: '5 gün içinde yenilenir',
+        lastUsedLabel: 'Depolama %92 dolu',
         status: SubscriptionStatus.renewalSoon,
         recommendation:
-            'Keep active, but review annual storage cost next cycle.',
+            'Aktif kalsın ama yıllık depolama maliyetini sonraki dönemde gözden geçir.',
         icon: Icons.cloud_outlined,
       ),
     ];
+
+    // Detect additional subscriptions in the user's imported transactions
+    // (receipt OCR + statement import). Dedupe against the seed by vendor.
+    final detected = _parser.detectSubscriptions(userTxns);
+    final seedVendors =
+        items.map((s) => s.vendor.toLowerCase()).toSet();
+    for (final d in detected) {
+      if (seedVendors.contains(d.vendor.toLowerCase())) continue;
+      items.add(d);
+    }
 
     return items;
   }
@@ -86,26 +99,26 @@ class SubscriptionsRepository {
 
     return [
       SubscriptionAlert(
-        title: 'Potential monthly savings',
+        title: 'Aylık tasarruf potansiyeli',
         message:
-            'Vera found subscriptions you can pause or downgrade without hurting your routine.',
-        metricLabel: 'SAVE',
-        metricValue: 'TL ${savings.toStringAsFixed(0)}',
+            'Vera, rutinini bozmadan dondurabileceğin veya alt pakete düşürebileceğin abonelikler buldu.',
+        metricLabel: 'KAZANÇ',
+        metricValue: '${savings.toStringAsFixed(0)} TL',
       ),
       SubscriptionAlert(
-        title: 'Price increase detected',
+        title: 'Fiyat artışı tespit edildi',
         message: priceUpItems.isEmpty
-            ? 'No unusual price jumps detected this cycle.'
-            : 'One or more plans increased in price compared with last month.',
-        metricLabel: 'RAISED',
+            ? 'Bu dönem alışılmadık fiyat sıçraması yok.'
+            : 'Bir veya daha fazla planın fiyatı geçen aya göre arttı.',
+        metricLabel: 'ARTAN',
         metricValue: '${priceUpItems.length}',
       ),
       SubscriptionAlert(
-        title: 'Low-usage plans',
+        title: 'Az kullanılan planlar',
         message: unusedItems == 0
-            ? 'All subscriptions show healthy engagement.'
-            : '$unusedItems plan looks underused based on your recent activity pattern.',
-        metricLabel: 'IDLE',
+            ? 'Tüm abonelikler sağlıklı kullanılıyor.'
+            : 'Son aktivite örüntüne göre $unusedItems plan az kullanılıyor görünüyor.',
+        metricLabel: 'BOŞTA',
         metricValue: '$unusedItems',
       ),
     ];
@@ -117,10 +130,10 @@ class SubscriptionsRepository {
         items.where((item) => item.status.needsAttention).length;
 
     if (needsAttention == 0) {
-      return 'Your subscriptions look healthy this month. No immediate savings leak stands out.';
+      return 'Abonelikler bu ay sağlıklı görünüyor. Acil bir tasarruf kaçağı yok.';
     }
 
-    return 'You have $needsAttention subscriptions that deserve a quick review. Vera estimates you can recover around TL ${savings.toStringAsFixed(0)} per month by pausing unused plans and downgrading recent price increases.';
+    return 'Hızlıca incelemen gereken $needsAttention abonelik var. Vera, kullanılmayanları dondurarak ve fiyat artışı olanları alt pakete düşürerek aylık ${savings.toStringAsFixed(0)} TL kadar geri kazanabileceğini hesaplıyor.';
   }
 
   double estimatedMonthlySavings(List<SubscriptionItem> items) {

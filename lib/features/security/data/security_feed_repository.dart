@@ -35,14 +35,14 @@ class SecurityFeedRepository {
       SecurityCheck(
         id: 900 + now.minute,
         name: now.minute.isEven
-            ? 'Merchant token refresh'
-            : 'Card-not-present · TL 129',
+            ? 'Cüzdan tokenı yenilendi'
+            : 'Karta dokunmadan ödeme · 129 TL',
         location: now.minute.isEven ? 'Apple Wallet' : 'Getir',
-        when: '${(now.second % 50) + 1} sec ago',
+        when: '${(now.second % 50) + 1} sn önce',
         blocked: !now.minute.isEven,
         reason: now.minute.isEven
             ? null
-            : 'The payment originated from a merchant pattern you have not used recently and the device signature did not match your last known checkout path.',
+            : 'Ödeme, son zamanlarda kullanmadığın bir satıcı örüntüsünden geldi ve cihaz imzası bilinen son ödeme yolu ile eşleşmedi.',
       ),
       ...kSecurityChecks.take(4),
     ];

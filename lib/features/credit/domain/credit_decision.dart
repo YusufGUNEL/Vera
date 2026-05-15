@@ -28,10 +28,24 @@ class CreditDecision {
   final int recommendedMonths;
   final int decisionTimeSeconds;
 
+  /// Internal band code; UI maps it to a localized label via AppStrings.
+  String get bandCode {
+    if (score >= 760) return 'excellent';
+    if (score >= 690) return 'strong';
+    if (score >= 620) return 'fair';
+    return 'watch';
+  }
+
   String get bandLabel {
-    if (score >= 760) return 'EXCELLENT';
-    if (score >= 690) return 'STRONG';
-    if (score >= 620) return 'FAIR';
-    return 'WATCH';
+    switch (bandCode) {
+      case 'excellent':
+        return 'EXCELLENT';
+      case 'strong':
+        return 'STRONG';
+      case 'fair':
+        return 'FAIR';
+      default:
+        return 'WATCH';
+    }
   }
 }

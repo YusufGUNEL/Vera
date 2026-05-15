@@ -122,17 +122,6 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
               controller: _inputController,
               onSubmit: _send,
               busy: state.thinking,
-              onUseMicHint: () {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Voice command UI is next on the roadmap. For now, try one of the quick actions.',
-                      ),
-                    ),
-                  );
-              },
             ),
           ],
         ),
@@ -434,13 +423,11 @@ class _Input extends StatelessWidget {
     required this.controller,
     required this.onSubmit,
     required this.busy,
-    required this.onUseMicHint,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onSubmit;
   final bool busy;
-  final VoidCallback onUseMicHint;
 
   @override
   Widget build(BuildContext context) {
@@ -462,11 +449,7 @@ class _Input extends StatelessWidget {
           ),
           child: Row(
             children: [
-              IconButton(
-                onPressed: busy ? null : onUseMicHint,
-                icon: Icon(Icons.mic_none_rounded, color: t.ink2, size: 18),
-                tooltip: context.l10n.voiceCommandTooltip,
-              ),
+              const SizedBox(width: 6),
               Expanded(
                 child: TextField(
                   controller: controller,

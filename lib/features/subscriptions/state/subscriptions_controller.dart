@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../home/data/transaction.dart';
+import '../../home/state/home_controller.dart';
 import '../data/subscriptions_repository.dart';
 import '../domain/subscription_alert.dart';
 import '../domain/subscription_item.dart';
@@ -56,15 +58,22 @@ class SubscriptionsState {
 }
 
 class SubscriptionsController extends StateNotifier<SubscriptionsState> {
-  SubscriptionsController(this._repository)
+  SubscriptionsController(this._repository, this._ref)
       : super(const SubscriptionsState()) {
     _load();
+    _sub = _ref.listen<List<Txn>>(
+      homeControllerProvider.select((s) => s.transactions),
+      (_, __) => _load(),
+    );
   }
 
   final SubscriptionsRepository _repository;
+  final Ref _ref;
+  ProviderSubscription<List<Txn>>? _sub;
 
   void _load() {
-    final items = _repository.getSubscriptions();
+    final txns = _ref.read(homeControllerProvider).transactions;
+    final items = _repository.getSubscriptions(userTxns: txns);
     state = state.copyWith(
       items: items,
       alerts: _repository.buildAlerts(items),
@@ -75,9 +84,18 @@ class SubscriptionsController extends StateNotifier<SubscriptionsState> {
   void setFilter(SubscriptionFilter filter) {
     state = state.copyWith(filter: filter);
   }
+
+  @override
+  void dispose() {
+    _sub?.close();
+    super.dispose();
+  }
 }
 
 final subscriptionsControllerProvider =
     StateNotifierProvider<SubscriptionsController, SubscriptionsState>((ref) {
-  return SubscriptionsController(ref.watch(subscriptionsRepositoryProvider));
+  return SubscriptionsController(
+    ref.watch(subscriptionsRepositoryProvider),
+    ref,
+  );
 });

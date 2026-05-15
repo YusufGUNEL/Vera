@@ -14,6 +14,7 @@ import '../../auth/state/auth_controller.dart';
 import '../../home/data/bank.dart';
 import '../domain/profile_state.dart';
 import '../state/profile_controller.dart';
+import 'widgets/account_info_sheet.dart';
 
 class ProfileSettingsSheet extends ConsumerWidget {
   const ProfileSettingsSheet({super.key});
@@ -205,11 +206,17 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     icon: Icons.person_outline,
                     label: l10n.accountTilePersonal,
                     value: auth.displayName ?? l10n.demoUser,
+                    onTap: () => _openInfo(
+                      context,
+                      _personalInfo(l10n, auth),
+                    ),
                   ),
                   _AccountTile(
                     icon: Icons.email_outlined,
                     label: l10n.accountTileEmail,
                     value: auth.email ?? 'demo@vera.app',
+                    onTap: () =>
+                        _openInfo(context, _emailInfo(l10n, auth)),
                   ),
                   _AccountTile(
                     icon: Icons.lock_outline,
@@ -217,16 +224,21 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     value: profile.faceIdEnabled
                         ? 'Session vault + Face ID'
                         : 'Session vault only',
+                    onTap: () =>
+                        _openInfo(context, _securityInfo(l10n, profile)),
                   ),
                   _AccountTile(
                     icon: Icons.storage_outlined,
                     label: l10n.accountTileStorage,
                     value: _syncModeLabel(profile.dataSyncMode),
+                    onTap: () =>
+                        _openInfo(context, _storageInfo(l10n, profile)),
                   ),
                   _AccountTile(
                     icon: Icons.help_outline,
                     label: l10n.accountTileHelp,
                     value: auth.authMethod,
+                    onTap: () => _openInfo(context, _helpInfo(l10n)),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -252,6 +264,117 @@ class ProfileSettingsSheet extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _openInfo(BuildContext context, AccountInfoSheet sheet) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => sheet,
+    );
+  }
+
+  AccountInfoSheet _personalInfo(AppStrings l10n, AuthSession auth) {
+    return AccountInfoSheet(
+      title: l10n.accountTilePersonal,
+      icon: Icons.person_outline,
+      sections: [
+        AccountInfoSection(
+          label: l10n.infoDisplayName,
+          body: auth.displayName ?? l10n.demoUser,
+        ),
+        AccountInfoSection(
+          label: l10n.infoMember,
+          body: l10n.infoMemberDescription,
+        ),
+      ],
+    );
+  }
+
+  AccountInfoSheet _emailInfo(AppStrings l10n, AuthSession auth) {
+    return AccountInfoSheet(
+      title: l10n.accountTileEmail,
+      icon: Icons.email_outlined,
+      sections: [
+        AccountInfoSection(
+          label: l10n.infoEmailLabel,
+          body: auth.email ?? 'demo@vera.app',
+        ),
+        AccountInfoSection(
+          label: l10n.infoEmailUsage,
+          body: l10n.infoEmailDescription,
+        ),
+      ],
+    );
+  }
+
+  AccountInfoSheet _securityInfo(AppStrings l10n, ProfileState profile) {
+    return AccountInfoSheet(
+      title: l10n.accountTileSecurity,
+      icon: Icons.lock_outline,
+      sections: [
+        AccountInfoSection(
+          label: l10n.infoSessionVault,
+          body: l10n.infoSessionVaultDescription,
+        ),
+        AccountInfoSection(
+          label: l10n.infoFaceId,
+          body: profile.faceIdEnabled
+              ? l10n.infoFaceIdOn
+              : l10n.infoFaceIdOff,
+        ),
+        AccountInfoSection(
+          label: l10n.infoFraudAlerts,
+          body: profile.fraudAlertsEnabled
+              ? l10n.infoFraudAlertsOn
+              : l10n.infoFraudAlertsOff,
+        ),
+      ],
+    );
+  }
+
+  AccountInfoSheet _storageInfo(AppStrings l10n, ProfileState profile) {
+    return AccountInfoSheet(
+      title: l10n.accountTileStorage,
+      icon: Icons.storage_outlined,
+      sections: [
+        AccountInfoSection(
+          label: l10n.infoSyncMode,
+          body: _syncModeLabel(profile.dataSyncMode),
+        ),
+        AccountInfoSection(
+          label: l10n.infoLocalData,
+          body: l10n.infoLocalDataDescription,
+        ),
+      ],
+    );
+  }
+
+  AccountInfoSheet _helpInfo(AppStrings l10n) {
+    return AccountInfoSheet(
+      title: l10n.accountTileHelp,
+      icon: Icons.help_outline,
+      sections: [
+        AccountInfoSection(
+          label: l10n.helpFaqQ1,
+          body: l10n.helpFaqA1,
+        ),
+        AccountInfoSection(
+          label: l10n.helpFaqQ2,
+          body: l10n.helpFaqA2,
+        ),
+        AccountInfoSection(
+          label: l10n.helpFaqQ3,
+          body: l10n.helpFaqA3,
+        ),
+        AccountInfoSection(
+          label: l10n.helpContact,
+          body: 'support@vera.app · https://github.com/YusufGUNEL/Vera/issues',
+        ),
+      ],
     );
   }
 }
@@ -1003,11 +1126,13 @@ class _AccountTile extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1018,7 +1143,7 @@ class _AccountTile extends StatelessWidget {
         color: t.card,
         borderRadius: BorderRadius.circular(t.vibe.radius),
         child: InkWell(
-          onTap: () {},
+          onTap: onTap,
           borderRadius: BorderRadius.circular(t.vibe.radius),
           child: Container(
             padding: const EdgeInsets.all(16),

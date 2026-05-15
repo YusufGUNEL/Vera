@@ -44,14 +44,14 @@ class HomeFeedRepository {
     final transactions = [
       Txn(
         id: 1000 + now.minute,
-        name: now.minute.isEven ? 'Yemeksepeti' : 'Marti',
-        category: now.minute.isEven ? 'Food & Drink' : 'Transport',
+        name: now.minute.isEven ? 'Yemeksepeti' : 'Martı',
+        category: now.minute.isEven ? 'Yeme & İçme' : 'Ulaşım',
         icon: now.minute.isEven
             ? kTransactions[2].icon
             : const IconData(0xe1d5, fontFamily: 'MaterialIcons'),
         amount: now.minute.isEven ? -184 : -96,
         when:
-            'Today, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+            'Bugün, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
         color: now.minute.isEven
             ? const Color(0xFF8E5A3C)
             : const Color(0xFF2D5FB0),
@@ -61,7 +61,7 @@ class HomeFeedRepository {
 
     final total = banks.fold<double>(0, (sum, bank) => sum + bank.balance);
     final insight =
-        'Live sync completed. Vera refreshed ${banks.length} accounts and now tracks ${transactions.length} recent items. Cash position is ${total > 340000 ? 'healthy' : 'worth reviewing'} after the latest update.';
+        'Canlı senkron tamamlandı. Vera ${banks.length} hesabı yeniledi ve şu an ${transactions.length} son işlemi takip ediyor. Son güncellemeden sonra nakit pozisyonu ${total > 340000 ? 'sağlıklı' : 'gözden geçirilmeli'}.';
 
     final data = HomeFeedData(
       banks: banks,

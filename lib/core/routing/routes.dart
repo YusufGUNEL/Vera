@@ -3,6 +3,7 @@ class Routes {
   Routes._();
 
   static const String login = '/login';
+  static const String signup = '/signup';
   static const String home = '/';
   static const String wealth = '/wealth';
   static const String subscriptions = '/subscriptions';

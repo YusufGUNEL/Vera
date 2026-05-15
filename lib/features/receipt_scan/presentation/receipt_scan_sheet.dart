@@ -6,6 +6,8 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
+import '../../home/data/imported_transactions_store.dart';
+import '../../home/state/home_controller.dart';
 import '../domain/parsed_receipt.dart';
 import '../state/receipt_controller.dart';
 
@@ -336,9 +338,24 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
             const SizedBox(width: 10),
             Expanded(
               child: FilledButton(
-                onPressed: () {
+                onPressed: () async {
+                  final txn = r.toTxn();
+                  final messenger = ScaffoldMessenger.of(context);
+                  if (txn == null) {
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.scanNoTotal),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    return;
+                  }
+                  await ref
+                      .read(homeControllerProvider.notifier)
+                      .addImportedTransactions([txn]);
+                  if (!mounted) return;
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(l10n.addedToTransactions),
                       behavior: SnackBarBehavior.floating,

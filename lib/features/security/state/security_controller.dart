@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/services/notification_service.dart';
 import '../data/security_check.dart';
 import '../data/security_feed_repository.dart';
 import '../domain/security_feed_data.dart';
@@ -24,9 +25,9 @@ class SecurityState {
   final Map<int, ReviewDecision> decisions;
 
   String get refreshedLabel {
-    if (lastUpdated == null) return 'Waiting for first scan';
+    if (lastUpdated == null) return 'İlk tarama bekleniyor';
     final dt = lastUpdated!;
-    return 'Last scan ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    return 'Son tarama ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   int get blockedCount => checks.where((check) {
@@ -54,13 +55,17 @@ class SecurityState {
 }
 
 class SecurityController extends StateNotifier<SecurityState> {
-  SecurityController(this._repository) : super(const SecurityState()) {
+  SecurityController(this._repository, this._notifications)
+      : super(const SecurityState()) {
     _bootstrap();
     _timer = Timer.periodic(const Duration(seconds: 35), (_) => refresh());
   }
 
   final SecurityFeedRepository _repository;
+  final NotificationService _notifications;
   Timer? _timer;
+  final Set<int> _notifiedIds = <int>{};
+  bool _firstApplyDone = false;
 
   Future<void> _bootstrap() async {
     final cached = await _repository.loadCached();
@@ -104,6 +109,36 @@ class SecurityController extends StateNotifier<SecurityState> {
       lastUpdated: data.lastUpdated,
       expandedIds: expanded,
     );
+    // Fire one local notification per newly-blocked check. Bootstrap counts as
+    // first surface — we still want the demo to feel real on app launch.
+    if (_firstApplyDone) {
+      _fireNotificationsForNewBlocks(data.checks);
+    } else {
+      // On bootstrap, seed the notified set with existing blocked ids so we
+      // don't spam the device with notifications for the seeded demo data.
+      _notifiedIds.addAll(
+        data.checks.where((c) => c.blocked).map((c) => c.id),
+      );
+      _firstApplyDone = true;
+    }
+  }
+
+  Future<void> _fireNotificationsForNewBlocks(
+      List<SecurityCheck> checks) async {
+    for (final check in checks) {
+      if (!check.blocked) continue;
+      if (_notifiedIds.contains(check.id)) continue;
+      _notifiedIds.add(check.id);
+      try {
+        await _notifications.showFraudAlert(
+          title: 'Vera • Şüpheli işlem engellendi',
+          body: '${check.name} · ${check.location}',
+          payload: '/security',
+        );
+      } catch (_) {
+        // Notifications best-effort; never break the controller flow.
+      }
+    }
   }
 
   @override
@@ -115,5 +150,8 @@ class SecurityController extends StateNotifier<SecurityState> {
 
 final securityControllerProvider =
     StateNotifierProvider<SecurityController, SecurityState>((ref) {
-  return SecurityController(ref.watch(securityFeedRepositoryProvider));
+  return SecurityController(
+    ref.watch(securityFeedRepositoryProvider),
+    ref.watch(notificationServiceProvider),
+  );
 });

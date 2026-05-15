@@ -33,6 +33,7 @@ class IntentRouter {
 
     if (lower.contains('spend') ||
         lower.contains('analyze') ||
+        lower.contains('analiz') ||
         lower.contains('harca')) {
       return UmaIntent(
           type: UmaIntentType.analyzeSpending, originalText: userText);
@@ -73,7 +74,8 @@ class IntentRouter {
   }
 
   bool _isGoldIntent(String lower) {
-    return lower.contains('gold') &&
+    return (lower.contains('gold') || lower.contains('altın') ||
+            lower.contains('altin')) &&
         (lower.contains('buy') ||
             lower.contains('al') ||
             lower.contains('gram') ||

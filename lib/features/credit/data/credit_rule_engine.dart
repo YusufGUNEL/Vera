@@ -23,21 +23,21 @@ class CreditRuleEngine {
 
     final riskFactors = <RiskFactor>[
       RiskFactor(
-        title: 'Income stability',
+        title: 'Gelir istikrarı',
         detail: application.monthlyIncome >= 45000
-            ? 'Your verified monthly income supports a larger repayment envelope.'
-            : 'Income covers the request, but leaves less room for an aggressive offer.',
+            ? 'Doğrulanmış aylık geliriniz daha büyük bir ödeme zarfını destekliyor.'
+            : 'Geliriniz talebi karşılıyor ancak agresif bir teklif için manevra alanı bırakmıyor.',
         impact: application.monthlyIncome >= 45000
             ? RiskImpact.positive
             : RiskImpact.caution,
       ),
       RiskFactor(
-        title: 'Debt load',
+        title: 'Borç yükü',
         detail: dti <= 0.2
-            ? 'Existing obligations stay well below the healthy debt-to-income threshold.'
+            ? 'Mevcut yükümlülükler sağlıklı borç/gelir eşiğinin oldukça altında.'
             : dti <= 0.35
-                ? 'Current monthly debt is manageable, but it tightens the available offer.'
-                : 'Current monthly debt is high for this request and increases repayment risk.',
+                ? 'Aylık borç yönetilebilir ama mevcut teklifi daraltıyor.'
+                : 'Aylık borç bu talep için yüksek ve ödeme riskini artırıyor.',
         impact: dti <= 0.2
             ? RiskImpact.positive
             : dti <= 0.35
@@ -45,12 +45,12 @@ class CreditRuleEngine {
                 : RiskImpact.negative,
       ),
       RiskFactor(
-        title: 'Requested monthly burden',
+        title: 'Aylık ödeme yükü',
         detail: paymentLoad <= 0.18
-            ? 'The projected installment fits comfortably inside your income profile.'
+            ? 'Öngörülen taksit gelir profilinizin içinde rahatça kalıyor.'
             : paymentLoad <= 0.28
-                ? 'The projected installment is acceptable, but not best-in-class.'
-                : 'The projected installment would take too much of your monthly cash flow.',
+                ? 'Öngörülen taksit kabul edilebilir ancak ideal değil.'
+                : 'Öngörülen taksit aylık nakit akışınızın çok büyük bir kısmını alıyor.',
         impact: paymentLoad <= 0.18
             ? RiskImpact.positive
             : paymentLoad <= 0.28
@@ -64,23 +64,23 @@ class CreditRuleEngine {
         status: CreditDecisionStatus.approved,
         score: score,
         apr: 2.08,
-        summary: 'Approved for the best available rate',
+        summary: 'En iyi faiz oranıyla onaylandı',
         insight:
-            'Approved quickly because your income profile is strong, existing debt is light, and the projected installment stays inside a healthy range.',
+            'Hızla onaylandı: gelir profiliniz güçlü, mevcut borcunuz hafif ve öngörülen taksit sağlıklı aralıkta.',
         riskFactors: riskFactors,
         offers: const [
           OfferOption(
-              name: 'Personal loan',
-              rateLabel: 'from 2.08% APR',
-              tag: 'Best rate'),
+              name: 'İhtiyaç kredisi',
+              rateLabel: '%2,08 faizden başlayan',
+              tag: 'En iyi faiz'),
           OfferOption(
-              name: 'Auto loan',
-              rateLabel: 'from 2.21% APR',
-              tag: 'Pre-qualified'),
+              name: 'Taşıt kredisi',
+              rateLabel: '%2,21 faizden başlayan',
+              tag: 'Ön onaylı'),
           OfferOption(
-              name: 'Credit limit increase',
-              rateLabel: 'up to TL 35.000',
-              tag: 'Instant'),
+              name: 'Kart limit artışı',
+              rateLabel: '35.000 TL\'ye kadar',
+              tag: 'Anında'),
         ],
         recommendedAmount: application.amount,
         recommendedMonths: application.months,
@@ -95,22 +95,24 @@ class CreditRuleEngine {
         status: CreditDecisionStatus.review,
         score: score,
         apr: 2.56,
-        summary: 'Conditionally eligible with safer terms',
+        summary: 'Daha güvenli koşullarla şartlı uygun',
         insight:
-            'You are close to approval, but the current request stretches your monthly cash flow. Lowering the amount or extending the term would improve the offer quality.',
+            'Onaya yakınsın ama mevcut talep aylık nakit akışını zorluyor. Tutarı düşürmek veya vadeyi uzatmak teklifi iyileştirir.',
         riskFactors: riskFactors,
         offers: [
           OfferOption(
-            name: 'Adjusted personal loan',
-            rateLabel: 'TL ${adjustedAmount.round()} · $adjustedMonths mo',
-            tag: 'Safer fit',
+            name: 'Düzeltilmiş ihtiyaç kredisi',
+            rateLabel: '${adjustedAmount.round()} TL · $adjustedMonths ay',
+            tag: 'Güvenli',
           ),
           const OfferOption(
-              name: 'Auto loan', rateLabel: 'from 2.34% APR', tag: 'Review'),
+              name: 'Taşıt kredisi',
+              rateLabel: '%2,34 faizden başlayan',
+              tag: 'İnceleme'),
           const OfferOption(
-              name: 'Secured credit line',
-              rateLabel: 'from 1.98% APR',
-              tag: 'Alternative'),
+              name: 'Teminatlı kredi hattı',
+              rateLabel: '%1,98 faizden başlayan',
+              tag: 'Alternatif'),
         ],
         recommendedAmount: adjustedAmount,
         recommendedMonths: adjustedMonths,
@@ -122,23 +124,23 @@ class CreditRuleEngine {
       status: CreditDecisionStatus.declined,
       score: score,
       apr: 3.04,
-      summary: 'Request declined for now',
+      summary: 'Talep şimdilik reddedildi',
       insight:
-          'The requested payment would place too much pressure on your monthly income given current debt obligations. Reducing the loan size or improving debt ratio would meaningfully improve approval odds.',
+          'Talep edilen ödeme, mevcut borç yükümlülükleri göz önüne alındığında aylık gelirinize fazla baskı uyguluyor. Tutarı azaltmak veya borç oranını iyileştirmek onay şansını ciddi artırır.',
       riskFactors: riskFactors,
       offers: const [
         OfferOption(
-            name: 'Starter cash reserve plan',
-            rateLabel: 'Build 3 months buffer',
-            tag: 'Recommended'),
+            name: 'Acil nakit tampon planı',
+            rateLabel: '3 aylık tampon oluştur',
+            tag: 'Önerilen'),
         OfferOption(
-            name: 'Debt consolidation review',
-            rateLabel: 'Reduce monthly burden',
-            tag: 'Coaching'),
+            name: 'Borç yapılandırma incelemesi',
+            rateLabel: 'Aylık yükü azalt',
+            tag: 'Koçluk'),
         OfferOption(
-            name: 'Small-ticket credit line',
-            rateLabel: 'up to TL 20.000',
-            tag: 'Alternative'),
+            name: 'Küçük tutarlı kredi hattı',
+            rateLabel: '20.000 TL\'ye kadar',
+            tag: 'Alternatif'),
       ],
       recommendedAmount: application.amount * 0.55,
       recommendedMonths: application.months < 24 ? 24 : application.months,
