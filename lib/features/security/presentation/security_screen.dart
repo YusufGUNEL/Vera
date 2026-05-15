@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
@@ -14,6 +15,7 @@ class SecurityScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final state = ref.watch(securityControllerProvider);
 
     return SafeArea(
@@ -25,6 +27,34 @@ class SecurityScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 8, bottom: 130),
           children: [
             _Header(lastUpdatedLabel: state.refreshedLabel),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: t.umaSoft,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: t.uma.withValues(alpha: 0.18)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline, color: t.uma, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.securityVeraSideBanner,
+                        style: TextStyle(
+                          color: t.ink2,
+                          fontSize: 11.5,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
               child: Container(
@@ -69,8 +99,8 @@ class SecurityScreen extends ConsumerWidget {
                               ),
                               Text(
                                 state.blockedCount == 0
-                                    ? 'All clear'
-                                    : 'Monitoring',
+                                    ? l10n.statusAllClear
+                                    : l10n.statusMonitoring,
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -127,8 +157,9 @@ class SecurityScreen extends ConsumerWidget {
               ),
             ),
             SectionTitle(
-              title: 'Recent activity',
-              actionLabel: state.refreshing ? 'Scanning...' : 'Refresh',
+              title: l10n.securityRecentActivity,
+              actionLabel:
+                  state.refreshing ? l10n.securityScanning : l10n.refresh,
               onAction: () =>
                   ref.read(securityControllerProvider.notifier).refresh(),
             ),
@@ -180,13 +211,14 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Security',
+            l10n.securityTitle,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -196,7 +228,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Fraud Radar is always on and learns from your approvals.',
+            l10n.securitySubtitle,
             style: TextStyle(fontSize: 13, color: t.muted),
           ),
           const SizedBox(height: 6),
@@ -412,15 +444,15 @@ class _CheckTile extends StatelessWidget {
                         children: [
                           _InfoChip(
                             icon: Icons.location_on_outlined,
-                            text: 'Live anomaly detected',
+                            text: context.l10n.liveAnomalyDetected,
                             color: t.uma,
                           ),
                           const SizedBox(width: 12),
                           _InfoChip(
                             icon: Icons.bolt,
                             text: check.blocked
-                                ? 'High risk confidence'
-                                : 'Reviewed signal',
+                                ? context.l10n.highRiskConfidence
+                                : context.l10n.reviewedSignal,
                             color: t.uma,
                           ),
                         ],
@@ -441,7 +473,7 @@ class _CheckTile extends StatelessWidget {
                                   height: 34,
                                   alignment: Alignment.center,
                                   child: Text(
-                                    'Keep blocked',
+                                    context.l10n.keepBlocked,
                                     style: TextStyle(
                                       color: t.brandFG,
                                       fontSize: 12,
@@ -468,7 +500,7 @@ class _CheckTile extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
-                                    'This was me',
+                                    context.l10n.thisWasMe,
                                     style: TextStyle(
                                       color: t.ink2,
                                       fontSize: 12,

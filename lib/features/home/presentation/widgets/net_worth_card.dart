@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/font_weight_helper.dart';
 import '../../../../core/utils/formatters.dart';
@@ -10,16 +11,25 @@ class NetWorthCard extends StatelessWidget {
     required this.balance,
     required this.lastUpdatedLabel,
     required this.refreshing,
+    this.onSend,
+    this.onRequest,
+    this.onTopUp,
+    this.onPay,
     super.key,
   });
 
   final double balance;
   final String lastUpdatedLabel;
   final bool refreshing;
+  final VoidCallback? onSend;
+  final VoidCallback? onRequest;
+  final VoidCallback? onTopUp;
+  final VoidCallback? onPay;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -74,7 +84,7 @@ class NetWorthCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'TOTAL NET WORTH',
+                      l10n.totalNetWorth,
                       style: TextStyle(
                         color: t.brandFG.withValues(alpha: 0.7),
                         fontSize: 11,
@@ -83,7 +93,7 @@ class NetWorthCard extends StatelessWidget {
                       ),
                     ),
                     Pill(
-                      label: refreshing ? 'SYNCING' : 'LIVE FEED',
+                      label: refreshing ? l10n.syncing : l10n.liveFeed,
                       color: t.brandFG,
                       background: Colors.white.withValues(alpha: 0.10),
                       fontSize: 10,
@@ -116,7 +126,7 @@ class NetWorthCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'this month',
+                      l10n.thisMonth,
                       style: TextStyle(
                         color: t.brandFG.withValues(alpha: 0.7),
                         fontSize: 13,
@@ -133,15 +143,31 @@ class NetWorthCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
-                const Row(
+                Row(
                   children: [
-                    _QuickAction(icon: Icons.send_outlined, label: 'Send'),
-                    SizedBox(width: 8),
-                    _QuickAction(icon: Icons.south_west, label: 'Request'),
-                    SizedBox(width: 8),
-                    _QuickAction(icon: Icons.add, label: 'Top up'),
-                    SizedBox(width: 8),
-                    _QuickAction(icon: Icons.north_east, label: 'Pay'),
+                    _QuickAction(
+                      icon: Icons.send_outlined,
+                      label: l10n.actionSend,
+                      onTap: onSend,
+                    ),
+                    const SizedBox(width: 8),
+                    _QuickAction(
+                      icon: Icons.south_west,
+                      label: l10n.actionRequest,
+                      onTap: onRequest,
+                    ),
+                    const SizedBox(width: 8),
+                    _QuickAction(
+                      icon: Icons.add,
+                      label: l10n.actionTopUp,
+                      onTap: onTopUp,
+                    ),
+                    const SizedBox(width: 8),
+                    _QuickAction(
+                      icon: Icons.north_east,
+                      label: l10n.actionPay,
+                      onTap: onPay,
+                    ),
                   ],
                 ),
               ],
@@ -154,33 +180,42 @@ class NetWorthCard extends StatelessWidget {
 }
 
 class _QuickAction extends StatelessWidget {
-  const _QuickAction({required this.icon, required this.label});
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.10),
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(t.vibe.radiusSmall + 2),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(t.vibe.radiusSmall + 2),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: t.brandFG, size: 18),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: t.brandFG.withValues(alpha: 0.9),
-                fontSize: 11,
-              ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+            child: Column(
+              children: [
+                Icon(icon, color: t.brandFG, size: 18),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: t.brandFG.withValues(alpha: 0.9),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

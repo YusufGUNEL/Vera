@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../data/bank.dart';
 
 class ConnectedBanks extends StatelessWidget {
-  const ConnectedBanks({required this.banks, super.key});
+  const ConnectedBanks({
+    required this.banks,
+    this.onBankTap,
+    this.onAddBankTap,
+    super.key,
+  });
 
   final List<Bank> banks;
+  final ValueChanged<Bank>? onBankTap;
+  final VoidCallback? onAddBankTap;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +28,13 @@ class ConnectedBanks extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
           if (i == banks.length) {
-            return const _AddBankCard();
+            return _AddBankCard(onTap: onAddBankTap);
           }
-          return _BankCard(bank: banks[i]);
+          final bank = banks[i];
+          return _BankCard(
+            bank: bank,
+            onTap: onBankTap == null ? null : () => onBankTap!(bank),
+          );
         },
       ),
     );
@@ -30,97 +42,119 @@ class ConnectedBanks extends StatelessWidget {
 }
 
 class _BankCard extends StatelessWidget {
-  const _BankCard({required this.bank});
+  const _BankCard({required this.bank, this.onTap});
 
   final Bank bank;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Container(
-      width: 168,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: t.card,
+    return Material(
+      color: t.card,
+      borderRadius: BorderRadius.circular(t.vibe.radius - 2),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(t.vibe.radius - 2),
-        border: Border.all(color: t.line),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Container(
+          width: 168,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(t.vibe.radius - 2),
+            border: Border.all(color: t.line),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: bank.color,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  bank.shortCode,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: bank.color,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      bank.shortCode,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
-                ),
+                  Text(
+                    bank.last4,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: t.muted,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 12),
+              Text(bank.name, style: TextStyle(fontSize: 12, color: t.muted)),
+              const SizedBox(height: 2),
               Text(
-                bank.last4,
+                fmtTL(bank.balance),
                 style: TextStyle(
-                  fontSize: 11,
-                  color: t.muted,
-                  fontFamily: 'monospace',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: t.ink,
+                  letterSpacing: -0.3,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(bank.name, style: TextStyle(fontSize: 12, color: t.muted)),
-          const SizedBox(height: 2),
-          Text(
-            fmtTL(bank.balance),
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: t.ink,
-              letterSpacing: -0.3,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _AddBankCard extends StatelessWidget {
-  const _AddBankCard();
+  const _AddBankCard({this.onTap});
+
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Container(
-      width: 168,
-      decoration: BoxDecoration(
+    final l10n = context.l10n;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: t.line,
-          width: 1.5,
-          style: BorderStyle.solid,
+        child: Container(
+          width: 168,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: t.line,
+              width: 1.5,
+              style: BorderStyle.solid,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add, color: t.muted, size: 20),
+              const SizedBox(height: 6),
+              Text(
+                l10n.connectBank,
+                style: TextStyle(fontSize: 12, color: t.muted),
+              ),
+            ],
+          ),
         ),
-      ),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add, color: t.muted, size: 20),
-          const SizedBox(height: 6),
-          Text('Connect bank', style: TextStyle(fontSize: 12, color: t.muted)),
-        ],
       ),
     );
   }

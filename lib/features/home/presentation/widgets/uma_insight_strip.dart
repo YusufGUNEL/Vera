@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 
 class UmaInsightStrip extends StatelessWidget {
@@ -15,6 +16,7 @@ class UmaInsightStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Material(
@@ -50,7 +52,7 @@ class UmaInsightStrip extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'UMA INSIGHT',
+                        l10n.umaInsight,
                         style: TextStyle(
                           color: t.uma,
                           fontSize: 12,

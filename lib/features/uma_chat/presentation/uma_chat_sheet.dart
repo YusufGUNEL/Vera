@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../domain/uma_message.dart';
 import '../state/uma_controller.dart';
@@ -94,12 +95,12 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
                               ),
                               child: UmaOrderCard(
                                 card: message.card!,
-                                onConfirm: () => ref
+                                onForward: () => ref
                                     .read(umaControllerProvider.notifier)
-                                    .confirmOrder(i),
-                                onCancel: () => ref
+                                    .forwardOrder(i),
+                                onDismiss: () => ref
                                     .read(umaControllerProvider.notifier)
-                                    .cancelOrder(i),
+                                    .dismissOrder(i),
                               ),
                             ),
                         ],
@@ -221,7 +222,7 @@ class _Header extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'AI assistant · online',
+                      context.l10n.umaStatusOnline,
                       style: TextStyle(fontSize: 11, color: t.green),
                     ),
                   ],
@@ -254,6 +255,7 @@ class _SettingsDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
       decoration: BoxDecoration(
@@ -264,7 +266,7 @@ class _SettingsDrawer extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'TRADE EXECUTION',
+            l10n.umaActionPolicy,
             style: TextStyle(
               fontSize: 11,
               color: t.muted,
@@ -272,17 +274,21 @@ class _SettingsDrawer extends ConsumerWidget {
               letterSpacing: 0.4,
             ),
           ),
-          const SizedBox(height: 10),
-          for (final option in const [
-            (
-              AutoExecMode.auto,
-              'Auto-execute actions',
-              'Uma acts without asking, within guardrails'
+          const SizedBox(height: 8),
+          Text(
+            l10n.umaActionPolicyDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: t.ink2,
+              height: 1.45,
             ),
+          ),
+          const SizedBox(height: 10),
+          for (final option in [
             (
               AutoExecMode.confirm,
-              'Require my confirmation',
-              'Always show a confirmation card first'
+              l10n.requireConfirmation,
+              l10n.requireConfirmationDesc,
             ),
           ])
             Padding(
@@ -366,27 +372,27 @@ class _SuggestionStrip extends StatelessWidget {
   final ValueChanged<String> onTap;
   final bool disabled;
 
-  static const _suggestions = [
-    'Buy 10g gold',
-    'Pay my credit card',
-    'Show my subscriptions',
-    'Move 2500 TL to savings',
-    'Analyze my spending',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
+    final suggestions = [
+      l10n.umaSuggestionBuyGold,
+      l10n.umaSuggestionPay,
+      l10n.umaSuggestionSubs,
+      l10n.umaSuggestionMoveSavings,
+      l10n.umaSuggestionAnalyze,
+    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       child: SizedBox(
         height: 38,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          itemCount: _suggestions.length,
+          itemCount: suggestions.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (_, i) {
-            final suggestion = _suggestions[i];
+            final suggestion = suggestions[i];
             return Material(
               color: t.card,
               borderRadius: BorderRadius.circular(999),
@@ -459,7 +465,7 @@ class _Input extends StatelessWidget {
               IconButton(
                 onPressed: busy ? null : onUseMicHint,
                 icon: Icon(Icons.mic_none_rounded, color: t.ink2, size: 18),
-                tooltip: 'Voice command',
+                tooltip: context.l10n.voiceCommandTooltip,
               ),
               Expanded(
                 child: TextField(
@@ -471,8 +477,9 @@ class _Input extends StatelessWidget {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
-                    hintText:
-                        busy ? 'Uma is thinking...' : 'Ask Uma anything...',
+                    hintText: busy
+                        ? context.l10n.umaThinking
+                        : context.l10n.umaAskHint,
                     hintStyle: TextStyle(color: t.muted, fontSize: 15),
                   ),
                 ),

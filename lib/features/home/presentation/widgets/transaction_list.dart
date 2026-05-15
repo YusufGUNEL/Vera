@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/vera_card.dart';
 import '../../data/transaction.dart';
 
 class TransactionList extends StatelessWidget {
-  const TransactionList({required this.transactions, super.key});
+  const TransactionList({
+    required this.transactions,
+    this.onTap,
+    super.key,
+  });
 
   final List<Txn> transactions;
+  final ValueChanged<Txn>? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,11 @@ class TransactionList extends StatelessWidget {
           children: [
             for (var i = 0; i < groups.length; i++) ...[
               if (i != 0) const SizedBox(height: 8),
-              _TransactionGroup(group: groups[i], isFirst: i == 0),
+              _TransactionGroup(
+                group: groups[i],
+                isFirst: i == 0,
+                onTap: onTap,
+              ),
             ],
           ],
         ),
@@ -34,14 +44,17 @@ class _TransactionGroup extends StatelessWidget {
   const _TransactionGroup({
     required this.group,
     required this.isFirst,
+    this.onTap,
   });
 
   final _TxnGroup group;
   final bool isFirst;
+  final ValueChanged<Txn>? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final spent = group.transactions
         .where((txn) => !txn.isCredit)
         .fold<double>(0, (sum, txn) => sum + txn.amount.abs());
@@ -69,7 +82,7 @@ class _TransactionGroup extends StatelessWidget {
                 ),
               ),
               Text(
-                '${group.transactions.length} items',
+                l10n.itemsCount(group.transactions.length),
                 style: TextStyle(fontSize: 12, color: t.muted),
               ),
               const SizedBox(width: 8),
@@ -89,13 +102,13 @@ class _TransactionGroup extends StatelessWidget {
           child: Row(
             children: [
               _SummaryPill(
-                label: 'Spent ${fmtTL(spent)}',
+                label: '${l10n.spent} ${fmtTL(spent)}',
                 color: t.ink2,
                 background: t.bgSoft,
               ),
               const SizedBox(width: 8),
               _SummaryPill(
-                label: 'In ${fmtTL(income)}',
+                label: '${l10n.incoming} ${fmtTL(income)}',
                 color: t.green,
                 background: t.green.withValues(alpha: 0.08),
               ),
@@ -104,7 +117,10 @@ class _TransactionGroup extends StatelessWidget {
         ),
         for (var i = 0; i < group.transactions.length; i++) ...[
           if (i != 0) Divider(height: 1, color: t.line),
-          _TxnTile(txn: group.transactions[i]),
+          _TxnTile(
+            txn: group.transactions[i],
+            onTap: onTap == null ? null : () => onTap!(group.transactions[i]),
+          ),
         ],
       ],
     );
@@ -112,16 +128,19 @@ class _TransactionGroup extends StatelessWidget {
 }
 
 class _TxnTile extends StatelessWidget {
-  const _TxnTile({required this.txn});
+  const _TxnTile({required this.txn, this.onTap});
 
   final Txn txn;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
         children: [
           Container(
             width: 38,
@@ -165,6 +184,7 @@ class _TxnTile extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

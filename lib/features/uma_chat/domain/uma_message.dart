@@ -1,6 +1,6 @@
 enum UmaRole { uma, user }
 
-enum OrderStatus { review, confirmed, cancelled }
+enum OrderStatus { review, forwarded, dismissed }
 
 enum UmaActionType { buyGold, payCreditCard, moveToSavings }
 
@@ -11,10 +11,10 @@ class OrderCard {
     required this.from,
     required this.to,
     required this.amount,
-    required this.balanceDelta,
-    required this.successMessage,
+    required this.bankApp,
     this.detailLabel,
     this.detailValue,
+    this.note,
     this.status = OrderStatus.review,
   });
 
@@ -23,10 +23,10 @@ class OrderCard {
   final String from;
   final String to;
   final double amount;
-  final double balanceDelta;
-  final String successMessage;
+  final String bankApp;
   final String? detailLabel;
   final String? detailValue;
+  final String? note;
   final OrderStatus status;
 
   OrderCard copyWith({OrderStatus? status}) => OrderCard(
@@ -35,10 +35,10 @@ class OrderCard {
         from: from,
         to: to,
         amount: amount,
-        balanceDelta: balanceDelta,
-        successMessage: successMessage,
+        bankApp: bankApp,
         detailLabel: detailLabel,
         detailValue: detailValue,
+        note: note,
         status: status ?? this.status,
       );
 }

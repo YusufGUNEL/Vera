@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
-import '../../../shared/widgets/toggle_switch.dart';
 import '../../../shared/widgets/vera_card.dart';
 import '../domain/autonomy_policy.dart';
 import '../domain/rebalance_action.dart';
@@ -18,6 +18,7 @@ class WealthScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final state = ref.watch(wealthControllerProvider);
     final portfolio = [
       for (final allocation in state.allocations)
@@ -49,7 +50,7 @@ class WealthScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'PORTFOLIO',
+                              l10n.portfolio,
                               style: TextStyle(
                                 color: t.muted,
                                 fontSize: 12,
@@ -69,7 +70,7 @@ class WealthScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '+TL 4.820 (1.4%) today',
+                              '+TL 4.820 (1.4%) ${l10n.today}',
                               style: TextStyle(color: t.green, fontSize: 13),
                             ),
                           ],
@@ -82,7 +83,7 @@ class WealthScreen extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'YTD',
+                              l10n.ytd,
                               style: TextStyle(
                                 color: t.muted,
                                 fontSize: 10,
@@ -158,13 +159,13 @@ class WealthScreen extends ConsumerWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: state.policy.enabled ? t.uma : t.bgSoft,
+                          color: t.uma,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,
-                        child: Icon(
+                        child: const Icon(
                           Icons.auto_awesome,
-                          color: state.policy.enabled ? Colors.white : t.muted,
+                          color: Colors.white,
                           size: 18,
                         ),
                       ),
@@ -173,32 +174,18 @@ class WealthScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Autonomous Wealth',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: t.ink,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                ),
-                                ToggleSwitch(
-                                  on: state.policy.enabled,
-                                  onChanged: (v) => ref
-                                      .read(wealthControllerProvider.notifier)
-                                      .setAutonomous(v),
-                                ),
-                              ],
+                            Text(
+                              l10n.thisMonthsAiPlan,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: t.ink,
+                                letterSpacing: -0.2,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              state.policy.enabled
-                                  ? 'Uma can rebalance within your guardrails and will ask for confirmation on larger moves.'
-                                  : 'Automation is paused. Vera is still watching drift and will wait for your decision.',
+                              l10n.aiPlanFooter,
                               style: TextStyle(
                                 color: t.muted,
                                 fontSize: 12,
@@ -215,21 +202,21 @@ class WealthScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _PolicyChip(
-                          label: 'PROFILE',
+                          label: l10n.profile,
                           value: state.policy.riskProfile,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _PolicyChip(
-                          label: 'MOVE LIMIT',
+                          label: l10n.moveLimit,
                           value: fmtTL(state.policy.monthlyMoveLimit),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _PolicyChip(
-                          label: 'APPROVAL',
+                          label: l10n.approval,
                           value: _approvalLabel(state.policy.approvalMode),
                         ),
                       ),
@@ -275,12 +262,33 @@ class WealthScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.applyAtBank),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: Text(l10n.applyAtBank),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: t.brand,
+                        foregroundColor: t.brandFG,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-          const SectionTitle(
-              title: 'Activity feed', actionLabel: 'Explainability'),
+          SectionTitle(
+              title: l10n.activityFeed, actionLabel: l10n.explainability),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: VeraCard(
@@ -313,13 +321,14 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Wealth',
+            l10n.wealthTitle,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -329,7 +338,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Your money, working autonomously.',
+            l10n.wealthSubtitle,
             style: TextStyle(fontSize: 13, color: t.muted),
           ),
         ],
@@ -473,7 +482,7 @@ class _ActivityRow extends StatelessWidget {
                   children: [
                     if (onUndo != null) ...[
                       _SmallBtn(
-                        label: 'Undo',
+                        label: context.l10n.undo,
                         icon: Icons.undo,
                         background: t.bgSoft,
                         color: t.ink2,
@@ -482,10 +491,17 @@ class _ActivityRow extends StatelessWidget {
                       const SizedBox(width: 8),
                     ],
                     _SmallBtn(
-                      label: 'View details',
+                      label: context.l10n.viewDetails,
                       background: Colors.transparent,
                       color: t.brand,
                       bordered: true,
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(context.l10n.comingSoon),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      ),
                     ),
                   ],
                 ),

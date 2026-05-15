@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
@@ -17,6 +18,7 @@ class SubscriptionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final state = ref.watch(subscriptionsControllerProvider);
 
     return SafeArea(
@@ -33,7 +35,7 @@ class SubscriptionsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SUBSCRIPTION INTELLIGENCE',
+                    l10n.subscriptionIntelligence,
                     style: TextStyle(
                       color: t.muted,
                       fontSize: 12,
@@ -112,8 +114,8 @@ class SubscriptionsScreen extends ConsumerWidget {
             ),
           ),
           SectionTitle(
-            title: 'Detected plans',
-            actionLabel: '${state.visibleItems.length} visible',
+            title: l10n.detectedPlans,
+            actionLabel: '${state.visibleItems.length} ${l10n.itemsVisible}',
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -123,7 +125,7 @@ class SubscriptionsScreen extends ConsumerWidget {
               children: [
                 for (final filter in SubscriptionFilter.values)
                   _FilterChip(
-                    label: _filterLabel(filter),
+                    label: _filterLabel(filter, l10n),
                     selected: state.filter == filter,
                     onTap: () => ref
                         .read(subscriptionsControllerProvider.notifier)
@@ -158,13 +160,14 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Plans',
+            l10n.plansTitle,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -174,7 +177,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Catch silent money leaks before they stack up.',
+            l10n.plansSubtitle,
             style: TextStyle(fontSize: 13, color: t.muted),
           ),
         ],
@@ -391,13 +394,15 @@ class _SubscriptionTile extends StatelessWidget {
                 Row(
                   children: [
                     _ActionChip(
-                      label: item.canFreeze ? 'Freeze plan' : 'Review plan',
+                      label: item.canFreeze
+                          ? context.l10n.freezePlan
+                          : context.l10n.reviewPlan,
                       foreground: t.brand,
                       background: t.brandSoft.withValues(alpha: 0.16),
                     ),
                     const SizedBox(width: 8),
                     _ActionChip(
-                      label: 'Ask Uma',
+                      label: context.l10n.askUma,
                       foreground: t.uma,
                       background: t.umaSoft,
                     ),
@@ -520,11 +525,11 @@ _StatusSpec _statusSpec(SubscriptionStatus status, AppTokens t) {
   };
 }
 
-String _filterLabel(SubscriptionFilter filter) {
+String _filterLabel(SubscriptionFilter filter, AppStrings l10n) {
   return switch (filter) {
-    SubscriptionFilter.all => 'All',
-    SubscriptionFilter.attention => 'Needs attention',
-    SubscriptionFilter.unused => 'Unused',
-    SubscriptionFilter.priceChanges => 'Price changes',
+    SubscriptionFilter.all => l10n.filterAll,
+    SubscriptionFilter.attention => l10n.filterAttention,
+    SubscriptionFilter.unused => l10n.filterUnused,
+    SubscriptionFilter.priceChanges => l10n.filterPriceChanges,
   };
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_locale.dart';
+import '../../../core/localization/app_strings.dart';
+import '../../../core/localization/locale_controller.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/palette.dart';
 import '../../../core/theme/tweaks_controller.dart';
@@ -18,11 +21,14 @@ class ProfileSettingsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final tweaks = ref.watch(tweaksControllerProvider);
     final tweaksCtrl = ref.read(tweaksControllerProvider.notifier);
     final auth = ref.watch(authControllerProvider);
     final profile = ref.watch(profileControllerProvider);
     final profileCtrl = ref.read(profileControllerProvider.notifier);
+    final currentLocale = ref.watch(localeControllerProvider);
+    final localeCtrl = ref.read(localeControllerProvider.notifier);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.92,
@@ -57,7 +63,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   ),
                   Expanded(
                     child: Text(
-                      'Profile & Settings',
+                      l10n.profileAndSettings,
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
@@ -76,14 +82,21 @@ class ProfileSettingsSheet extends ConsumerWidget {
                 children: [
                   _ProfileCard(
                     initials: auth.initials,
-                    name: auth.displayName ?? 'Vera User',
+                    name: auth.displayName ?? l10n.defaultUserName,
                     email: auth.email ?? 'demo@vera.app',
                     aiTone: profile.aiTone,
                   ),
                   const SizedBox(height: 12),
                   _SessionVaultCard(auth: auth, profile: profile),
                   const SizedBox(height: 24),
-                  const _SectionLabel(label: 'APPEARANCE & THEMING'),
+                  _SectionLabel(label: l10n.sectionLanguage),
+                  const SizedBox(height: 8),
+                  _LanguageSelector(
+                    selected: currentLocale,
+                    onChange: localeCtrl.setLocale,
+                  ),
+                  const SizedBox(height: 24),
+                  _SectionLabel(label: l10n.sectionAppearance),
                   const SizedBox(height: 8),
                   _PaletteSelector(
                     selected: tweaks.paletteId,
@@ -91,35 +104,35 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   _SegmentedSelector<MoodId>(
-                    label: 'Mood',
+                    label: l10n.mood,
                     selected: tweaks.mood,
-                    options: const [
-                      (MoodId.light, 'Light'),
-                      (MoodId.dark, 'Dark'),
+                    options: [
+                      (MoodId.light, l10n.moodLight),
+                      (MoodId.dark, l10n.moodDark),
                     ],
                     onChange: tweaksCtrl.setMood,
                   ),
                   const SizedBox(height: 12),
                   _SegmentedSelector<VibeId>(
-                    label: 'Vibe',
+                    label: l10n.vibe,
                     selected: tweaks.vibeId,
-                    options: const [
-                      (VibeId.calm, 'Calm'),
-                      (VibeId.standard, 'Standard'),
-                      (VibeId.bold, 'Bold'),
+                    options: [
+                      (VibeId.calm, l10n.vibeCalm),
+                      (VibeId.standard, l10n.vibeStandard),
+                      (VibeId.bold, l10n.vibeBold),
                     ],
                     onChange: tweaksCtrl.setVibe,
                   ),
                   const SizedBox(height: 24),
-                  const _SectionLabel(label: 'AI PREFERENCES'),
+                  _SectionLabel(label: l10n.sectionAi),
                   const SizedBox(height: 8),
                   _SegmentedSelector<AiTone>(
-                    label: 'Uma tone',
+                    label: l10n.umaTone,
                     selected: profile.aiTone,
-                    options: const [
-                      (AiTone.concise, 'Concise'),
-                      (AiTone.coach, 'Coach'),
-                      (AiTone.proactive, 'Proactive'),
+                    options: [
+                      (AiTone.concise, l10n.toneConcise),
+                      (AiTone.coach, l10n.toneCoach),
+                      (AiTone.proactive, l10n.toneProactive),
                     ],
                     onChange: profileCtrl.setAiTone,
                   ),
@@ -182,37 +195,37 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     onChanged: profileCtrl.setFraudAlerts,
                   ),
                   const SizedBox(height: 24),
-                  const _SectionLabel(label: 'CONNECTED INSTITUTIONS'),
+                  _SectionLabel(label: l10n.sectionConnected),
                   const SizedBox(height: 8),
                   const _ConnectedInstitutionsCard(),
                   const SizedBox(height: 24),
-                  const _SectionLabel(label: 'ACCOUNT'),
+                  _SectionLabel(label: l10n.sectionAccount),
                   const SizedBox(height: 8),
                   _AccountTile(
                     icon: Icons.person_outline,
-                    label: 'Personal info',
-                    value: auth.displayName ?? 'Demo user',
+                    label: l10n.accountTilePersonal,
+                    value: auth.displayName ?? l10n.demoUser,
                   ),
                   _AccountTile(
                     icon: Icons.email_outlined,
-                    label: 'Email',
+                    label: l10n.accountTileEmail,
                     value: auth.email ?? 'demo@vera.app',
                   ),
                   _AccountTile(
                     icon: Icons.lock_outline,
-                    label: 'Security & PIN',
+                    label: l10n.accountTileSecurity,
                     value: profile.faceIdEnabled
                         ? 'Session vault + Face ID'
                         : 'Session vault only',
                   ),
                   _AccountTile(
                     icon: Icons.storage_outlined,
-                    label: 'Storage policy',
+                    label: l10n.accountTileStorage,
                     value: _syncModeLabel(profile.dataSyncMode),
                   ),
                   _AccountTile(
                     icon: Icons.help_outline,
-                    label: 'Help & support',
+                    label: l10n.accountTileHelp,
                     value: auth.authMethod,
                   ),
                   const SizedBox(height: 20),
@@ -230,7 +243,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                         side: BorderSide(color: t.red.withValues(alpha: 0.35)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('Sign out'),
+                      child: Text(l10n.signOut),
                     ),
                   ),
                 ],
@@ -495,6 +508,117 @@ class _SectionLabel extends StatelessWidget {
           color: t.muted,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageSelector extends StatelessWidget {
+  const _LanguageSelector({
+    required this.selected,
+    required this.onChange,
+  });
+
+  final AppLocale selected;
+  final ValueChanged<AppLocale> onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(t.vibe.radius),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.language,
+            style: TextStyle(
+              fontSize: 14,
+              color: t.muted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            selected.label,
+            style: TextStyle(
+              fontSize: 16,
+              color: t.ink,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final locale in AppLocale.values)
+                _LanguageChip(
+                  locale: locale,
+                  selected: locale == selected,
+                  onTap: () => onChange(locale),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageChip extends StatelessWidget {
+  const _LanguageChip({
+    required this.locale,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AppLocale locale;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Material(
+      color: selected ? t.uma : t.bgSoft,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                locale.short,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: selected ? Colors.white : t.muted,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                locale.label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? Colors.white : t.ink2,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/font_weight_helper.dart';
 import '../../../core/utils/formatters.dart';
@@ -315,13 +316,14 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Credit',
+            l10n.creditTitle,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w600,
@@ -331,7 +333,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Borrowing built around your real income.',
+            l10n.creditSubtitle,
             style: TextStyle(fontSize: 13, color: t.muted),
           ),
         ],

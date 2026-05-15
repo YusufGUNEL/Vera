@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/localization/app_locale.dart';
+import 'core/localization/app_strings.dart';
+import 'core/localization/locale_controller.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_tokens.dart';
@@ -15,22 +19,41 @@ class VeraApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = ref.watch(tokensProvider);
     final auth = ref.watch(authControllerProvider);
+    final locale = ref.watch(localeControllerProvider);
+    final strings = ref.watch(stringsProvider);
+
+    final supportedLocales = AppLocale.values.map((l) => l.toLocale()).toList();
+
+    final localizationsDelegates = const <LocalizationsDelegate<dynamic>>[
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ];
 
     return TokensProvider(
       tokens: tokens,
-      child: auth.status == AuthStatus.loading
-          ? MaterialApp(
-              title: 'Vera',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.fromTokens(tokens),
-              home: _AppLoading(tokens: tokens),
-            )
-          : MaterialApp.router(
-              title: 'Vera',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.fromTokens(tokens),
-              routerConfig: ref.watch(appRouterProvider),
-            ),
+      child: StringsProvider(
+        strings: strings,
+        child: auth.status == AuthStatus.loading
+            ? MaterialApp(
+                title: 'Vera',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.fromTokens(tokens),
+                locale: locale.toLocale(),
+                supportedLocales: supportedLocales,
+                localizationsDelegates: localizationsDelegates,
+                home: _AppLoading(tokens: tokens),
+              )
+            : MaterialApp.router(
+                title: 'Vera',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.fromTokens(tokens),
+                locale: locale.toLocale(),
+                supportedLocales: supportedLocales,
+                localizationsDelegates: localizationsDelegates,
+                routerConfig: ref.watch(appRouterProvider),
+              ),
+      ),
     );
   }
 }

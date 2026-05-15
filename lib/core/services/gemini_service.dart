@@ -7,15 +7,25 @@ import '../config/env.dart';
 
 /// Gemini API ile tek dokunma noktasi.
 /// Tum feature'lar buradan gecsin - direkt GenerativeModel insantsiate etmeyin.
+///
+/// API key tanimsiz ise servis "offline mode"da boot eder; uretim cagrilari
+/// [MissingGeminiKeyException] firlatir. Repository katmaninda her cagri
+/// try/catch ile fallback'e baglanmalidir (bkz. docs/GEMINI.md).
 class GeminiService {
   GeminiService._(this._model);
 
-  final GenerativeModel _model;
+  final GenerativeModel? _model;
+
+  bool get isAvailable => _model != null;
 
   factory GeminiService.create() {
+    final apiKey = Env.geminiApiKey;
+    if (apiKey == null) {
+      return GeminiService._(null);
+    }
     final model = GenerativeModel(
       model: Env.geminiModel,
-      apiKey: Env.geminiApiKey,
+      apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
         maxOutputTokens: 2048,
@@ -26,13 +36,17 @@ class GeminiService {
 
   /// Tek seferlik metin uretimi (tek prompt, tek cevap).
   Future<String> generateText(String prompt) async {
-    final response = await _model.generateContent([Content.text(prompt)]);
+    final model = _model;
+    if (model == null) throw const MissingGeminiKeyException();
+    final response = await model.generateContent([Content.text(prompt)]);
     return response.text ?? '';
   }
 
   /// Streaming metin uretimi - chat icin ideal.
   Stream<String> streamText(String prompt) async* {
-    final stream = _model.generateContentStream([Content.text(prompt)]);
+    final model = _model;
+    if (model == null) throw const MissingGeminiKeyException();
+    final stream = model.generateContentStream([Content.text(prompt)]);
     await for (final chunk in stream) {
       if (chunk.text != null) yield chunk.text!;
     }
@@ -40,7 +54,9 @@ class GeminiService {
 
   /// Multi-turn chat baslatir. Konusma gecmisini Gemini saklar.
   ChatSession startChat({List<Content>? history}) {
-    return _model.startChat(history: history ?? []);
+    final model = _model;
+    if (model == null) throw const MissingGeminiKeyException();
+    return model.startChat(history: history ?? []);
   }
 
   /// Multimodal: gorsel + metin.
@@ -49,7 +65,9 @@ class GeminiService {
     required String prompt,
     String mimeType = 'image/jpeg',
   }) async {
-    final response = await _model.generateContent([
+    final model = _model;
+    if (model == null) throw const MissingGeminiKeyException();
+    final response = await model.generateContent([
       Content.multi([
         TextPart(prompt),
         DataPart(mimeType, imageBytes),
@@ -57,6 +75,14 @@ class GeminiService {
     ]);
     return response.text ?? '';
   }
+}
+
+class MissingGeminiKeyException implements Exception {
+  const MissingGeminiKeyException();
+
+  @override
+  String toString() =>
+      'GEMINI_API_KEY tanimli degil. .env dosyasina ekleyince Gemini aktiflesir.';
 }
 
 /// Riverpod provider - tum feature'lar bunu kullansin.

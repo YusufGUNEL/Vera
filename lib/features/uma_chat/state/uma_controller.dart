@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../home/state/balance_controller.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_message.dart';
 
@@ -12,7 +11,7 @@ class UmaState {
       UmaMessage(
         role: UmaRole.uma,
         text:
-            'Hi Mert. Gold is up 1.8% today. I can help you rebalance, pay a card bill, or move money into savings.',
+            'Hi Mert. I read your latest statement — your monthly spend is 14% below last month. I can help you pay a card bill, plan a transfer, or look at gold pricing. The action happens in your bank app; I prepare it and track the result.',
       ),
     ],
     this.thinking = false,
@@ -42,10 +41,9 @@ class UmaState {
 }
 
 class UmaController extends StateNotifier<UmaState> {
-  UmaController(this._repository, this._ref) : super(const UmaState());
+  UmaController(this._repository) : super(const UmaState());
 
   final UmaRepository _repository;
-  final Ref _ref;
 
   Future<void> send(String text) async {
     if (text.trim().isEmpty || state.thinking) return;
@@ -62,43 +60,32 @@ class UmaController extends StateNotifier<UmaState> {
     );
   }
 
-  void confirmOrder(int messageIndex) {
+  /// Order'i kullanicinin kendi bankasina yonlendirildi olarak isaretler.
+  /// Vera burada para hareketi yapmaz - sadece kullaniciyi banka uygulamasina
+  /// yonlendirdigimizi kayda alir.
+  void forwardOrder(int messageIndex) {
     final msg = state.messages[messageIndex];
     final card = msg.card;
     if (card == null || card.status != OrderStatus.review) return;
 
-    if (card.balanceDelta < 0) {
-      _ref.read(balanceProvider.notifier).debit(card.balanceDelta.abs());
-    } else if (card.balanceDelta > 0) {
-      _ref.read(balanceProvider.notifier).credit(card.balanceDelta);
-    }
-
-    final updated =
-        msg.copyWith(card: card.copyWith(status: OrderStatus.confirmed));
+    final updated = msg.copyWith(card: card.copyWith(status: OrderStatus.forwarded));
     final list = [...state.messages]..[messageIndex] = updated;
     state = state.copyWith(
       messages: list,
-      toast: '${card.title} confirmed · ${card.amount.toStringAsFixed(0)} TL',
+      toast: '${card.title} · ${card.bankApp}',
     );
-
-    final newBalance = _ref.read(balanceProvider);
-    Future.delayed(const Duration(milliseconds: 500), () {
-      final confirm =
-          _repository.actionConfirmation(card: card, newBalance: newBalance);
-      state = state.copyWith(messages: [...state.messages, confirm]);
-    });
 
     Future.delayed(const Duration(milliseconds: 2800), () {
       state = state.copyWith(clearToast: true);
     });
   }
 
-  void cancelOrder(int messageIndex) {
+  void dismissOrder(int messageIndex) {
     final msg = state.messages[messageIndex];
     final card = msg.card;
     if (card == null || card.status != OrderStatus.review) return;
     final updated =
-        msg.copyWith(card: card.copyWith(status: OrderStatus.cancelled));
+        msg.copyWith(card: card.copyWith(status: OrderStatus.dismissed));
     final list = [...state.messages]..[messageIndex] = updated;
     state = state.copyWith(messages: list);
   }
@@ -110,5 +97,5 @@ class UmaController extends StateNotifier<UmaState> {
 
 final umaControllerProvider =
     StateNotifierProvider<UmaController, UmaState>((ref) {
-  return UmaController(ref.watch(umaRepositoryProvider), ref);
+  return UmaController(ref.watch(umaRepositoryProvider));
 });

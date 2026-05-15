@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../state/auth_controller.dart';
 
@@ -81,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 14),
               _Field(
-                label: 'Email',
+                label: context.l10n.emailField,
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -103,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     foregroundColor: t.brandFG,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  child: const Text('Continue with demo account'),
+                  child: Text(context.l10n.continueWithDemo),
                 ),
               ),
               const SizedBox(height: 12),
