@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../auth/state/auth_controller.dart';
 import '../../receipt_scan/domain/parsed_receipt.dart';
 import '../../statement_import/domain/parsed_statement.dart';
+import 'firebase_imported_transactions_service.dart';
 import 'transaction.dart';
 
 const _kImportedTxnsKey = 'home.imported.txns';
@@ -16,11 +18,46 @@ const _kImportedTxnsKey = 'home.imported.txns';
 /// The HomeController merges this list with the feed-driven mock data: imports
 /// always appear at the top of the transaction list, in newest-first order.
 class ImportedTransactionsStore {
-  const ImportedTransactionsStore();
+  const ImportedTransactionsStore(this._firebaseService);
+
+  final FirebaseImportedTransactionsService _firebaseService;
 
   Future<List<Txn>> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kImportedTxnsKey);
+    final local = _decode(raw);
+
+    if (!_firebaseService.isEnabled) return local;
+
+    final remote = await _firebaseService.load();
+    if (remote.isEmpty) return local;
+    await _saveLocal(remote);
+    return remote;
+  }
+
+  Future<void> save(List<Txn> txns) async {
+    await _saveLocal(txns);
+    if (_firebaseService.isEnabled) {
+      await _firebaseService.saveAll(txns);
+    }
+  }
+
+  Future<List<Txn>> append(List<Txn> newTxns) async {
+    final existing = await load();
+    final merged = [...newTxns, ...existing];
+    await save(merged);
+    return merged;
+  }
+
+  Future<void> clear() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kImportedTxnsKey);
+    if (_firebaseService.isEnabled) {
+      await _firebaseService.saveAll(const []);
+    }
+  }
+
+  List<Txn> _decode(String? raw) {
     if (raw == null || raw.isEmpty) return const [];
     try {
       final decoded = jsonDecode(raw);
@@ -34,28 +71,19 @@ class ImportedTransactionsStore {
     }
   }
 
-  Future<void> save(List<Txn> txns) async {
+  Future<void> _saveLocal(List<Txn> txns) async {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(txns.map((t) => t.toMap()).toList());
     await prefs.setString(_kImportedTxnsKey, encoded);
-  }
-
-  Future<List<Txn>> append(List<Txn> newTxns) async {
-    final existing = await load();
-    final merged = [...newTxns, ...existing];
-    await save(merged);
-    return merged;
-  }
-
-  Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kImportedTxnsKey);
   }
 }
 
 final importedTransactionsStoreProvider =
     Provider<ImportedTransactionsStore>((ref) {
-  return const ImportedTransactionsStore();
+  ref.watch(authControllerProvider);
+  return ImportedTransactionsStore(
+    ref.watch(firebaseImportedTransactionsServiceProvider),
+  );
 });
 
 /// Maps a category code (whatever Gemini returned or what the user picked) to

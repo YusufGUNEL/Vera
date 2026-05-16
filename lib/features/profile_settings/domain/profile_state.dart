@@ -40,4 +40,42 @@ class ProfileState {
       autoApproveLimit: autoApproveLimit ?? this.autoApproveLimit,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'notificationsEnabled': notificationsEnabled,
+      'faceIdEnabled': faceIdEnabled,
+      'fraudAlertsEnabled': fraudAlertsEnabled,
+      'dailyBriefingEnabled': dailyBriefingEnabled,
+      'aiTone': aiTone.name,
+      'dataSyncMode': dataSyncMode.name,
+      'autoApproveLimit': autoApproveLimit,
+    };
+  }
+
+  factory ProfileState.fromMap(Map<String, dynamic> map) {
+    return ProfileState(
+      notificationsEnabled: map['notificationsEnabled'] as bool? ?? true,
+      faceIdEnabled: map['faceIdEnabled'] as bool? ?? true,
+      fraudAlertsEnabled: map['fraudAlertsEnabled'] as bool? ?? true,
+      dailyBriefingEnabled: map['dailyBriefingEnabled'] as bool? ?? true,
+      aiTone: _toneByName(map['aiTone'] as String?),
+      dataSyncMode: _syncModeByName(map['dataSyncMode'] as String?),
+      autoApproveLimit: (map['autoApproveLimit'] as num?)?.toInt() ?? 2500,
+    );
+  }
+}
+
+AiTone _toneByName(String? name) {
+  for (final tone in AiTone.values) {
+    if (tone.name == name) return tone;
+  }
+  return AiTone.coach;
+}
+
+DataSyncMode _syncModeByName(String? name) {
+  for (final mode in DataSyncMode.values) {
+    if (mode.name == name) return mode;
+  }
+  return DataSyncMode.live;
 }

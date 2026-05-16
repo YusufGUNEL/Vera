@@ -371,6 +371,19 @@ class AppStrings {
   String get umaSuggestionMoveSavings => _t('umaSuggestionMoveSavings');
   String get umaActionPolicy => _t('umaActionPolicy');
   String get umaActionPolicyDesc => _t('umaActionPolicyDesc');
+  String get umaFeedbackLabel => _t('umaFeedbackLabel');
+  String get umaFeedbackHelpful => _t('umaFeedbackHelpful');
+  String get umaFeedbackNotHelpful => _t('umaFeedbackNotHelpful');
+  String get umaFeedbackAddNote => _t('umaFeedbackAddNote');
+  String get umaFeedbackEditNote => _t('umaFeedbackEditNote');
+  String get umaFeedbackHelpfulTitle => _t('umaFeedbackHelpfulTitle');
+  String get umaFeedbackNotHelpfulTitle => _t('umaFeedbackNotHelpfulTitle');
+  String get umaFeedbackNoteHint => _t('umaFeedbackNoteHint');
+  String get umaFeedbackPlaceholder => _t('umaFeedbackPlaceholder');
+  String get umaFeedbackSave => _t('umaFeedbackSave');
+  String get umaFeedbackSkipNote => _t('umaFeedbackSkipNote');
+  String get umaFeedbackSaved => _t('umaFeedbackSaved');
+  String get umaFeedbackSavedWithNote => _t('umaFeedbackSavedWithNote');
 
   // ---- Category budget ----
   String get categoryBudgetLabel => _t('categoryBudgetLabel');
@@ -1275,6 +1288,21 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'umaPromptTopUp': 'I want to top up my account.',
     'umaPromptPay': 'I want to pay my credit card bill.',
     'umaPromptAnalyze': 'Analyze my spending this month.',
+    'umaFeedbackLabel': 'WAS THIS HELPFUL?',
+    'umaFeedbackHelpful': 'Helpful',
+    'umaFeedbackNotHelpful': 'Needs work',
+    'umaFeedbackAddNote': 'Add note',
+    'umaFeedbackEditNote': 'Edit note',
+    'umaFeedbackHelpfulTitle': 'What made this answer useful?',
+    'umaFeedbackNotHelpfulTitle': 'What should Uma improve here?',
+    'umaFeedbackNoteHint':
+        'Leave an optional note. Uma will use it to improve future free-form replies.',
+    'umaFeedbackPlaceholder':
+        'Example: be shorter, give clearer next steps, explain the risk more directly...',
+    'umaFeedbackSave': 'Save note',
+    'umaFeedbackSkipNote': 'Skip note',
+    'umaFeedbackSaved': 'Your feedback was saved for Uma.',
+    'umaFeedbackSavedWithNote': 'Your feedback and note were saved for Uma.',
     'txnDetailWhen': 'When',
     'txnDetailCategory': 'Category',
     'txnDetailDirection': 'Direction',

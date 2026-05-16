@@ -25,6 +25,7 @@ Thumbs.db
 # Secrets
 .env
 .env.local
+firebase-debug.log
 *.keystore
 *.jks
 key.properties

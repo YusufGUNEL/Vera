@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../state/auth_controller.dart';
 import 'widgets/auth_field.dart';
@@ -48,29 +49,30 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _signUp() async {
+    final firebase = ref.read(firebaseBootstrapProvider);
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
     if (name.isEmpty) {
-      setState(() => _error = 'Tam adını gir');
+      setState(() => _error = 'Please enter your full name.');
       return;
     }
     if (!email.contains('@') || !email.contains('.')) {
-      setState(() => _error = 'Geçerli bir e-posta adresi gir');
+      setState(() => _error = 'Please enter a valid email.');
       return;
     }
     if (password.length < 6) {
-      setState(() => _error = 'Şifre en az 6 karakter olmalı');
+      setState(() => _error = 'Password must be at least 6 characters.');
       return;
     }
     if (password != confirm) {
-      setState(() => _error = 'Şifreler eşleşmiyor');
+      setState(() => _error = 'Passwords do not match.');
       return;
     }
     if (!_accepted) {
-      setState(() => _error = 'Devam etmek için koşulları kabul et');
+      setState(() => _error = 'Please accept the terms to continue.');
       return;
     }
 
@@ -79,11 +81,25 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       _error = null;
     });
 
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    await ref.read(authControllerProvider.notifier).signInDemo(
-          displayName: name,
-          email: email,
-        );
+    try {
+      if (firebase.ready) {
+        await ref.read(authControllerProvider.notifier).signUpWithEmail(
+              displayName: name,
+              email: email,
+              password: password,
+            );
+      } else {
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+        await ref.read(authControllerProvider.notifier).signInDemo(
+              displayName: name,
+              email: email,
+            );
+      }
+    } catch (_) {
+      setState(() => _error = 'Account creation failed. Please try again.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   double _strength(String password) {
@@ -97,16 +113,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     return score.clamp(0.0, 1.0);
   }
 
-  String _strengthLabel(double s) {
-    if (s == 0) return ' ';
-    if (s < 0.4) return 'Zayıf';
-    if (s < 0.7) return 'Orta';
-    return 'Güçlü';
+  String _strengthLabel(double value) {
+    if (value == 0) return ' ';
+    if (value < 0.4) return 'Weak';
+    if (value < 0.7) return 'Medium';
+    return 'Strong';
   }
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final firebase = ref.watch(firebaseBootstrapProvider);
     final strength = _strength(_passwordController.text);
     final strengthColor = strength < 0.4
         ? t.red
@@ -132,7 +149,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hesabını oluştur',
+                'Create your account',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -142,19 +159,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Vera\'ya katıl ve finansal yaşamını Uma yönetsin.',
+                firebase.ready
+                    ? 'Your Vera identity and profile will sync through Firebase.'
+                    : 'Firebase is not configured yet. This flow will continue in local demo mode.',
                 style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
               ),
               const SizedBox(height: 24),
               AuthField(
-                label: 'Ad soyad',
+                label: 'Full name',
                 controller: _nameController,
                 prefixIcon: Icons.person_outline,
                 autofillHints: const [AutofillHints.name],
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'E-posta',
+                label: 'Email',
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: Icons.mail_outline,
@@ -162,7 +181,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'Şifre',
+                label: 'Password',
                 controller: _passwordController,
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
@@ -205,7 +224,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'Şifreyi tekrarla',
+                label: 'Confirm password',
                 controller: _confirmController,
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
@@ -236,7 +255,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Vera Kullanım Koşulları ve Gizlilik Politikası\'nı kabul ediyorum.',
+                        'I accept Vera terms and the local demo data policy.',
                         style: TextStyle(
                           fontSize: 12.5,
                           color: t.ink2,
@@ -250,10 +269,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               if (_error != null) ...[
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: t.red.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
@@ -296,9 +313,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             color: t.brandFG,
                           ),
                         )
-                      : const Text(
-                          'Hesap oluştur',
-                          style: TextStyle(
+                      : Text(
+                          firebase.ready ? 'Create Firebase account' : 'Continue locally',
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -311,14 +328,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      'Zaten hesabın var mı? ',
+                      'Already have an account? ',
                       style: TextStyle(fontSize: 13.5, color: t.muted),
                     ),
                     GestureDetector(
                       onTap: () => context.pop(),
                       behavior: HitTestBehavior.opaque,
                       child: Text(
-                        'Giriş yap',
+                        'Sign in',
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,

@@ -12,23 +12,36 @@ class StatementState {
     this.status = StatementStatus.idle,
     this.statement,
     this.error,
+    this.sourceBytes,
+    this.fileName,
+    this.mimeType,
   });
 
   final StatementStatus status;
   final ParsedStatement? statement;
   final String? error;
+  final Uint8List? sourceBytes;
+  final String? fileName;
+  final String? mimeType;
 
   StatementState copyWith({
     StatementStatus? status,
     ParsedStatement? statement,
     String? error,
+    Uint8List? sourceBytes,
+    String? fileName,
+    String? mimeType,
     bool clearStatement = false,
     bool clearError = false,
+    bool clearSource = false,
   }) {
     return StatementState(
       status: status ?? this.status,
       statement: clearStatement ? null : (statement ?? this.statement),
       error: clearError ? null : (error ?? this.error),
+      sourceBytes: clearSource ? null : (sourceBytes ?? this.sourceBytes),
+      fileName: clearSource ? null : (fileName ?? this.fileName),
+      mimeType: clearSource ? null : (mimeType ?? this.mimeType),
     );
   }
 }
@@ -41,11 +54,13 @@ class StatementController extends StateNotifier<StatementState> {
   Future<void> parse({
     required Uint8List bytes,
     required String mimeType,
+    required String fileName,
   }) async {
     state = state.copyWith(
       status: StatementStatus.parsing,
       clearStatement: true,
       clearError: true,
+      clearSource: true,
     );
     try {
       final statement = await _repository.parse(
@@ -55,6 +70,9 @@ class StatementController extends StateNotifier<StatementState> {
       state = state.copyWith(
         status: StatementStatus.ready,
         statement: statement,
+        sourceBytes: bytes,
+        fileName: fileName,
+        mimeType: mimeType,
       );
     } catch (e) {
       state = state.copyWith(

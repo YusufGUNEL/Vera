@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/app_locale.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/localization/locale_controller.dart';
+import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/palette.dart';
 import '../../../core/theme/tweaks_controller.dart';
@@ -12,8 +13,11 @@ import '../../../core/utils/formatters.dart';
 import '../../auth/domain/auth_session.dart';
 import '../../auth/state/auth_controller.dart';
 import '../../home/data/bank.dart';
+import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/state/goals_controller.dart';
 import '../../home/state/home_controller.dart';
+import '../../uma_chat/data/uma_audit_store.dart';
+import '../../uma_chat/data/uma_feedback_store.dart';
 import '../domain/profile_state.dart';
 import '../state/profile_controller.dart';
 import 'widgets/account_info_sheet.dart';
@@ -323,6 +327,9 @@ class ProfileSettingsSheet extends ConsumerWidget {
     if (!context.mounted) return;
     await ref.read(homeControllerProvider.notifier).resetDemoState();
     await ref.read(goalsControllerProvider.notifier).reset();
+    await ref.read(umaFeedbackStoreProvider).clear();
+    await ref.read(umaAuditStoreProvider).clear();
+    await ref.read(firebaseImportArtifactsServiceProvider).clearAll();
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -393,6 +400,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
 
   AccountInfoSheet _storageInfo(
       BuildContext context, AppStrings l10n, ProfileState profile) {
+    final firebase = FirebaseBootstrap.state;
     return AccountInfoSheet(
       title: l10n.accountTileStorage,
       icon: Icons.storage_outlined,
@@ -404,6 +412,12 @@ class ProfileSettingsSheet extends ConsumerWidget {
         AccountInfoSection(
           label: l10n.infoLocalData,
           body: l10n.infoLocalDataDescription,
+        ),
+        AccountInfoSection(
+          label: 'Cloud sync',
+          body: firebase.ready
+              ? 'Firebase is active. Imported receipts, statements, banks, profile settings, and imported transactions can sync to the vera-ai-finance project.'
+              : 'Firebase is not active on this session yet, so Vera is currently running in local-first mode.',
         ),
       ],
     );

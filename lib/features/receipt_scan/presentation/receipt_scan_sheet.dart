@@ -6,6 +6,7 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
+import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/data/imported_transactions_store.dart';
 import '../../home/state/home_controller.dart';
 import '../domain/parsed_receipt.dart';
@@ -34,7 +35,11 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
       if (!mounted) return;
       await ref
           .read(receiptControllerProvider.notifier)
-          .scan(bytes: bytes, mimeType: mime);
+          .scan(
+            bytes: bytes,
+            mimeType: mime,
+            fileName: picked.name,
+          );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -214,6 +219,7 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
   }
 
   Widget _resultView(AppTokens t, AppStrings l10n, ParsedReceipt r) {
+    final scanState = ref.watch(receiptControllerProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -353,6 +359,23 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                   await ref
                       .read(homeControllerProvider.notifier)
                       .addImportedTransactions([txn]);
+                  final artifacts =
+                      ref.read(firebaseImportArtifactsServiceProvider);
+                  if (artifacts.isEnabled &&
+                      scanState.sourceBytes != null &&
+                      scanState.mimeType != null) {
+                    try {
+                      await artifacts.uploadReceipt(
+                        fileName: scanState.fileName ?? 'receipt.jpg',
+                        bytes: scanState.sourceBytes!,
+                        mimeType: scanState.mimeType!,
+                        receipt: r,
+                        transactions: [txn],
+                      );
+                    } catch (_) {
+                      // Local import already succeeded; cloud backup is best-effort.
+                    }
+                  }
                   if (!mounted) return;
                   Navigator.of(context).pop();
                   messenger.showSnackBar(

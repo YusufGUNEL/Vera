@@ -6,6 +6,7 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
+import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/data/imported_transactions_store.dart';
 import '../../home/state/home_controller.dart';
 import '../domain/parsed_statement.dart';
@@ -29,7 +30,11 @@ class StatementImportSheet extends ConsumerWidget {
       if (!context.mounted) return;
       await ref
           .read(statementControllerProvider.notifier)
-          .parse(bytes: bytes, mimeType: mime);
+          .parse(
+            bytes: bytes,
+            mimeType: mime,
+            fileName: picked.name,
+          );
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -229,6 +234,7 @@ class StatementImportSheet extends ConsumerWidget {
 
   Widget _result(BuildContext context, WidgetRef ref, AppTokens t,
       AppStrings l10n, ParsedStatement s) {
+    final importState = ref.watch(statementControllerProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -353,6 +359,23 @@ class StatementImportSheet extends ConsumerWidget {
                   await ref
                       .read(homeControllerProvider.notifier)
                       .addImportedTransactions(txns);
+                  final artifacts =
+                      ref.read(firebaseImportArtifactsServiceProvider);
+                  if (artifacts.isEnabled &&
+                      importState.sourceBytes != null &&
+                      importState.mimeType != null) {
+                    try {
+                      await artifacts.uploadStatement(
+                        fileName: importState.fileName ?? 'statement.pdf',
+                        bytes: importState.sourceBytes!,
+                        mimeType: importState.mimeType!,
+                        statement: s,
+                        transactions: txns,
+                      );
+                    } catch (_) {
+                      // Local import already succeeded; cloud backup is best-effort.
+                    }
+                  }
                   if (!context.mounted) return;
                   Navigator.of(context).pop();
                   messenger.showSnackBar(

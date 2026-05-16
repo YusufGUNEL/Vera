@@ -8,15 +8,27 @@ import '../../home/data/category_summary.dart';
 import '../../home/state/goals_controller.dart';
 import '../../home/state/home_controller.dart';
 import '../../subscriptions/state/subscriptions_controller.dart';
+import '../domain/uma_audit_event.dart';
+import '../domain/uma_feedback.dart';
 import '../domain/uma_intent.dart';
 import '../domain/uma_message.dart';
 import 'intent_router.dart';
+import 'uma_audit_store.dart';
+import 'uma_feedback_store.dart';
 
 class UmaRepository {
-  UmaRepository(this._gemini, this._router, this._ref);
+  UmaRepository(
+    this._gemini,
+    this._router,
+    this._feedbackStore,
+    this._auditStore,
+    this._ref,
+  );
 
   final GeminiService _gemini;
   final IntentRouter _router;
+  final UmaFeedbackStore _feedbackStore;
+  final UmaAuditStore _auditStore;
   final Ref _ref;
 
   AppStrings get _strings => AppStrings(_ref.read(localeControllerProvider));
@@ -28,16 +40,15 @@ class UmaRepository {
     switch (intent.type) {
       case UmaIntentType.buyGold:
         final banks = _ref.read(homeControllerProvider).banks;
-        final primary =
-            banks.isEmpty ? 'Garanti BBVA' : banks.first.name;
-        final last4 = banks.isEmpty ? '••••' : banks.first.last4;
-        return UmaMessage(
-          role: UmaRole.uma,
+        final primary = banks.isEmpty ? 'Garanti BBVA' : banks.first.name;
+        final last4 = banks.isEmpty ? '****' : banks.first.last4;
+        return _reply(
+          intent: intent.type.name,
           text: l10n.umaReplyBuyGold(primary),
           card: OrderCard(
             type: UmaActionType.buyGold,
             title: l10n.orderTitleBuyGold,
-            from: '${l10n.connectedAccounts} · $primary $last4',
+            from: '${l10n.connectedAccounts} / $primary $last4',
             to: '$primary Gold',
             amount: 29840,
             bankApp: primary,
@@ -47,17 +58,17 @@ class UmaRepository {
         );
       case UmaIntentType.payCreditCard:
         final banks = _ref.read(homeControllerProvider).banks;
-        // pick a bank that "looks" like the credit card bill target — fall
-        // back to the second bank or the first.
-        final bank = banks.length > 1 ? banks[1] : (banks.isNotEmpty ? banks.first : null);
+        final bank =
+            banks.length > 1 ? banks[1] : (banks.isNotEmpty ? banks.first : null);
         final bankName = bank?.name ?? 'Akbank';
-        return UmaMessage(
-          role: UmaRole.uma,
+        return _reply(
+          intent: intent.type.name,
           text: l10n.umaReplyPayCard(bankName),
           card: OrderCard(
             type: UmaActionType.payCreditCard,
             title: l10n.orderTitlePayCard,
-            from: '${l10n.connectedAccounts} · $bankName ${bank?.last4 ?? '••••'}',
+            from:
+                '${l10n.connectedAccounts} / $bankName ${bank?.last4 ?? '****'}',
             to: bankName,
             amount: 12450,
             bankApp: bankName,
@@ -74,11 +85,10 @@ class UmaRepository {
                 .clamp(0, 100)
                 .round();
         final banks = _ref.read(homeControllerProvider).banks;
-        final source =
-            banks.isEmpty ? 'Yapı Kredi' : banks.first.name;
-        final last4 = banks.isEmpty ? '••••' : banks.first.last4;
-        return UmaMessage(
-          role: UmaRole.uma,
+        final source = banks.isEmpty ? 'Yapi Kredi' : banks.first.name;
+        final last4 = banks.isEmpty ? '****' : banks.first.last4;
+        return _reply(
+          intent: intent.type.name,
           text: l10n.umaReplyMoveSavings(after),
           card: OrderCard(
             type: UmaActionType.moveToSavings,
@@ -94,13 +104,13 @@ class UmaRepository {
       case UmaIntentType.showSubscriptions:
         final subs = _ref.read(subscriptionsControllerProvider);
         if (subs.items.isEmpty) {
-          return UmaMessage(
-            role: UmaRole.uma,
+          return _reply(
+            intent: intent.type.name,
             text: l10n.umaReplySubscriptionsEmpty(),
           );
         }
-        return UmaMessage(
-          role: UmaRole.uma,
+        return _reply(
+          intent: intent.type.name,
           text: l10n.umaReplySubscriptions(
             subs.items.length,
             fmtTL(subs.monthlyTotal),
@@ -111,15 +121,15 @@ class UmaRepository {
         final spending =
             summarizeSpending(txns, otherLabel: l10n.categoryOther);
         if (spending.isEmpty) {
-          return UmaMessage(
-            role: UmaRole.uma,
+          return _reply(
+            intent: intent.type.name,
             text: l10n.umaReplyAnalyzeEmpty(),
           );
         }
         final top = spending.first;
         final total = totalSpending(spending);
-        return UmaMessage(
-          role: UmaRole.uma,
+        return _reply(
+          intent: intent.type.name,
           text: l10n.umaReplyAnalyze(
             top.category,
             fmtTL(top.amount),
@@ -127,33 +137,83 @@ class UmaRepository {
           ),
         );
       case UmaIntentType.explainWealth:
-        return UmaMessage(
-          role: UmaRole.uma,
-          text: l10n.umaReplyExplainWealth,
-        );
+        return _reply(intent: intent.type.name, text: l10n.umaReplyExplainWealth);
       case UmaIntentType.checkLoanEligibility:
-        return UmaMessage(
-          role: UmaRole.uma,
-          text: l10n.umaReplyLoan,
-        );
+        return _reply(intent: intent.type.name, text: l10n.umaReplyLoan);
       case UmaIntentType.explainSecurityAlert:
-        return UmaMessage(
-          role: UmaRole.uma,
-          text: l10n.umaReplySecurity,
-        );
+        return _reply(intent: intent.type.name, text: l10n.umaReplySecurity);
       case UmaIntentType.unknown:
         break;
     }
 
     try {
-      final reply = await _gemini.generateText(_systemPrompt(userText));
-      return UmaMessage(role: UmaRole.uma, text: reply.trim());
+      final reply = await _gemini.generateText(await buildPrompt(userText));
+      return _reply(intent: intent.type.name, text: reply.trim());
     } catch (_) {
-      return UmaMessage(role: UmaRole.uma, text: l10n.umaReplyFallback);
+      return _reply(intent: intent.type.name, text: l10n.umaReplyFallback);
     }
   }
 
-  String _systemPrompt(String userText) {
+  Future<void> saveFeedback({
+    required String messageId,
+    required String responseText,
+    required UmaFeedbackVote vote,
+    String? note,
+  }) {
+    return _feedbackStore.save(
+      UmaFeedbackEntry(
+        messageId: messageId,
+        vote: vote,
+        responseText: responseText,
+        createdAt: DateTime.now(),
+        note: note,
+      ),
+    );
+  }
+
+  Future<List<UmaFeedbackEntry>> loadFeedback() {
+    return _feedbackStore.load();
+  }
+
+  Future<void> appendAuditEvent({
+    required String messageId,
+    required UmaAuditAction action,
+    required String summary,
+    String? intent,
+    String? note,
+    Map<String, dynamic> metadata = const {},
+  }) {
+    final timestamp = DateTime.now();
+    final signature = _signatureFor(
+      messageId: messageId,
+      action: action,
+      summary: summary,
+      timestamp: timestamp,
+      intent: intent,
+      note: note,
+      metadata: metadata,
+    );
+    return _auditStore.append(
+      UmaAuditEvent(
+        id: 'audit-${timestamp.microsecondsSinceEpoch}',
+        messageId: messageId,
+        action: action,
+        timestamp: timestamp,
+        signature: signature,
+        summary: summary,
+        intent: intent,
+        note: note,
+        metadata: metadata,
+      ),
+    );
+  }
+
+  Future<List<UmaAuditEvent>> loadAuditEvents() {
+    return _auditStore.load();
+  }
+
+  Future<String> buildPrompt(String userText) async {
+    final feedbackContext = await _feedbackStore.buildPromptContext();
     return '''
 You are Uma, the AI coach inside Vera, a Turkish personal finance app.
 Vera does NOT execute bank transactions itself. It analyzes the user's data
@@ -164,9 +224,60 @@ Tone: warm, concise (1-3 sentences), helpful. Use TL when relevant.
 Never invent specific transaction history or prices the user hasn't asked about.
 Never claim Vera will move money. If the user wants an action, say you will
 open the right bank app and that they'll confirm there.
+${feedbackContext.isEmpty ? '' : '\n$feedbackContext\n'}
 
 User: $userText
 Uma:''';
+  }
+
+  UmaMessage _reply({
+    required String text,
+    OrderCard? card,
+    String? intent,
+  }) {
+    final message = UmaMessage(
+      id: _messageId(),
+      role: UmaRole.uma,
+      text: text,
+      card: card,
+      createdAt: DateTime.now(),
+      intent: intent,
+    );
+    appendAuditEvent(
+      messageId: message.id,
+      action: UmaAuditAction.replyGenerated,
+      summary: text,
+      intent: intent,
+      metadata: {
+        'hasCard': card != null,
+        if (card != null) 'bankApp': card.bankApp,
+      },
+    );
+    return message;
+  }
+
+  String _messageId() => 'uma-${DateTime.now().microsecondsSinceEpoch}';
+
+  String _signatureFor({
+    required String messageId,
+    required UmaAuditAction action,
+    required String summary,
+    required DateTime timestamp,
+    String? intent,
+    String? note,
+    Map<String, dynamic> metadata = const {},
+  }) {
+    final source = [
+      messageId,
+      action.name,
+      summary,
+      timestamp.toIso8601String(),
+      intent ?? '',
+      note ?? '',
+      metadata.entries.map((entry) => '${entry.key}:${entry.value}').join('|'),
+    ].join('::');
+    final hash = Object.hashAll(source.codeUnits);
+    return 'VERA-${hash.abs().toRadixString(16).toUpperCase()}';
   }
 }
 
@@ -174,6 +285,8 @@ final umaRepositoryProvider = Provider<UmaRepository>((ref) {
   return UmaRepository(
     ref.watch(geminiServiceProvider),
     ref.watch(intentRouterProvider),
+    ref.watch(umaFeedbackStoreProvider),
+    ref.watch(umaAuditStoreProvider),
     ref,
   );
 });

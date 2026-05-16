@@ -12,23 +12,36 @@ class ReceiptState {
     this.status = ReceiptScanStatus.idle,
     this.receipt,
     this.error,
+    this.sourceBytes,
+    this.fileName,
+    this.mimeType,
   });
 
   final ReceiptScanStatus status;
   final ParsedReceipt? receipt;
   final String? error;
+  final Uint8List? sourceBytes;
+  final String? fileName;
+  final String? mimeType;
 
   ReceiptState copyWith({
     ReceiptScanStatus? status,
     ParsedReceipt? receipt,
     String? error,
+    Uint8List? sourceBytes,
+    String? fileName,
+    String? mimeType,
     bool clearReceipt = false,
     bool clearError = false,
+    bool clearSource = false,
   }) {
     return ReceiptState(
       status: status ?? this.status,
       receipt: clearReceipt ? null : (receipt ?? this.receipt),
       error: clearError ? null : (error ?? this.error),
+      sourceBytes: clearSource ? null : (sourceBytes ?? this.sourceBytes),
+      fileName: clearSource ? null : (fileName ?? this.fileName),
+      mimeType: clearSource ? null : (mimeType ?? this.mimeType),
     );
   }
 }
@@ -41,11 +54,13 @@ class ReceiptController extends StateNotifier<ReceiptState> {
   Future<void> scan({
     required Uint8List bytes,
     required String mimeType,
+    required String fileName,
   }) async {
     state = state.copyWith(
       status: ReceiptScanStatus.scanning,
       clearReceipt: true,
       clearError: true,
+      clearSource: true,
     );
     try {
       final receipt = await _repository.parse(
@@ -55,6 +70,9 @@ class ReceiptController extends StateNotifier<ReceiptState> {
       state = state.copyWith(
         status: ReceiptScanStatus.ready,
         receipt: receipt,
+        sourceBytes: bytes,
+        fileName: fileName,
+        mimeType: mimeType,
       );
     } catch (e) {
       state = state.copyWith(
