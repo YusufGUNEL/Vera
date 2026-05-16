@@ -15,7 +15,7 @@ Vera bir "AI-native financial operating system" demosu olarak konumlanır. Ürü
 5. **Subscription Intelligence** — sessiz para kaçışlarını bulma
 6. **Uma Agent Orchestration** — doğal dil komutla bütün modülleri tetikleme
 
-Detay için: [docs/AI_SISTEMLERI.md](docs/AI_SISTEMLERI.md), [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md)
+Detay için: [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md), [docs/MIMARI.md](docs/MIMARI.md)
 
 ## Şu an çalışan ana özellikler
 
@@ -49,17 +49,12 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 | Dosya | İçerik |
 |---|---|
 | [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md) | Ürün konumlandırma, persona, demo hikayesi |
-| [docs/AI_SISTEMLERI.md](docs/AI_SISTEMLERI.md) | 6 AI modülü, veri akışları, guardrail'ler |
-| [docs/MIMARI.md](docs/MIMARI.md) | Feature-first Flutter mimarisi ve ekip kuralları |
-| [docs/GEMINI.md](docs/GEMINI.md) | Gemini servis kullanımı, repository pattern, fallback |
-| [docs/PROMPTS.md](docs/PROMPTS.md) | Vera içinde gerçekten gönderilen prompt şablonları |
-| [docs/FEATURES.md](docs/FEATURES.md) | ✅/⚠/🔜 özellik durumu, lisans matrisi |
+| [docs/MIMARI.md](docs/MIMARI.md) | Feature-first Flutter mimarisi, AI katmanları, ekip kuralları |
+| [docs/PROMPTS.md](docs/PROMPTS.md) | Vera içinde gerçekten Gemini'ye gönderilen prompt şablonları |
+| [docs/FEATURES.md](docs/FEATURES.md) | ✅/🔜 özellik durumu, lisans matrisi |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 90 saniyelik sahne senaryosu |
-| [docs/DEMO_AKISI.md](docs/DEMO_AKISI.md) | 3 dakikalık demo akışı |
-| [docs/ICON_SPLASH_PROMPT.md](docs/ICON_SPLASH_PROMPT.md) | App icon + splash görsel üretimi promptları |
 | [docs/SETUP.md](docs/SETUP.md) | Geliştirici ortamı ve build rehberi |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | Sürüm geçmişi |
-| [docs/ANALIZ_VE_TODO.md](docs/ANALIZ_VE_TODO.md) | Genişletilmiş backlog ve sprint planı |
 
 ## Stack
 

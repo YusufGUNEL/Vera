@@ -7,6 +7,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/vera_card.dart';
+import '../../uma_chat/presentation/open_uma.dart';
 import '../domain/autonomy_policy.dart';
 import '../domain/rebalance_action.dart';
 import '../state/wealth_controller.dart';
@@ -14,6 +15,58 @@ import 'widgets/portfolio_donut.dart';
 
 class WealthScreen extends ConsumerWidget {
   const WealthScreen({super.key});
+
+  void _openInsight(BuildContext context, String insight) {
+    final t = context.tokens;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          decoration: BoxDecoration(
+            color: t.bg,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: t.line,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                context.l10n.explainability,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: t.ink,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                insight,
+                style:
+                    TextStyle(fontSize: 13, color: t.ink2, height: 1.5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,10 +122,19 @@ class WealthScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Text(
-                              '+TL 4.820 (1.4%) ${l10n.today}',
-                              style: TextStyle(color: t.green, fontSize: 13),
-                            ),
+                            Builder(builder: (_) {
+                              final delta = state.todayDelta;
+                              final pct = state.total <= 0
+                                  ? 0
+                                  : (delta / state.total * 100);
+                              final color = delta >= 0 ? t.green : t.red;
+                              final sign = delta >= 0 ? '+' : '-';
+                              final pctStr = pct.abs().toStringAsFixed(1);
+                              return Text(
+                                '$sign${fmtTL(delta.abs())} ($pctStr%) ${l10n.today}',
+                                style: TextStyle(color: color, fontSize: 13),
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -90,14 +152,18 @@ class WealthScreen extends ConsumerWidget {
                                 letterSpacing: 0.4,
                               ),
                             ),
-                            Text(
-                              '+18.2%',
-                              style: TextStyle(
-                                color: t.green,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            Builder(builder: (_) {
+                              final ytd = state.ytdPercent;
+                              final sign = ytd >= 0 ? '+' : '';
+                              return Text(
+                                '$sign${ytd.toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  color: ytd >= 0 ? t.green : t.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -266,14 +332,11 @@ class WealthScreen extends ConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.applyAtBank),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      },
+                      onPressed: () => openUma(
+                        context,
+                        ref,
+                        prompt: state.insight,
+                      ),
                       icon: const Icon(Icons.open_in_new, size: 16),
                       label: Text(l10n.applyAtBank),
                       style: FilledButton.styleFrom(
@@ -304,6 +367,8 @@ class WealthScreen extends ConsumerWidget {
                                   .read(wealthControllerProvider.notifier)
                                   .undoAction(state.actions[i].id)
                               : null,
+                      onDetails: () =>
+                          _openInsight(context, state.actions[i].why),
                     ),
                 ],
               ),
@@ -396,11 +461,13 @@ class _ActivityRow extends StatelessWidget {
     required this.action,
     required this.isFirst,
     required this.onUndo,
+    required this.onDetails,
   });
 
   final RebalanceAction action;
   final bool isFirst;
   final VoidCallback? onUndo;
+  final VoidCallback onDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -495,13 +562,7 @@ class _ActivityRow extends StatelessWidget {
                       background: Colors.transparent,
                       color: t.brand,
                       bordered: true,
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(context.l10n.comingSoon),
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      ),
+                      onTap: onDetails,
                     ),
                   ],
                 ),

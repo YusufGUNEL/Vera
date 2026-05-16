@@ -8,7 +8,7 @@ import '../domain/parsed_receipt.dart';
 
 /// Fis veya banka ekran goruntusu parser'i. Gemini multimodal cagrisi yapar,
 /// JSON cikti bekler. AI cagrisi basarisiz olursa deterministic mock fallback
-/// doner (docs/GEMINI.md fallback prensibine uygun).
+/// doner (docs/PROMPTS.md fallback prensibine uygun).
 class ReceiptRepository {
   ReceiptRepository(this._gemini);
 

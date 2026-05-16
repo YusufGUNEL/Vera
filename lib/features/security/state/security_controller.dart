@@ -24,10 +24,10 @@ class SecurityState {
   final Set<int> expandedIds;
   final Map<int, ReviewDecision> decisions;
 
-  String get refreshedLabel {
-    if (lastUpdated == null) return 'İlk tarama bekleniyor';
-    final dt = lastUpdated!;
-    return 'Son tarama ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  String? get lastUpdatedTime {
+    final dt = lastUpdated;
+    if (dt == null) return null;
+    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   int get blockedCount => checks.where((check) {
@@ -35,7 +35,27 @@ class SecurityState {
             decisions[check.id] != ReviewDecision.approvedByUser;
       }).length;
 
-  int get reviewedCount => 147 + decisions.length;
+  /// Checks the user has resolved (kept blocked or approved) plus the
+  /// non-blocked items that Fraud Radar already cleared in the current feed.
+  int get reviewedCount {
+    final cleared = checks.where((c) => !c.blocked).length;
+    return cleared + decisions.length;
+  }
+
+  /// Distinct device labels seen in the feed (e.g. MacBook Pro, iPhone 17).
+  /// We pull "device-like" check names; the count never goes below 1 since
+  /// the user is always on at least one device.
+  int get trustedDevices {
+    final pattern = RegExp(
+      r'(macbook|iphone|ipad|android|samsung|xiaomi|cihaz|device|laptop|pc|windows|browser|tarayıcı)',
+      caseSensitive: false,
+    );
+    final unique = checks
+        .where((c) => pattern.hasMatch(c.name))
+        .map((c) => c.location)
+        .toSet();
+    return unique.isEmpty ? 1 : unique.length;
+  }
 
   SecurityState copyWith({
     List<SecurityCheck>? checks,

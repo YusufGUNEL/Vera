@@ -92,8 +92,10 @@ class UmaOrderCard extends StatelessWidget {
               switch (card.status) {
                 OrderStatus.forwarded =>
                   Pill(label: card.bankApp.toUpperCase(), color: t.green),
-                OrderStatus.dismissed => Pill(label: '—', color: t.muted),
-                OrderStatus.review => Pill(label: 'READY', color: t.uma),
+                OrderStatus.dismissed =>
+                  Pill(label: context.l10n.orderPillDismissed, color: t.muted),
+                OrderStatus.review =>
+                  Pill(label: context.l10n.orderPillReady, color: t.uma),
               },
             ],
           ),

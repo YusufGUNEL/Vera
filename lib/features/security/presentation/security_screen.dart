@@ -26,7 +26,11 @@ class SecurityScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 130),
           children: [
-            _Header(lastUpdatedLabel: state.refreshedLabel),
+            _Header(
+              lastUpdatedLabel: state.lastUpdatedTime == null
+                  ? l10n.firstScanPending
+                  : l10n.lastScanAt(state.lastUpdatedTime!),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Container(
@@ -90,7 +94,7 @@ class SecurityScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'ACCOUNT SECURITY',
+                                l10n.securityAccountSection,
                                 style: TextStyle(
                                   color: t.muted,
                                   fontSize: 12,
@@ -112,8 +116,8 @@ class SecurityScreen extends ConsumerWidget {
                               const SizedBox(height: 1),
                               Text(
                                 state.blockedCount == 0
-                                    ? 'No unresolved fraud alerts in the latest scan.'
-                                    : 'Fraud Radar is tracking ${state.blockedCount} active alert${state.blockedCount == 1 ? '' : 's'}.',
+                                    ? l10n.securityClearBody
+                                    : l10n.securityActiveBody(state.blockedCount),
                                 style: TextStyle(fontSize: 12, color: t.muted),
                               ),
                             ],
@@ -126,27 +130,27 @@ class SecurityScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _StatCell(
-                            label: 'BLOCKED',
+                            label: l10n.securityStatBlockedLabel,
                             value: '${state.blockedCount}',
-                            sub: 'active',
+                            sub: l10n.securityStatBlockedSub,
                             color: state.blockedCount == 0 ? t.green : t.red,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _StatCell(
-                            label: 'REVIEWED',
+                            label: l10n.securityStatReviewedLabel,
                             value: '${state.reviewedCount}',
-                            sub: 'this week',
+                            sub: l10n.securityStatReviewedSub,
                             color: t.ink,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _StatCell(
-                            label: 'DEVICES',
-                            value: '3',
-                            sub: 'trusted',
+                            label: l10n.securityStatDevicesLabel,
+                            value: '${state.trustedDevices}',
+                            sub: l10n.securityStatDevicesSub,
                             color: t.ink,
                           ),
                         ),
@@ -308,7 +312,8 @@ class _CheckTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final state = _tileStateFor(check, decision, t);
+    final l10n = context.l10n;
+    final state = _tileStateFor(check, decision, t, l10n);
 
     return Column(
       children: [
@@ -403,7 +408,7 @@ class _CheckTile extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'VIEW UMA REPORT',
+                            context.l10n.securityViewReport,
                             style: TextStyle(
                               fontSize: 12,
                               color: t.uma,
@@ -523,8 +528,8 @@ class _CheckTile extends StatelessWidget {
                         ),
                         child: Text(
                           decision == ReviewDecision.keptBlocked
-                              ? 'You kept this event blocked. Fraud Radar will continue treating similar patterns as high risk.'
-                              : 'You marked this event as safe. Fraud Radar will use that feedback to reduce similar false positives.',
+                              ? context.l10n.securityDecisionKept
+                              : context.l10n.securityDecisionApproved,
                           style: TextStyle(
                             fontSize: 12,
                             color: t.ink2,
@@ -584,6 +589,7 @@ _TileState _tileStateFor(
   SecurityCheck check,
   ReviewDecision decision,
   AppTokens t,
+  AppStrings l10n,
 ) {
   if (decision == ReviewDecision.approvedByUser) {
     return _TileState(
@@ -591,7 +597,7 @@ _TileState _tileStateFor(
       color: t.green,
       softColor: t.green.withValues(alpha: 0.10),
       background: t.green.withValues(alpha: 0.03),
-      pillLabel: 'APPROVED BY YOU',
+      pillLabel: l10n.securityPillApproved,
     );
   }
 
@@ -602,8 +608,8 @@ _TileState _tileStateFor(
       softColor: t.red.withValues(alpha: 0.10),
       background: t.red.withValues(alpha: 0.03),
       pillLabel: decision == ReviewDecision.keptBlocked
-          ? 'KEPT BLOCKED'
-          : 'BLOCKED BY AI',
+          ? l10n.securityPillKept
+          : l10n.securityPillBlocked,
     );
   }
 

@@ -7,10 +7,16 @@ import '../../../auth/state/auth_controller.dart';
 import '../../../profile_settings/presentation/profile_settings_sheet.dart';
 
 class TopBar extends ConsumerWidget {
-  const TopBar({this.onScanTap, this.onImportTap, super.key});
+  const TopBar({
+    this.onScanTap,
+    this.onImportTap,
+    this.onNotificationsTap,
+    super.key,
+  });
 
   final VoidCallback? onScanTap;
   final VoidCallback? onImportTap;
+  final VoidCallback? onNotificationsTap;
 
   void _openProfile(BuildContext context) {
     showModalBottomSheet(
@@ -19,17 +25,6 @@ class TopBar extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.45),
       builder: (_) => const ProfileSettingsSheet(),
-    );
-  }
-
-  void _showNotifications(BuildContext context) {
-    final l10n = context.l10n;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.comingSoon),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
     );
   }
 
@@ -135,7 +130,7 @@ class TopBar extends ConsumerWidget {
             color: t.card,
             shape: CircleBorder(side: BorderSide(color: t.line)),
             child: InkWell(
-              onTap: () => _showNotifications(context),
+              onTap: onNotificationsTap,
               customBorder: const CircleBorder(),
               child: SizedBox(
                 width: 40,

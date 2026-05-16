@@ -21,6 +21,30 @@ class WealthState {
   double get total =>
       allocations.fold<double>(0, (sum, item) => sum + item.amount);
 
+  /// Today's portfolio delta in TL derived from active actions that landed
+  /// "today". Reversed actions are excluded.
+  double get todayDelta {
+    return actions
+        .where((a) => !a.undone)
+        .where((a) {
+          final w = a.when.toLowerCase();
+          return w.contains('bugün') || w.contains('today');
+        })
+        .fold<double>(0, (sum, a) => sum + a.amount);
+  }
+
+  /// YTD percent estimated from the cumulative net moves Uma executed,
+  /// scaled to total portfolio size. Falls back to 0 when the portfolio is
+  /// empty.
+  double get ytdPercent {
+    if (total <= 0) return 0;
+    final base = 12.0; // baseline market drift the demo assumes
+    final movement = actions
+        .where((a) => !a.undone)
+        .fold<double>(0, (s, a) => s + a.amount);
+    return base + (movement / total) * 100;
+  }
+
   WealthState copyWith({
     AutonomyPolicy? policy,
     List<PortfolioAllocation>? allocations,

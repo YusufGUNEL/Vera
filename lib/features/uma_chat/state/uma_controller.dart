@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
+import '../../../core/localization/locale_controller.dart';
+import '../../auth/state/auth_controller.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_message.dart';
 
@@ -7,13 +10,7 @@ enum AutoExecMode { auto, confirm }
 
 class UmaState {
   const UmaState({
-    this.messages = const [
-      UmaMessage(
-        role: UmaRole.uma,
-        text:
-            'Hi Mert. I read your latest statement — your monthly spend is 14% below last month. I can help you pay a card bill, plan a transfer, or look at gold pricing. The action happens in your bank app; I prepare it and track the result.',
-      ),
-    ],
+    this.messages = const [],
     this.thinking = false,
     this.autoExec = AutoExecMode.confirm,
     this.toast,
@@ -41,7 +38,10 @@ class UmaState {
 }
 
 class UmaController extends StateNotifier<UmaState> {
-  UmaController(this._repository) : super(const UmaState());
+  UmaController(this._repository, String greeting)
+      : super(UmaState(
+          messages: [UmaMessage(role: UmaRole.uma, text: greeting)],
+        ));
 
   final UmaRepository _repository;
 
@@ -97,5 +97,13 @@ class UmaController extends StateNotifier<UmaState> {
 
 final umaControllerProvider =
     StateNotifierProvider<UmaController, UmaState>((ref) {
-  return UmaController(ref.watch(umaRepositoryProvider));
+  final auth = ref.read(authControllerProvider);
+  final locale = ref.read(localeControllerProvider);
+  final strings = AppStrings(locale);
+  final name = auth.displayName?.trim().split(' ').first ??
+      strings.defaultUserName.split(' ').first;
+  return UmaController(
+    ref.watch(umaRepositoryProvider),
+    strings.umaGreeting(name),
+  );
 });

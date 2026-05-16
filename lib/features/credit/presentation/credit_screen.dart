@@ -20,6 +20,7 @@ class CreditScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final state = ref.watch(creditControllerProvider);
     final application = state.application;
     final decision = state.decision;
@@ -42,7 +43,7 @@ class CreditScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          'Credit Health Score',
+                          l10n.creditHealthScore,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -85,7 +86,7 @@ class CreditScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _StatChip(
-                          label: 'INCOME',
+                          label: l10n.creditStatIncome,
                           value: fmtTL(application.monthlyIncome),
                           color: t.green,
                         ),
@@ -93,7 +94,7 @@ class CreditScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _StatChip(
-                          label: 'DTI',
+                          label: l10n.creditStatDti,
                           value: '${(application.debtToIncome * 100).round()}%',
                           color: application.debtToIncome <= 0.25
                               ? t.green
@@ -103,8 +104,8 @@ class CreditScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _StatChip(
-                          label: 'TERM',
-                          value: '${application.months} mo',
+                          label: l10n.creditStatTerm,
+                          value: l10n.creditTermMo(application.months),
                           color: t.ink2,
                         ),
                       ),
@@ -138,7 +139,7 @@ class CreditScreen extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Run loan simulation',
+                        l10n.creditRunSimulation,
                         style: TextStyle(
                           color: t.brandFG,
                           fontSize: 15,
@@ -154,7 +155,7 @@ class CreditScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SectionTitle(title: 'Current decision'),
+          SectionTitle(title: l10n.creditCurrentDecision),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: VeraCard(
@@ -184,7 +185,8 @@ class CreditScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Personal loan · ${fmtTL(decision.recommendedAmount)}',
+                              l10n.creditPersonalLoan(
+                                  fmtTL(decision.recommendedAmount)),
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -193,7 +195,10 @@ class CreditScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 1),
                             Text(
-                              '${decision.recommendedMonths} months · ${decision.apr.toStringAsFixed(2)}% APR',
+                              l10n.creditMonthsApr(
+                                decision.recommendedMonths,
+                                decision.apr.toStringAsFixed(2),
+                              ),
                               style: TextStyle(color: t.muted, fontSize: 12),
                             ),
                           ],
@@ -236,7 +241,7 @@ class CreditScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'UMA INSIGHT',
+                                l10n.creditUmaInsight,
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -282,7 +287,7 @@ class CreditScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SectionTitle(title: 'Eligible products'),
+          SectionTitle(title: l10n.creditEligibleProducts),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -501,6 +506,7 @@ class _LoanSimulationSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef localRef) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final state = localRef.watch(creditControllerProvider);
     final current = state.application;
     final decision = state.decision;
@@ -533,7 +539,7 @@ class _LoanSimulationSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Loan simulation',
+                    l10n.creditLoanSimulation,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -542,12 +548,12 @@ class _LoanSimulationSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Tune the request and Vera will refresh the decision in real time.',
+                    l10n.creditLoanSimulationSubtitle,
                     style: TextStyle(fontSize: 13, color: t.muted),
                   ),
                   const SizedBox(height: 18),
                   _SliderField(
-                    label: 'Loan amount',
+                    label: l10n.creditFieldLoanAmount,
                     valueLabel: fmtTL(current.amount),
                     min: 20000,
                     max: 250000,
@@ -557,8 +563,8 @@ class _LoanSimulationSheet extends ConsumerWidget {
                         .setAmount(value),
                   ),
                   _SliderField(
-                    label: 'Term',
-                    valueLabel: '${current.months} months',
+                    label: l10n.creditFieldTerm,
+                    valueLabel: l10n.creditTermMonths(current.months),
                     min: 12,
                     max: 48,
                     divisions: 6,
@@ -568,7 +574,7 @@ class _LoanSimulationSheet extends ConsumerWidget {
                         .setMonths((value / 6).round() * 6),
                   ),
                   _SliderField(
-                    label: 'Monthly income',
+                    label: l10n.creditFieldIncome,
                     valueLabel: fmtTL(current.monthlyIncome),
                     min: 20000,
                     max: 80000,
@@ -578,7 +584,7 @@ class _LoanSimulationSheet extends ConsumerWidget {
                         .setIncome(value),
                   ),
                   _SliderField(
-                    label: 'Monthly debt',
+                    label: l10n.creditFieldDebt,
                     valueLabel: fmtTL(current.monthlyDebt),
                     min: 0,
                     max: 30000,

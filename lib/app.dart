@@ -11,6 +11,7 @@ import 'core/theme/app_tokens.dart';
 import 'core/theme/tweaks_controller.dart';
 import 'features/auth/domain/auth_session.dart';
 import 'features/auth/state/auth_controller.dart';
+import 'features/home/state/bill_reminders.dart';
 
 class VeraApp extends ConsumerWidget {
   const VeraApp({super.key});
@@ -21,6 +22,8 @@ class VeraApp extends ConsumerWidget {
     final auth = ref.watch(authControllerProvider);
     final locale = ref.watch(localeControllerProvider);
     final strings = ref.watch(stringsProvider);
+    // Eager-instantiate the bill reminder scheduler so it boots with the app.
+    ref.watch(billRemindersProvider);
 
     final supportedLocales = AppLocale.values.map((l) => l.toLocale()).toList();
 

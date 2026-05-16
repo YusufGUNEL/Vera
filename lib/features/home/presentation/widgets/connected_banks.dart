@@ -9,12 +9,14 @@ class ConnectedBanks extends StatelessWidget {
   const ConnectedBanks({
     required this.banks,
     this.onBankTap,
+    this.onBankLongPress,
     this.onAddBankTap,
     super.key,
   });
 
   final List<Bank> banks;
   final ValueChanged<Bank>? onBankTap;
+  final ValueChanged<Bank>? onBankLongPress;
   final VoidCallback? onAddBankTap;
 
   @override
@@ -34,6 +36,9 @@ class ConnectedBanks extends StatelessWidget {
           return _BankCard(
             bank: bank,
             onTap: onBankTap == null ? null : () => onBankTap!(bank),
+            onLongPress: onBankLongPress == null
+                ? null
+                : () => onBankLongPress!(bank),
           );
         },
       ),
@@ -42,10 +47,11 @@ class ConnectedBanks extends StatelessWidget {
 }
 
 class _BankCard extends StatelessWidget {
-  const _BankCard({required this.bank, this.onTap});
+  const _BankCard({required this.bank, this.onTap, this.onLongPress});
 
   final Bank bank;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +61,7 @@ class _BankCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(t.vibe.radius - 2),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(t.vibe.radius - 2),
         child: Container(
           width: 168,

@@ -12,9 +12,12 @@ import '../../../core/utils/formatters.dart';
 import '../../auth/domain/auth_session.dart';
 import '../../auth/state/auth_controller.dart';
 import '../../home/data/bank.dart';
+import '../../home/state/goals_controller.dart';
+import '../../home/state/home_controller.dart';
 import '../domain/profile_state.dart';
 import '../state/profile_controller.dart';
 import 'widgets/account_info_sheet.dart';
+import 'widgets/export_data_sheet.dart';
 
 class ProfileSettingsSheet extends ConsumerWidget {
   const ProfileSettingsSheet({super.key});
@@ -140,29 +143,28 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   const SizedBox(height: 12),
                   _ToggleTile(
                     icon: Icons.wb_twilight_outlined,
-                    label: 'Daily AI briefing',
-                    subtitle:
-                        'Start the day with account health, suspicious activity, and savings prompts',
+                    label: l10n.profileDailyBriefing,
+                    subtitle: l10n.profileDailyBriefingSub,
                     value: profile.dailyBriefingEnabled,
                     onChanged: profileCtrl.setDailyBriefing,
                   ),
                   const SizedBox(height: 12),
                   _SegmentedSelector<DataSyncMode>(
-                    label: 'Live data sync',
+                    label: l10n.profileLiveSync,
                     selected: profile.dataSyncMode,
-                    options: const [
-                      (DataSyncMode.live, 'Live'),
-                      (DataSyncMode.balanced, 'Balanced'),
-                      (DataSyncMode.saver, 'Saver'),
+                    options: [
+                      (DataSyncMode.live, l10n.profileLiveSyncLive),
+                      (DataSyncMode.balanced, l10n.profileLiveSyncBalanced),
+                      (DataSyncMode.saver, l10n.profileLiveSyncSaver),
                     ],
                     onChange: profileCtrl.setDataSyncMode,
                   ),
                   const SizedBox(height: 12),
                   _SegmentedSelector<int>(
-                    label: 'Auto-approve limit',
+                    label: l10n.profileAutoApprove,
                     selected: profile.autoApproveLimit,
-                    options: const [
-                      (0, 'Off'),
+                    options: [
+                      (0, l10n.profileAutoApproveOff),
                       (2500, 'TL 2.500'),
                       (10000, 'TL 10.000'),
                     ],
@@ -171,27 +173,24 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   const SizedBox(height: 12),
                   _ToggleTile(
                     icon: Icons.notifications_outlined,
-                    label: 'Smart notifications',
-                    subtitle:
-                        'Alerts for fraud, renewals, and approval changes',
+                    label: l10n.profileSmartNotif,
+                    subtitle: l10n.profileSmartNotifSub,
                     value: profile.notificationsEnabled,
                     onChanged: profileCtrl.setNotifications,
                   ),
                   const SizedBox(height: 8),
                   _ToggleTile(
                     icon: Icons.face_outlined,
-                    label: 'Face ID relock',
-                    subtitle:
-                        'Require biometric unlock before sensitive actions',
+                    label: l10n.profileFaceId,
+                    subtitle: l10n.profileFaceIdSub,
                     value: profile.faceIdEnabled,
                     onChanged: profileCtrl.setFaceId,
                   ),
                   const SizedBox(height: 8),
                   _ToggleTile(
                     icon: Icons.shield_outlined,
-                    label: 'High-sensitivity fraud alerts',
-                    subtitle:
-                        'Let Vera flag unusual device and payment patterns earlier',
+                    label: l10n.profileFraudHigh,
+                    subtitle: l10n.profileFraudHighSub,
                     value: profile.fraudAlertsEnabled,
                     onChanged: profileCtrl.setFraudAlerts,
                   ),
@@ -230,15 +229,27 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   _AccountTile(
                     icon: Icons.storage_outlined,
                     label: l10n.accountTileStorage,
-                    value: _syncModeLabel(profile.dataSyncMode),
+                    value: _syncModeLabel(context, profile.dataSyncMode),
                     onTap: () =>
-                        _openInfo(context, _storageInfo(l10n, profile)),
+                        _openInfo(context, _storageInfo(context, l10n, profile)),
                   ),
                   _AccountTile(
                     icon: Icons.help_outline,
                     label: l10n.accountTileHelp,
                     value: auth.authMethod,
                     onTap: () => _openInfo(context, _helpInfo(l10n)),
+                  ),
+                  _AccountTile(
+                    icon: Icons.download_outlined,
+                    label: l10n.exportTile,
+                    value: l10n.exportTileValue,
+                    onTap: () => _openExport(context),
+                  ),
+                  _AccountTile(
+                    icon: Icons.restart_alt,
+                    label: l10n.demoResetTile,
+                    value: l10n.demoResetTileValue,
+                    onTap: () => _confirmDemoReset(context, ref),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -274,6 +285,50 @@ class ProfileSettingsSheet extends ConsumerWidget {
       isScrollControlled: true,
       barrierColor: Colors.black.withValues(alpha: 0.45),
       builder: (_) => sheet,
+    );
+  }
+
+  void _openExport(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const ExportDataSheet(),
+    );
+  }
+
+  Future<void> _confirmDemoReset(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
+    final t = context.tokens;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.demoResetTitle),
+        content: Text(l10n.demoResetBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.demoResetCancel),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: t.red),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.demoResetConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+    await ref.read(homeControllerProvider.notifier).resetDemoState();
+    await ref.read(goalsControllerProvider.notifier).reset();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.demoResetDone),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -336,14 +391,15 @@ class ProfileSettingsSheet extends ConsumerWidget {
     );
   }
 
-  AccountInfoSheet _storageInfo(AppStrings l10n, ProfileState profile) {
+  AccountInfoSheet _storageInfo(
+      BuildContext context, AppStrings l10n, ProfileState profile) {
     return AccountInfoSheet(
       title: l10n.accountTileStorage,
       icon: Icons.storage_outlined,
       sections: [
         AccountInfoSection(
           label: l10n.infoSyncMode,
-          body: _syncModeLabel(profile.dataSyncMode),
+          body: _syncModeLabel(context, profile.dataSyncMode),
         ),
         AccountInfoSection(
           label: l10n.infoLocalData,
@@ -450,7 +506,8 @@ class _ProfileCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'AI TONE / ${_aiToneLabel(aiTone).toUpperCase()}',
+                    context.l10n.profileAiToneBadge(
+                        _aiToneLabel(aiTone).toUpperCase()),
                     style: TextStyle(
                       color: t.uma,
                       fontSize: 10,
@@ -508,7 +565,7 @@ class _SessionVaultCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Protected session vault',
+                      context.l10n.profileVaultTitle,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -517,7 +574,7 @@ class _SessionVaultCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Identity is persisted separately from local preferences.',
+                      context.l10n.profileVaultSubtitle,
                       style: TextStyle(
                         fontSize: 12,
                         color: t.muted,
@@ -534,15 +591,15 @@ class _SessionVaultCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _VaultStat(
-                  label: 'Sign-in',
+                  label: context.l10n.profileVaultSignIn,
                   value: auth.authMethod,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _VaultStat(
-                  label: 'Protected since',
-                  value: _signedInLabel(auth.signedInAt),
+                  label: context.l10n.profileVaultProtectedSince,
+                  value: _signedInLabel(context, auth.signedInAt),
                 ),
               ),
             ],
@@ -552,16 +609,16 @@ class _SessionVaultCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _VaultStat(
-                  label: 'Sync mode',
-                  value: _syncModeLabel(profile.dataSyncMode),
+                  label: context.l10n.profileVaultSyncMode,
+                  value: _syncModeLabel(context, profile.dataSyncMode),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _VaultStat(
-                  label: 'Approval guardrail',
+                  label: context.l10n.profileVaultApproval,
                   value: profile.autoApproveLimit == 0
-                      ? 'Manual only'
+                      ? context.l10n.profileVaultManualOnly
                       : fmtTL(profile.autoApproveLimit),
                 ),
               ),
@@ -768,7 +825,7 @@ class _PaletteSelector extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Brand palette',
+            context.l10n.brandPalette,
             style: TextStyle(
               fontSize: 14,
               color: t.muted,
@@ -777,7 +834,7 @@ class _PaletteSelector extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Vera x Uma',
+            'Vera × Uma',
             style: TextStyle(
               fontSize: 16,
               color: t.ink,
@@ -1010,12 +1067,14 @@ class _ToggleTile extends StatelessWidget {
   }
 }
 
-class _ConnectedInstitutionsCard extends StatelessWidget {
+class _ConnectedInstitutionsCard extends ConsumerWidget {
   const _ConnectedInstitutionsCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
+    final banks = ref.watch(homeControllerProvider).banks;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1027,7 +1086,7 @@ class _ConnectedInstitutionsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${kBanks.length} connected institutions',
+            l10n.profileConnectedTitle(banks.length),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -1036,7 +1095,7 @@ class _ConnectedInstitutionsCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Live balances refresh through the current sync policy and feed cache.',
+            l10n.profileConnectedSubtitle,
             style: TextStyle(
               fontSize: 12,
               color: t.muted,
@@ -1044,9 +1103,9 @@ class _ConnectedInstitutionsCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          for (final bank in kBanks) ...[
-            _InstitutionTile(bank: bank),
-            if (bank != kBanks.last) const SizedBox(height: 8),
+          for (var i = 0; i < banks.length; i++) ...[
+            _InstitutionTile(bank: banks[i]),
+            if (i != banks.length - 1) const SizedBox(height: 8),
           ],
         ],
       ),
@@ -1101,7 +1160,7 @@ class _InstitutionTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Account ${bank.last4}',
+                  context.l10n.profileConnectedAccount(bank.last4),
                   style: TextStyle(fontSize: 12, color: t.muted),
                 ),
               ],
@@ -1202,16 +1261,17 @@ String _aiToneLabel(AiTone tone) {
   };
 }
 
-String _syncModeLabel(DataSyncMode mode) {
+String _syncModeLabel(BuildContext context, DataSyncMode mode) {
+  final l10n = context.l10n;
   return switch (mode) {
-    DataSyncMode.live => 'Live sync',
-    DataSyncMode.balanced => 'Balanced sync',
-    DataSyncMode.saver => 'Battery saver sync',
+    DataSyncMode.live => l10n.profileVaultSyncLive,
+    DataSyncMode.balanced => l10n.profileVaultSyncBalanced,
+    DataSyncMode.saver => l10n.profileVaultSyncSaver,
   };
 }
 
-String _signedInLabel(DateTime? date) {
-  if (date == null) return 'This device';
+String _signedInLabel(BuildContext context, DateTime? date) {
+  if (date == null) return context.l10n.profileVaultThisDevice;
   final hour = date.hour.toString().padLeft(2, '0');
   final minute = date.minute.toString().padLeft(2, '0');
   return '${date.day}.${date.month} $hour:$minute';

@@ -13,15 +13,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: 'Mert Aksoy');
-    _emailController = TextEditingController(text: 'mert@aksoy.com');
-  }
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
 
   @override
   void dispose() {
@@ -30,9 +23,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  void _signIn() {
+    final l10n = context.l10n;
+    final name = _nameController.text.trim().isEmpty
+        ? l10n.defaultUserName
+        : _nameController.text.trim();
+    final email = _emailController.text.trim().isEmpty
+        ? l10n.loginEmailHint
+        : _emailController.text.trim();
+    ref.read(authControllerProvider.notifier).signInDemo(
+          displayName: name,
+          email: email,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: t.bg,
@@ -62,7 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 18),
               Text(
-                'Sign in to Vera',
+                l10n.loginTitle,
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w700,
@@ -72,44 +80,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Demo session identity is protected in the device vault, while profile preferences and AI actions stay local until you sign out.',
+                l10n.loginSubtitle,
                 style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
               ),
               const SizedBox(height: 24),
               _Field(
-                label: 'Display name',
+                label: l10n.loginDisplayName,
                 controller: _nameController,
+                hint: l10n.loginDisplayNameHint,
               ),
               const SizedBox(height: 14),
               _Field(
-                label: context.l10n.emailField,
+                label: l10n.emailField,
                 controller: _emailController,
+                hint: l10n.loginEmailHint,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      ref.read(authControllerProvider.notifier).signInDemo(
-                            displayName: _nameController.text.trim().isEmpty
-                                ? 'Mert Aksoy'
-                                : _nameController.text.trim(),
-                            email: _emailController.text.trim().isEmpty
-                                ? 'mert@aksoy.com'
-                                : _emailController.text.trim(),
-                          ),
+                  onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: t.brand,
                     foregroundColor: t.brandFG,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  child: Text(context.l10n.continueWithDemo),
+                  child: Text(l10n.continueWithDemo),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Next step: real auth, connected bank identity, and biometric relock.',
+                l10n.loginFooter,
                 style: TextStyle(fontSize: 12, color: t.muted, height: 1.45),
               ),
               const Spacer(),
@@ -125,11 +127,13 @@ class _Field extends StatelessWidget {
   const _Field({
     required this.label,
     required this.controller,
+    this.hint,
     this.keyboardType,
   });
 
   final String label;
   final TextEditingController controller;
+  final String? hint;
   final TextInputType? keyboardType;
 
   @override
@@ -151,6 +155,8 @@ class _Field extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: t.muted),
             filled: true,
             fillColor: t.card,
             border: OutlineInputBorder(

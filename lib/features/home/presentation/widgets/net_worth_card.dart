@@ -9,6 +9,7 @@ import '../../../../shared/widgets/pill.dart';
 class NetWorthCard extends StatelessWidget {
   const NetWorthCard({
     required this.balance,
+    required this.monthDelta,
     required this.lastUpdatedLabel,
     required this.refreshing,
     this.onSend,
@@ -19,6 +20,7 @@ class NetWorthCard extends StatelessWidget {
   });
 
   final double balance;
+  final double monthDelta;
   final String lastUpdatedLabel;
   final bool refreshing;
   final VoidCallback? onSend;
@@ -112,28 +114,35 @@ class NetWorthCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.trending_up, color: t.accentPop, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      '+TL 12.480',
-                      style: TextStyle(
-                        color: t.accentPop,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                if (monthDelta != 0)
+                  Row(
+                    children: [
+                      Icon(
+                        monthDelta >= 0
+                            ? Icons.trending_up
+                            : Icons.trending_down,
+                        color: monthDelta >= 0 ? t.accentPop : t.red,
+                        size: 14,
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.thisMonth,
-                      style: TextStyle(
-                        color: t.brandFG.withValues(alpha: 0.7),
-                        fontSize: 13,
+                      const SizedBox(width: 6),
+                      Text(
+                        '${monthDelta >= 0 ? '+' : '-'}${fmtTL(monthDelta.abs())}',
+                        style: TextStyle(
+                          color: monthDelta >= 0 ? t.accentPop : t.red,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.thisMonth,
+                        style: TextStyle(
+                          color: t.brandFG.withValues(alpha: 0.7),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 8),
                 Text(
                   lastUpdatedLabel,

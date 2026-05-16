@@ -10,7 +10,7 @@ import '../config/env.dart';
 ///
 /// API key tanimsiz ise servis "offline mode"da boot eder; uretim cagrilari
 /// [MissingGeminiKeyException] firlatir. Repository katmaninda her cagri
-/// try/catch ile fallback'e baglanmalidir (bkz. docs/GEMINI.md).
+/// try/catch ile fallback'e baglanmalidir (bkz. docs/PROMPTS.md).
 class GeminiService {
   GeminiService._(this._model);
 

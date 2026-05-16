@@ -8,7 +8,7 @@ Bu doküman, Vera içinde **şu an gerçekten Gemini'ye gönderilen** prompt'lar
 
 ## Genel ilkeler
 
-Her prompt 5 parça içerir (bkz. [GEMINI.md](GEMINI.md)):
+Her prompt 5 parça içerir:
 
 1. **Rol** — "You are X inside Y"
 2. **Bağlam** — kullanıcı/uygulama bağlamı
@@ -144,7 +144,7 @@ Match olmazsa → Gemini fallback'ine düşer (yukarıdaki §3).
 
 ## 5. Eklenmesi planlanan promptlar
 
-Aşağıdakiler henüz repository olarak yazılmadı; AI_SISTEMLERI.md ve ANALIZ_VE_TODO.md'de listelendi:
+Aşağıdaki repository'ler ve prompt'lar henüz yazılmadı:
 
 | Repository | Amaç | Öncelik |
 |---|---|---|
@@ -153,8 +153,6 @@ Aşağıdakiler henüz repository olarak yazılmadı; AI_SISTEMLERI.md ve ANALIZ
 | `security/data/fraud_explanation_repository.dart` | Fraud event → kullanıcı diline çevir | P0 |
 | `wealth/data/wealth_explanation_repository.dart` | Rebalance kararını açıkla | P1 |
 | `subscriptions/data/subscription_insight_repository.dart` | "En anlamsız 3 abonelik" özeti | P1 |
-
-Her birinin prompt taslağı `docs/AI_SISTEMLERI.md` § 3-8'de feature bazında listeli.
 
 ---
 

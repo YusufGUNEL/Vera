@@ -102,7 +102,7 @@ flutter build appbundle --release
 
 ## 6. Icon ve splash üretimi
 
-Üretilen görselleri `assets/branding/` altına koy (bkz. [ICON_SPLASH_PROMPT.md](ICON_SPLASH_PROMPT.md)):
+Üretilen görselleri `assets/branding/` altına koy (1024×1024 ana ikon + adaptive bg/fg + 768×768 splash). `flutter pub run flutter_launcher_icons` ve `flutter pub run flutter_native_splash:create` komutlarıyla bağla.
 
 ```
 assets/branding/

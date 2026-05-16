@@ -25,10 +25,10 @@ class HomeState {
   final DateTime? lastUpdated;
   final bool refreshing;
 
-  String get refreshedLabel {
-    if (lastUpdated == null) return 'İlk senkron bekleniyor';
-    final dt = lastUpdated!;
-    return 'Güncellendi ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  String? get lastUpdatedTime {
+    final dt = lastUpdated;
+    if (dt == null) return null;
+    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   HomeState copyWith({
@@ -98,6 +98,17 @@ class HomeController extends StateNotifier<HomeState> {
   Future<void> clearImported() async {
     _imported = const [];
     await _imports.clear();
+    final feed = _feed;
+    if (feed != null) _apply(feed);
+  }
+
+  /// Wipes user-added state (imports + custom banks) so the demo starts fresh.
+  /// Goal progress lives in [goalsControllerProvider] and is reset separately.
+  Future<void> resetDemoState() async {
+    _imported = const [];
+    _customBanks = const [];
+    await _imports.clear();
+    await _banksStore.clear();
     final feed = _feed;
     if (feed != null) _apply(feed);
   }

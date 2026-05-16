@@ -38,6 +38,12 @@ class AppStrings {
   String get connectedAccounts => _t('connectedAccounts');
   String get refresh => _t('refresh');
   String get syncingDots => _t('syncingDots');
+  String get firstSyncPending => _t('firstSyncPending');
+  String updatedAt(String time) =>
+      _t('updatedAt').replaceAll('{time}', time);
+  String get firstScanPending => _t('firstScanPending');
+  String lastScanAt(String time) =>
+      _t('lastScanAt').replaceAll('{time}', time);
   String get recentTransactions => _t('recentTransactions');
   String itemsCount(int n) => _t('itemsCount').replaceAll('{n}', '$n');
   String get itemsVisible => _t('itemsVisible');
@@ -55,6 +61,30 @@ class AppStrings {
   String get umaInsight => _t('umaInsight');
   String get spent => _t('spent');
   String get incoming => _t('incoming');
+
+  // ---- Credit screen ----
+  String get creditHealthScore => _t('creditHealthScore');
+  String get creditStatIncome => _t('creditStatIncome');
+  String get creditStatDti => _t('creditStatDti');
+  String get creditStatTerm => _t('creditStatTerm');
+  String creditTermMo(int n) =>
+      _t('creditTermMo').replaceAll('{n}', '$n');
+  String creditTermMonths(int n) =>
+      _t('creditTermMonths').replaceAll('{n}', '$n');
+  String get creditRunSimulation => _t('creditRunSimulation');
+  String get creditCurrentDecision => _t('creditCurrentDecision');
+  String creditPersonalLoan(String amount) =>
+      _t('creditPersonalLoan').replaceAll('{amount}', amount);
+  String creditMonthsApr(int n, String apr) =>
+      _t('creditMonthsApr').replaceAll('{n}', '$n').replaceAll('{apr}', apr);
+  String get creditUmaInsight => _t('creditUmaInsight');
+  String get creditEligibleProducts => _t('creditEligibleProducts');
+  String get creditLoanSimulation => _t('creditLoanSimulation');
+  String get creditLoanSimulationSubtitle => _t('creditLoanSimulationSubtitle');
+  String get creditFieldLoanAmount => _t('creditFieldLoanAmount');
+  String get creditFieldTerm => _t('creditFieldTerm');
+  String get creditFieldIncome => _t('creditFieldIncome');
+  String get creditFieldDebt => _t('creditFieldDebt');
 
   // ---- Credit card on home ----
   String get creditTitle => _t('creditTitle');
@@ -77,6 +107,56 @@ class AppStrings {
   String get undo => _t('undo');
   String get viewDetails => _t('viewDetails');
 
+  // ---- Subscriptions detail ----
+  String get subsRenewalLabel => _t('subsRenewalLabel');
+  String get subsActivityLabel => _t('subsActivityLabel');
+
+  // ---- Profile (AI / Sync / Auto / Notifications) ----
+  String get profileDailyBriefing => _t('profileDailyBriefing');
+  String get profileDailyBriefingSub => _t('profileDailyBriefingSub');
+  String get profileLiveSync => _t('profileLiveSync');
+  String get profileLiveSyncLive => _t('profileLiveSyncLive');
+  String get profileLiveSyncBalanced => _t('profileLiveSyncBalanced');
+  String get profileLiveSyncSaver => _t('profileLiveSyncSaver');
+  String get profileAutoApprove => _t('profileAutoApprove');
+  String get profileAutoApproveOff => _t('profileAutoApproveOff');
+  String get profileSmartNotif => _t('profileSmartNotif');
+  String get profileSmartNotifSub => _t('profileSmartNotifSub');
+  String get profileFaceId => _t('profileFaceId');
+  String get profileFaceIdSub => _t('profileFaceIdSub');
+  String get profileFraudHigh => _t('profileFraudHigh');
+  String get profileFraudHighSub => _t('profileFraudHighSub');
+  String get profileVaultTitle => _t('profileVaultTitle');
+  String get profileVaultSubtitle => _t('profileVaultSubtitle');
+  String get profileVaultSignIn => _t('profileVaultSignIn');
+  String get profileVaultProtectedSince => _t('profileVaultProtectedSince');
+  String get profileVaultSyncMode => _t('profileVaultSyncMode');
+  String get profileVaultApproval => _t('profileVaultApproval');
+  String get profileVaultThisDevice => _t('profileVaultThisDevice');
+  String get profileVaultManualOnly => _t('profileVaultManualOnly');
+  String get profileVaultSyncLive => _t('profileVaultSyncLive');
+  String get profileVaultSyncBalanced => _t('profileVaultSyncBalanced');
+  String get profileVaultSyncSaver => _t('profileVaultSyncSaver');
+  String profileAiToneBadge(String tone) =>
+      _t('profileAiToneBadge').replaceAll('{tone}', tone);
+  String profileConnectedTitle(int n) =>
+      _t('profileConnectedTitle').replaceAll('{n}', '$n');
+  String get profileConnectedSubtitle => _t('profileConnectedSubtitle');
+  String profileConnectedAccount(String last4) =>
+      _t('profileConnectedAccount').replaceAll('{last4}', last4);
+
+  // ---- UMA order card titles ----
+  String get orderTitleBuyGold => _t('orderTitleBuyGold');
+  String get orderTitlePayCard => _t('orderTitlePayCard');
+  String get orderTitleGoldRate => _t('orderTitleGoldRate');
+  String get orderTitleDue => _t('orderTitleDue');
+  String get orderTitleDueToday => _t('orderTitleDueToday');
+
+  // ---- UMA order card ----
+  String get orderPillReady => _t('orderPillReady');
+  String get orderPillSent => _t('orderPillSent');
+  String get orderPillDismissed => _t('orderPillDismissed');
+
   // ---- Plans / Subscriptions ----
   String get plansTitle => _t('plansTitle');
   String get plansSubtitle => _t('plansSubtitle');
@@ -93,6 +173,22 @@ class AppStrings {
   // ---- Security ----
   String get securityTitle => _t('securityTitle');
   String get securitySubtitle => _t('securitySubtitle');
+  String get securityStatBlockedLabel => _t('securityStatBlockedLabel');
+  String get securityStatBlockedSub => _t('securityStatBlockedSub');
+  String get securityStatReviewedLabel => _t('securityStatReviewedLabel');
+  String get securityStatReviewedSub => _t('securityStatReviewedSub');
+  String get securityStatDevicesLabel => _t('securityStatDevicesLabel');
+  String get securityStatDevicesSub => _t('securityStatDevicesSub');
+  String get securityAccountSection => _t('securityAccountSection');
+  String get securityClearBody => _t('securityClearBody');
+  String securityActiveBody(int n) =>
+      _t('securityActiveBody').replaceAll('{n}', '$n');
+  String get securityViewReport => _t('securityViewReport');
+  String get securityDecisionKept => _t('securityDecisionKept');
+  String get securityDecisionApproved => _t('securityDecisionApproved');
+  String get securityPillBlocked => _t('securityPillBlocked');
+  String get securityPillKept => _t('securityPillKept');
+  String get securityPillApproved => _t('securityPillApproved');
 
   // ---- Profile sheet ----
   String get profileAndSettings => _t('profileAndSettings');
@@ -189,6 +285,12 @@ class AppStrings {
   String get continueWithDemo => _t('continueWithDemo');
   String get emailField => _t('emailField');
   String get passwordField => _t('passwordField');
+  String get loginTitle => _t('loginTitle');
+  String get loginSubtitle => _t('loginSubtitle');
+  String get loginDisplayName => _t('loginDisplayName');
+  String get loginDisplayNameHint => _t('loginDisplayNameHint');
+  String get loginEmailHint => _t('loginEmailHint');
+  String get loginFooter => _t('loginFooter');
 
   // ---- UMA chat ----
   String get umaSuggestionPay => _t('umaSuggestionPay');
@@ -235,6 +337,32 @@ class AppStrings {
   String get helpContact => _t('helpContact');
   String get demoUser => _t('demoUser');
 
+  // ---- UMA greeting ----
+  String umaGreeting(String name) =>
+      _t('umaGreeting').replaceAll('{name}', name);
+
+  // ---- UMA fallback replies ----
+  String umaReplyBuyGold(String bank) =>
+      _t('umaReplyBuyGold').replaceAll('{bank}', bank);
+  String umaReplyPayCard(String bank) =>
+      _t('umaReplyPayCard').replaceAll('{bank}', bank);
+  String umaReplyMoveSavings(int pct) =>
+      _t('umaReplyMoveSavings').replaceAll('{pct}', '$pct');
+  String umaReplySubscriptions(int n, String total) => _t('umaReplySubscriptions')
+      .replaceAll('{n}', '$n')
+      .replaceAll('{total}', total);
+  String umaReplySubscriptionsEmpty() => _t('umaReplySubscriptionsEmpty');
+  String umaReplyAnalyze(String top, String topAmount, String spending) =>
+      _t('umaReplyAnalyze')
+          .replaceAll('{top}', top)
+          .replaceAll('{topAmount}', topAmount)
+          .replaceAll('{spending}', spending);
+  String umaReplyAnalyzeEmpty() => _t('umaReplyAnalyzeEmpty');
+  String get umaReplyExplainWealth => _t('umaReplyExplainWealth');
+  String get umaReplyLoan => _t('umaReplyLoan');
+  String get umaReplySecurity => _t('umaReplySecurity');
+  String get umaReplyFallback => _t('umaReplyFallback');
+
   // ---- UMA chat misc ----
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
@@ -243,6 +371,148 @@ class AppStrings {
   String get umaSuggestionMoveSavings => _t('umaSuggestionMoveSavings');
   String get umaActionPolicy => _t('umaActionPolicy');
   String get umaActionPolicyDesc => _t('umaActionPolicyDesc');
+
+  // ---- Category budget ----
+  String get categoryBudgetLabel => _t('categoryBudgetLabel');
+  String get categoryOther => _t('categoryOther');
+  String categoryBudgetTopHint(String category, String pct) => _t(
+        'categoryBudgetTopHint',
+      ).replaceAll('{category}', category).replaceAll('{pct}', pct);
+  String categoryRemaining(String amount) =>
+      _t('categoryRemaining').replaceAll('{amount}', amount);
+  String categoryOver(String amount) =>
+      _t('categoryOver').replaceAll('{amount}', amount);
+  String get categoryNoLimit => _t('categoryNoLimit');
+  String get categoryLimitEditTitle => _t('categoryLimitEditTitle');
+  String categoryLimitEditSubtitle(String category) =>
+      _t('categoryLimitEditSubtitle').replaceAll('{category}', category);
+  String get categoryLimitField => _t('categoryLimitField');
+  String get categoryLimitSave => _t('categoryLimitSave');
+  String get categoryLimitClear => _t('categoryLimitClear');
+
+  // ---- Goals (emergency fund) ----
+  String get goalsSectionTitle => _t('goalsSectionTitle');
+  String get goalEmergencyFund => _t('goalEmergencyFund');
+  String goalProgress(String pct) =>
+      _t('goalProgress').replaceAll('{pct}', pct);
+  String goalRemaining(String amount) =>
+      _t('goalRemaining').replaceAll('{amount}', amount);
+  String get goalEditTitle => _t('goalEditTitle');
+  String get goalEditTarget => _t('goalEditTarget');
+  String get goalEditSaved => _t('goalEditSaved');
+  String get goalEditSave => _t('goalEditSave');
+  String get goalEditFooter => _t('goalEditFooter');
+  String goalEtaMonths(int n) =>
+      _t('goalEtaMonths').replaceAll('{n}', '$n');
+  String get goalEtaReached => _t('goalEtaReached');
+
+  // ---- Bank actions / delete ----
+  String get bankActionsTitle => _t('bankActionsTitle');
+  String get bankActionsDelete => _t('bankActionsDelete');
+  String get bankActionsCancel => _t('bankActionsCancel');
+  String get bankActionsConfirmTitle => _t('bankActionsConfirmTitle');
+  String bankActionsConfirmBody(String name) =>
+      _t('bankActionsConfirmBody').replaceAll('{name}', name);
+  String bankDeleted(String name) =>
+      _t('bankDeleted').replaceAll('{name}', name);
+  String get bankActionsFeedNote => _t('bankActionsFeedNote');
+
+  // ---- UMA prompts (quick actions on home) ----
+  String get umaPromptSend => _t('umaPromptSend');
+  String get umaPromptRequest => _t('umaPromptRequest');
+  String get umaPromptTopUp => _t('umaPromptTopUp');
+  String get umaPromptPay => _t('umaPromptPay');
+  String get umaPromptAnalyze => _t('umaPromptAnalyze');
+
+  // ---- Transaction detail ----
+  String get txnDetailWhen => _t('txnDetailWhen');
+  String get txnDetailCategory => _t('txnDetailCategory');
+  String get txnDetailDirection => _t('txnDetailDirection');
+  String get txnDetailIncoming => _t('txnDetailIncoming');
+  String get txnDetailOutgoing => _t('txnDetailOutgoing');
+  String txnDetailAskPrompt(String name, String amount) =>
+      _t('txnDetailAskPrompt')
+          .replaceAll('{name}', name)
+          .replaceAll('{amount}', amount);
+  String billDetailPrompt(String name, String amount, int days) =>
+      _t('billDetailPrompt')
+          .replaceAll('{name}', name)
+          .replaceAll('{amount}', amount)
+          .replaceAll('{days}', '$days');
+
+  // ---- Notification center ----
+  String get notifTitle => _t('notifTitle');
+  String notifSubtitle(int n) =>
+      _t('notifSubtitle').replaceAll('{n}', '$n');
+  String get notifEmpty => _t('notifEmpty');
+  String get notifBlockedDefault => _t('notifBlockedDefault');
+  String notifPriceIncreaseTitle(String name) =>
+      _t('notifPriceIncreaseTitle').replaceAll('{name}', name);
+  String notifPriceIncreaseBody(String delta, String price) =>
+      _t('notifPriceIncreaseBody')
+          .replaceAll('{delta}', delta)
+          .replaceAll('{price}', price);
+  String notifUnusedTitle(String name) =>
+      _t('notifUnusedTitle').replaceAll('{name}', name);
+  String notifUnusedBody(String last) =>
+      _t('notifUnusedBody').replaceAll('{last}', last);
+  String notifBillTitle(String name) =>
+      _t('notifBillTitle').replaceAll('{name}', name);
+  String notifBillBody(String amount) =>
+      _t('notifBillBody').replaceAll('{amount}', amount);
+
+  // ---- Proactive insight ----
+  String get proactiveBadge => _t('proactiveBadge');
+  String proactiveBillTitle(String name) =>
+      _t('proactiveBillTitle').replaceAll('{name}', name);
+  String proactiveBillBody(String amount, int days) =>
+      _t('proactiveBillBody')
+          .replaceAll('{amount}', amount)
+          .replaceAll('{days}', '$days');
+  String get proactiveBillCta => _t('proactiveBillCta');
+  String proactiveBillPrompt(String name) =>
+      _t('proactiveBillPrompt').replaceAll('{name}', name);
+  String proactivePriceTitle(String name) =>
+      _t('proactivePriceTitle').replaceAll('{name}', name);
+  String proactivePriceBody(String delta) =>
+      _t('proactivePriceBody').replaceAll('{delta}', delta);
+  String get proactivePriceCta => _t('proactivePriceCta');
+  String proactiveUnusedTitle(String name) =>
+      _t('proactiveUnusedTitle').replaceAll('{name}', name);
+  String proactiveUnusedBody(String last) =>
+      _t('proactiveUnusedBody').replaceAll('{last}', last);
+  String get proactiveUnusedCta => _t('proactiveUnusedCta');
+
+  // ---- Data export ----
+  String get exportTile => _t('exportTile');
+  String get exportTileValue => _t('exportTileValue');
+  String get exportTitle => _t('exportTitle');
+  String get exportSubtitle => _t('exportSubtitle');
+  String get exportCopy => _t('exportCopy');
+  String get exportCopied => _t('exportCopied');
+
+  // ---- Onboarding ----
+  String get onbStep1Title => _t('onbStep1Title');
+  String get onbStep1Subtitle => _t('onbStep1Subtitle');
+  String get onbStep2Title => _t('onbStep2Title');
+  String get onbStep2Subtitle => _t('onbStep2Subtitle');
+  String get onbStep3Title => _t('onbStep3Title');
+  String get onbStep3Subtitle => _t('onbStep3Subtitle');
+  String get onbContinue => _t('onbContinue');
+  String get onbStart => _t('onbStart');
+  String get onbSkip => _t('onbSkip');
+  String get onbBack => _t('onbBack');
+  String get onbImportNow => _t('onbImportNow');
+  String get onbScanNow => _t('onbScanNow');
+
+  // ---- Demo replay ----
+  String get demoResetTile => _t('demoResetTile');
+  String get demoResetTileValue => _t('demoResetTileValue');
+  String get demoResetTitle => _t('demoResetTitle');
+  String get demoResetBody => _t('demoResetBody');
+  String get demoResetConfirm => _t('demoResetConfirm');
+  String get demoResetCancel => _t('demoResetCancel');
+  String get demoResetDone => _t('demoResetDone');
 
   // ---- Generic ----
   String get comingSoon => _t('comingSoon');
@@ -270,6 +540,10 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'connectedAccounts': 'Bağlı hesaplar',
     'refresh': 'Yenile',
     'syncingDots': 'Eşitleniyor...',
+    'firstSyncPending': 'İlk senkron bekleniyor',
+    'updatedAt': 'Güncellendi {time}',
+    'firstScanPending': 'İlk tarama bekleniyor',
+    'lastScanAt': 'Son tarama {time}',
     'recentTransactions': 'Son işlemler',
     'itemsCount': '{n} işlem',
     'itemsVisible': 'görünür',
@@ -287,6 +561,70 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'umaInsight': 'UMA İÇGÖRÜ',
     'spent': 'Harcanan',
     'incoming': 'Gelen',
+    'creditHealthScore': 'Kredi sağlık skoru',
+    'creditStatIncome': 'GELİR',
+    'creditStatDti': 'BORÇ/GELİR',
+    'creditStatTerm': 'VADE',
+    'creditTermMo': '{n} ay',
+    'creditTermMonths': '{n} ay',
+    'creditRunSimulation': 'Kredi simülasyonunu çalıştır',
+    'creditCurrentDecision': 'Geçerli karar',
+    'creditPersonalLoan': 'Kişisel kredi · {amount}',
+    'creditMonthsApr': '{n} ay · %{apr} APR',
+    'creditUmaInsight': 'UMA İÇGÖRÜ',
+    'creditEligibleProducts': 'Uygun ürünler',
+    'creditLoanSimulation': 'Kredi simülasyonu',
+    'creditLoanSimulationSubtitle':
+        'İstediğin değerleri ayarla, Vera kararı anlık günceller.',
+    'creditFieldLoanAmount': 'Kredi tutarı',
+    'creditFieldTerm': 'Vade',
+    'creditFieldIncome': 'Aylık gelir',
+    'creditFieldDebt': 'Aylık borç',
+    'subsRenewalLabel': 'Yenileme',
+    'subsActivityLabel': 'Aktivite',
+    'profileDailyBriefing': 'Günlük AI özeti',
+    'profileDailyBriefingSub':
+        'Hesap durumu, şüpheli aktivite ve tasarruf önerileriyle güne başla',
+    'profileLiveSync': 'Canlı veri senkronu',
+    'profileLiveSyncLive': 'Canlı',
+    'profileLiveSyncBalanced': 'Dengeli',
+    'profileLiveSyncSaver': 'Tasarruflu',
+    'profileAutoApprove': 'Otomatik onay limiti',
+    'profileAutoApproveOff': 'Kapalı',
+    'profileSmartNotif': 'Akıllı bildirimler',
+    'profileSmartNotifSub':
+        'Fraud, yenileme ve onay değişiklikleri için uyarılar',
+    'profileFaceId': 'Face ID kilidi',
+    'profileFaceIdSub':
+        'Hassas aksiyonlardan önce biyometrik kilit iste',
+    'profileFraudHigh': 'Yüksek hassasiyetli fraud uyarıları',
+    'profileFraudHighSub':
+        "Vera'nın olağandışı cihaz ve ödeme örüntülerini daha erken yakalamasına izin ver",
+    'profileVaultTitle': 'Korumalı oturum kasası',
+    'profileVaultSubtitle':
+        'Kimlik bilgisi yerel tercihlerden ayrı şekilde saklanır.',
+    'profileVaultSignIn': 'Giriş',
+    'profileVaultProtectedSince': 'Korunma başlangıcı',
+    'profileVaultSyncMode': 'Senkron modu',
+    'profileVaultApproval': 'Onay kuralı',
+    'profileVaultThisDevice': 'Bu cihaz',
+    'profileVaultManualOnly': 'Yalnızca manuel',
+    'profileVaultSyncLive': 'Canlı senkron',
+    'profileVaultSyncBalanced': 'Dengeli senkron',
+    'profileVaultSyncSaver': 'Pil tasarruflu senkron',
+    'profileAiToneBadge': 'AI TONU / {tone}',
+    'profileConnectedTitle': '{n} bağlı kurum',
+    'profileConnectedSubtitle':
+        'Canlı bakiyeler mevcut senkron politikası ve feed cache üzerinden tazelenir.',
+    'profileConnectedAccount': 'Hesap {last4}',
+    'orderTitleBuyGold': '10g altın alımı',
+    'orderTitlePayCard': 'Kredi kartı ekstresini öde',
+    'orderTitleGoldRate': 'Fiyat',
+    'orderTitleDue': 'Vade',
+    'orderTitleDueToday': 'Bugün',
+    'orderPillReady': 'HAZIR',
+    'orderPillSent': 'BANKADA',
+    'orderPillDismissed': 'İPTAL',
     'creditTitle': 'Kredi',
     'creditSubtitle': 'Gerçek gelirine göre borçlanma.',
     'creditScoreLabel': 'KREDİ PUANI',
@@ -317,6 +655,23 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'askUma': "UMA'ya sor",
     'securityTitle': 'Güvenlik',
     'securitySubtitle': 'Hesabınızın canlı koruma katmanı.',
+    'securityStatBlockedLabel': 'BLOKE',
+    'securityStatBlockedSub': 'aktif',
+    'securityStatReviewedLabel': 'İNCELENEN',
+    'securityStatReviewedSub': 'bu hafta',
+    'securityStatDevicesLabel': 'CİHAZ',
+    'securityStatDevicesSub': 'güvenilir',
+    'securityAccountSection': 'HESAP GÜVENLİĞİ',
+    'securityClearBody': 'Son taramada çözülmemiş fraud uyarısı yok.',
+    'securityActiveBody': 'Fraud Radar şu an {n} aktif uyarı izliyor.',
+    'securityViewReport': 'UMA RAPORUNU GÖR',
+    'securityDecisionKept':
+        'Bu olayı bloke olarak işaretledin. Fraud Radar benzer örüntüleri yüksek risk olarak izlemeye devam edecek.',
+    'securityDecisionApproved':
+        'Bu olayı güvenli olarak işaretledin. Fraud Radar benzer false positive\'leri azaltmak için bunu kullanacak.',
+    'securityPillBlocked': 'AI BLOKE ETTİ',
+    'securityPillKept': 'BLOKE TUTULDU',
+    'securityPillApproved': 'SEN ONAYLADIN',
     'profileAndSettings': 'Profil & Ayarlar',
     'sectionAppearance': 'GÖRÜNÜM & TEMA',
     'sectionAi': 'YAPAY ZEKA TERCİHLERİ',
@@ -389,6 +744,13 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'continueWithDemo': 'Demo hesabıyla devam et',
     'emailField': 'E-posta',
     'passwordField': 'Şifre',
+    'loginTitle': "Vera'ya giriş yap",
+    'loginSubtitle':
+        'Demo oturum kimliği cihaz kasasında korunur; profil tercihleri ve AI aksiyonları çıkış yapana kadar yerelde kalır.',
+    'loginDisplayName': 'Görünen ad',
+    'loginDisplayNameHint': 'Adın',
+    'loginEmailHint': 'demo@vera.app',
+    'loginFooter': 'Sonraki adım: gerçek auth, banka kimliği ve biyometrik kilit.',
     'umaSuggestionPay': 'Kredi kartımı öde',
     'umaSuggestionSubs': 'Aboneliklerimi göster',
     'umaSuggestionAnalyze': 'Harcamalarımı analiz et',
@@ -438,6 +800,30 @@ const Map<AppLocale, Map<String, String>> _strings = {
         'OCR ve ekstre import deterministic fallback ile çalışır (DEMO rozeti görünür). UMA chat heuristic intent router ile cevap verir. Tüm akış çalışır, sadece AI parsing canlı değildir.',
     'helpContact': 'İletişim',
     'demoUser': 'Demo kullanıcı',
+    'umaGreeting':
+        'Merhaba {name}. İçe aktardığın işlemleri okudum. Kart faturası ödeyebilir, transfer hazırlayabilir veya altın fiyatına bakabiliriz. Para hareketi hep senin bankanda olur; ben hazırlığı yapar, sonucu takip ederim.',
+    'umaReplyBuyGold':
+        '{bank} üzerinden 10 gram altın alım planını hazırladım. Uygulamayı açıp onayla; SMS\'ten sonucu takip ederim.',
+    'umaReplyPayCard':
+        '{bank} ekstresi ödemeye hazır. Uygulamayı doğrudan ödeme ekranında açacağım.',
+    'umaReplyMoveSavings':
+        'Acil durum fonu planın hazır. Bankanı aç ve transferi orada onayla. Bu transferden sonra hedefe %{pct} ulaşıyorsun.',
+    'umaReplySubscriptions':
+        'Bakmaya değer {n} planın var. Aylık abonelik toplamın {total} civarında.',
+    'umaReplySubscriptionsEmpty':
+        'Şu an aktif abonelik tespit etmedim. Bir ekstre yüklersen Vera tekrarlayan ödemeleri bulup listeye ekler.',
+    'umaReplyAnalyze':
+        'Bu ay en çok {top} kategorisinde {topAmount} harcadın. Toplam çıkış {spending}. İstersen kategori limitleri ayarlayabiliriz.',
+    'umaReplyAnalyzeEmpty':
+        'Henüz analiz edebileceğim işlem yok. Fiş tara veya bir ekstre yükle, sonra harcamayı parçalayalım.',
+    'umaReplyExplainWealth':
+        'Vera portföyünü içe aktardığın hesaplar üzerinden takip ediyor. Bu ay hisse kovan biraz yüksek görünüyor; bir sonraki bankayı açtığında altın veya nakide takviye önerim olacak.',
+    'umaReplyLoan':
+        'İçe aktardığın ekstrelerdeki gelir ve borç verisine göre orta tutarda kişisel kredi için güçlü görünüyorsun. Kredi simülasyonunu açarsan tutar ve vadeyi güvenli bir aralığa birlikte ayarlayabiliriz.',
+    'umaReplySecurity':
+        'O transferi işaretledim çünkü alıcı bir kez daha görünmüştü ve cihaz konumu olağan örüntünle eşleşmedi. Vera bankanı bloklamaz — uyarır, kararı sen verirsin.',
+    'umaReplyFallback':
+        'Bunu da yapabilirim. İstersen kısa bir finansal değerlendirme veya güvenli bir sonraki adım hazırlayayım.',
     'umaThinking': 'Uma düşünüyor...',
     'umaAskHint': "Uma'ya sor...",
     'umaStatusOnline': 'AI asistan · çevrimiçi',
@@ -445,6 +831,97 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'umaSuggestionMoveSavings': "2500 TL'yi birikime aktar",
     'umaActionPolicy': 'EYLEM POLİTİKASI',
     'umaActionPolicyDesc': 'Vera para hareketini bankanda yapar; sen her zaman onay verirsin.',
+    'categoryBudgetLabel': 'BU AYKİ HARCAMALAR',
+    'categoryOther': 'Diğer',
+    'categoryBudgetTopHint': 'En çok {category} · %{pct}',
+    'categoryRemaining': 'kalan {amount}',
+    'categoryOver': 'limit aşıldı · {amount}',
+    'categoryNoLimit': 'limit yok',
+    'categoryLimitEditTitle': 'Kategori limiti',
+    'categoryLimitEditSubtitle':
+        '{category} için aylık limiti belirle. Vera her harcamada kalan tutarı gösterir.',
+    'categoryLimitField': 'Aylık limit (TL)',
+    'categoryLimitSave': 'Kaydet',
+    'categoryLimitClear': 'Limiti kaldır',
+    'goalsSectionTitle': 'Hedeflerin',
+    'goalEmergencyFund': 'Acil durum fonu',
+    'goalProgress': '%{pct} yolda',
+    'goalRemaining': '{amount} kaldı',
+    'goalEditTitle': 'Hedefini düzenle',
+    'goalEditTarget': 'Hedef tutar (TL)',
+    'goalEditSaved': 'Biriken tutar (TL)',
+    'goalEditSave': 'Kaydet',
+    'goalEditFooter': 'Vera hedef paranı izler; Uma her ay yeni öneri yapar.',
+    'goalEtaMonths': '{n} ayda tamam',
+    'goalEtaReached': 'Hedefe ulaştın 🎯',
+    'bankActionsTitle': 'Banka seçenekleri',
+    'bankActionsDelete': 'Bankayı sil',
+    'bankActionsCancel': 'Vazgeç',
+    'bankActionsConfirmTitle': 'Silinsin mi?',
+    'bankActionsConfirmBody':
+        '{name} listeden silinecek. Bakiye toplamından çıkarılır.',
+    'bankDeleted': '{name} silindi',
+    'bankActionsFeedNote':
+        'Bu banka demo verisinde geliyor — silinemez. Kendi eklediklerini silebilirsin.',
+    'umaPromptSend': 'Bir arkadaşa para göndermek istiyorum.',
+    'umaPromptRequest': 'Bir arkadaştan para iste.',
+    'umaPromptTopUp': 'Hesabıma yükleme yapmak istiyorum.',
+    'umaPromptPay': 'Kredi kartı faturamı ödemek istiyorum.',
+    'umaPromptAnalyze': 'Bu ay harcamalarımı analiz et.',
+    'txnDetailWhen': 'Zaman',
+    'txnDetailCategory': 'Kategori',
+    'txnDetailDirection': 'Yön',
+    'txnDetailIncoming': 'Gelen',
+    'txnDetailOutgoing': 'Giden',
+    'txnDetailAskPrompt': '{name} işlemini değerlendir, {amount} normal mi?',
+    'billDetailPrompt': '{name} faturası {amount}, {days} gün kaldı. Ne yapayım?',
+    'notifTitle': 'Bildirimler',
+    'notifSubtitle': '{n} sinyal Uma tarafından izleniyor',
+    'notifEmpty': 'Her şey yolunda. Uma sessizce izlemeye devam ediyor.',
+    'notifBlockedDefault': 'Vera bu işlemi anomali olarak işaretledi.',
+    'notifPriceIncreaseTitle': '{name} zamlandı',
+    'notifPriceIncreaseBody': 'Aylık +{delta} · şimdi {price}. Plans ekranında dondurabilirsin.',
+    'notifUnusedTitle': '{name} kullanılmıyor',
+    'notifUnusedBody': 'Son kullanım: {last}. Vera bunu sessiz para sızıntısı olarak işaretledi.',
+    'notifBillTitle': '{name} faturası yaklaşıyor',
+    'notifBillBody': 'Ödenecek tutar {amount}. Uma ile öde veya bankan üzerinden tamamla.',
+    'proactiveBadge': 'VERA FARK ETTİ',
+    'proactiveBillTitle': '{name} faturası yaklaşıyor',
+    'proactiveBillBody': '{amount} · {days} gün kaldı. Uma ödeme planını hazırlasın mı?',
+    'proactiveBillCta': 'Uma ile öde',
+    'proactiveBillPrompt': '{name} faturamı ödemek için yardım et.',
+    'proactivePriceTitle': '{name} bu ay zamlandı',
+    'proactivePriceBody': 'Aylık +{delta} artış. Aboneliği dondurmak ister misin?',
+    'proactivePriceCta': 'Aboneliklere git',
+    'proactiveUnusedTitle': '{name} kullanılmıyor',
+    'proactiveUnusedBody': 'Son kullanım: {last}. Sessiz para sızıntısı olabilir.',
+    'proactiveUnusedCta': 'Aboneliklere git',
+    'exportTile': 'Verilerimi dışa aktar',
+    'exportTileValue': 'JSON · cihaza özel',
+    'exportTitle': 'Vera verilerin',
+    'exportSubtitle': 'İçe aktarılan işlemler, eklediğin bankalar, hedefin ve abonelik listen. Cihazından dışarı bilgi göndermeden kopyalanabilir.',
+    'exportCopy': 'JSON kopyala',
+    'exportCopied': 'Pano\'ya kopyalandı',
+    'onbStep1Title': "Vera'ya hoş geldin",
+    'onbStep1Subtitle': 'Önce kullanmak istediğin dili seç. Dil her zaman ayarlardan değiştirilebilir.',
+    'onbStep2Title': 'Görünüşünü ayarla',
+    'onbStep2Subtitle': 'Markanın paletini ve modunu seç. Tema daha sonra da değiştirilebilir.',
+    'onbStep3Title': 'Verini getir',
+    'onbStep3Subtitle': 'Vera bankana bağlanmaz — sen ekstreni getirirsin, Vera anlamlandırır. Şimdi başla veya sonra ekle.',
+    'onbContinue': 'Devam et',
+    'onbStart': 'Veraya başla',
+    'onbSkip': 'Atla',
+    'onbBack': 'Geri',
+    'onbImportNow': 'Ekstre yükle',
+    'onbScanNow': 'Fiş tara',
+    'demoResetTile': 'Demo verisini sıfırla',
+    'demoResetTileValue': 'İçe aktarılanları ve eklemeleri temizle',
+    'demoResetTitle': 'Demo verisini sıfırla?',
+    'demoResetBody':
+        'İçe aktarılan işlemler, eklediğin bankalar ve hedef ilerlemen başlangıç durumuna döner.',
+    'demoResetConfirm': 'Sıfırla',
+    'demoResetCancel': 'Vazgeç',
+    'demoResetDone': 'Demo durumuna döndü',
     'comingSoon': 'Yakında',
     'close': 'Kapat',
   },
@@ -467,6 +944,10 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'connectedAccounts': 'Connected accounts',
     'refresh': 'Refresh',
     'syncingDots': 'Syncing...',
+    'firstSyncPending': 'Awaiting first sync',
+    'updatedAt': 'Updated {time}',
+    'firstScanPending': 'Awaiting first scan',
+    'lastScanAt': 'Last scan {time}',
     'recentTransactions': 'Recent transactions',
     'itemsCount': '{n} items',
     'itemsVisible': 'visible',
@@ -484,6 +965,70 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'umaInsight': 'UMA INSIGHT',
     'spent': 'Spent',
     'incoming': 'In',
+    'creditHealthScore': 'Credit Health Score',
+    'creditStatIncome': 'INCOME',
+    'creditStatDti': 'DTI',
+    'creditStatTerm': 'TERM',
+    'creditTermMo': '{n} mo',
+    'creditTermMonths': '{n} months',
+    'creditRunSimulation': 'Run loan simulation',
+    'creditCurrentDecision': 'Current decision',
+    'creditPersonalLoan': 'Personal loan · {amount}',
+    'creditMonthsApr': '{n} months · {apr}% APR',
+    'creditUmaInsight': 'UMA INSIGHT',
+    'creditEligibleProducts': 'Eligible products',
+    'creditLoanSimulation': 'Loan simulation',
+    'creditLoanSimulationSubtitle':
+        'Tune the request and Vera will refresh the decision in real time.',
+    'creditFieldLoanAmount': 'Loan amount',
+    'creditFieldTerm': 'Term',
+    'creditFieldIncome': 'Monthly income',
+    'creditFieldDebt': 'Monthly debt',
+    'subsRenewalLabel': 'Renewal',
+    'subsActivityLabel': 'Activity',
+    'profileDailyBriefing': 'Daily AI briefing',
+    'profileDailyBriefingSub':
+        'Start the day with account health, suspicious activity, and savings prompts',
+    'profileLiveSync': 'Live data sync',
+    'profileLiveSyncLive': 'Live',
+    'profileLiveSyncBalanced': 'Balanced',
+    'profileLiveSyncSaver': 'Saver',
+    'profileAutoApprove': 'Auto-approve limit',
+    'profileAutoApproveOff': 'Off',
+    'profileSmartNotif': 'Smart notifications',
+    'profileSmartNotifSub':
+        'Alerts for fraud, renewals, and approval changes',
+    'profileFaceId': 'Face ID relock',
+    'profileFaceIdSub':
+        'Require biometric unlock before sensitive actions',
+    'profileFraudHigh': 'High-sensitivity fraud alerts',
+    'profileFraudHighSub':
+        'Let Vera flag unusual device and payment patterns earlier',
+    'profileVaultTitle': 'Protected session vault',
+    'profileVaultSubtitle':
+        'Identity is persisted separately from local preferences.',
+    'profileVaultSignIn': 'Sign-in',
+    'profileVaultProtectedSince': 'Protected since',
+    'profileVaultSyncMode': 'Sync mode',
+    'profileVaultApproval': 'Approval guardrail',
+    'profileVaultThisDevice': 'This device',
+    'profileVaultManualOnly': 'Manual only',
+    'profileVaultSyncLive': 'Live sync',
+    'profileVaultSyncBalanced': 'Balanced sync',
+    'profileVaultSyncSaver': 'Battery saver sync',
+    'profileAiToneBadge': 'AI TONE / {tone}',
+    'profileConnectedTitle': '{n} connected institutions',
+    'profileConnectedSubtitle':
+        'Live balances refresh through the current sync policy and feed cache.',
+    'profileConnectedAccount': 'Account {last4}',
+    'orderTitleBuyGold': 'Buy 10g of Gold',
+    'orderTitlePayCard': 'Pay credit card statement',
+    'orderTitleGoldRate': 'Rate',
+    'orderTitleDue': 'Due',
+    'orderTitleDueToday': 'Today',
+    'orderPillReady': 'READY',
+    'orderPillSent': 'AT BANK',
+    'orderPillDismissed': 'DISMISSED',
     'creditTitle': 'Credit',
     'creditSubtitle': 'Borrowing built around your real income.',
     'creditScoreLabel': 'CREDIT SCORE',
@@ -514,6 +1059,23 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'askUma': 'Ask Uma',
     'securityTitle': 'Security',
     'securitySubtitle': 'Your live protection layer.',
+    'securityStatBlockedLabel': 'BLOCKED',
+    'securityStatBlockedSub': 'active',
+    'securityStatReviewedLabel': 'REVIEWED',
+    'securityStatReviewedSub': 'this week',
+    'securityStatDevicesLabel': 'DEVICES',
+    'securityStatDevicesSub': 'trusted',
+    'securityAccountSection': 'ACCOUNT SECURITY',
+    'securityClearBody': 'No unresolved fraud alerts in the latest scan.',
+    'securityActiveBody': 'Fraud Radar is tracking {n} active alerts.',
+    'securityViewReport': 'VIEW UMA REPORT',
+    'securityDecisionKept':
+        'You kept this event blocked. Fraud Radar will continue treating similar patterns as high risk.',
+    'securityDecisionApproved':
+        "You marked this event as safe. Fraud Radar will use that feedback to reduce similar false positives.",
+    'securityPillBlocked': 'BLOCKED BY AI',
+    'securityPillKept': 'KEPT BLOCKED',
+    'securityPillApproved': 'APPROVED BY YOU',
     'profileAndSettings': 'Profile & Settings',
     'sectionAppearance': 'APPEARANCE & THEMING',
     'sectionAi': 'AI PREFERENCES',
@@ -586,6 +1148,14 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'continueWithDemo': 'Continue with demo account',
     'emailField': 'Email',
     'passwordField': 'Password',
+    'loginTitle': 'Sign in to Vera',
+    'loginSubtitle':
+        'Demo session identity is protected in the device vault, while profile preferences and AI actions stay local until you sign out.',
+    'loginDisplayName': 'Display name',
+    'loginDisplayNameHint': 'Your name',
+    'loginEmailHint': 'demo@vera.app',
+    'loginFooter':
+        'Next step: real auth, connected bank identity, and biometric relock.',
     'umaSuggestionPay': 'Pay my credit card',
     'umaSuggestionSubs': 'Show my subscriptions',
     'umaSuggestionAnalyze': 'Analyze my spending',
@@ -636,6 +1206,30 @@ const Map<AppLocale, Map<String, String>> _strings = {
         'OCR and statement import run a deterministic fallback (DEMO badge appears). UMA chat replies via a heuristic intent router. The whole flow still works — only the live AI parsing is off.',
     'helpContact': 'Contact',
     'demoUser': 'Demo user',
+    'umaGreeting':
+        "Hi {name}. I read your imported statements. I can help you pay a card bill, plan a transfer, or look at gold pricing. The action happens in your bank app; I prepare it and track the result.",
+    'umaReplyBuyGold':
+        'I prepared a 10g gold purchase plan via {bank}. Open the app and confirm — I will track it from the SMS.',
+    'umaReplyPayCard':
+        'Your {bank} statement is ready to pay. I will open the app directly on the payment screen.',
+    'umaReplyMoveSavings':
+        'Your emergency fund plan is ready. Open your bank and confirm the transfer there. After this transfer you will be {pct}% of the way to the goal.',
+    'umaReplySubscriptions':
+        'You have {n} plans worth reviewing. Your monthly subscription total is around {total}.',
+    'umaReplySubscriptionsEmpty':
+        'I do not see any active subscriptions yet. Import a statement and Vera will detect recurring charges.',
+    'umaReplyAnalyze':
+        'Your top spending this month is {top} at {topAmount}. Total outflow {spending}. We can set per-category limits if you want.',
+    'umaReplyAnalyzeEmpty':
+        'No transactions to analyze yet. Scan a receipt or import a statement and we will break the spending down together.',
+    'umaReplyExplainWealth':
+        'Vera tracks your portfolio across the accounts you imported. Equities look slightly over-allocated this month; my suggestion is to top up gold or cash next time you open your bank.',
+    'umaReplyLoan':
+        'Based on the income and debt I see in your imported statements, you look strong for mid-sized personal loans. Open the credit simulation and I can help tune the amount and term for a safer fit.',
+    'umaReplySecurity':
+        'I flagged that transfer because the recipient appeared once before and the device location did not match your usual pattern. Vera does not block at your bank — it warns you and you decide together.',
+    'umaReplyFallback':
+        'I can help with that. If you want, I can give you a quick financial read or prepare a safe next step.',
     'umaThinking': 'Uma is thinking...',
     'umaAskHint': 'Ask Uma anything...',
     'umaStatusOnline': 'AI assistant · online',
@@ -643,6 +1237,98 @@ const Map<AppLocale, Map<String, String>> _strings = {
     'umaSuggestionMoveSavings': 'Move 2500 TL to savings',
     'umaActionPolicy': 'ACTION POLICY',
     'umaActionPolicyDesc': 'Vera never moves money itself; every action opens your bank app for your approval.',
+    'categoryBudgetLabel': 'SPENDING THIS MONTH',
+    'categoryOther': 'Other',
+    'categoryBudgetTopHint': 'Most on {category} · {pct}%',
+    'categoryRemaining': '{amount} left',
+    'categoryOver': 'over by {amount}',
+    'categoryNoLimit': 'no limit',
+    'categoryLimitEditTitle': 'Category limit',
+    'categoryLimitEditSubtitle':
+        'Set a monthly budget for {category}. Vera shows the remainder on every spend.',
+    'categoryLimitField': 'Monthly limit (TL)',
+    'categoryLimitSave': 'Save',
+    'categoryLimitClear': 'Remove limit',
+    'goalsSectionTitle': 'Your goals',
+    'goalEmergencyFund': 'Emergency fund',
+    'goalProgress': '{pct}% there',
+    'goalRemaining': '{amount} to go',
+    'goalEditTitle': 'Edit your goal',
+    'goalEditTarget': 'Target amount (TL)',
+    'goalEditSaved': 'Saved so far (TL)',
+    'goalEditSave': 'Save',
+    'goalEditFooter':
+        "Vera tracks the balance; Uma checks in every month with a new nudge.",
+    'goalEtaMonths': '{n} months to finish',
+    'goalEtaReached': 'You reached it 🎯',
+    'bankActionsTitle': 'Bank options',
+    'bankActionsDelete': 'Delete bank',
+    'bankActionsCancel': 'Cancel',
+    'bankActionsConfirmTitle': 'Delete this bank?',
+    'bankActionsConfirmBody':
+        '{name} will be removed and stop counting toward your total balance.',
+    'bankDeleted': '{name} deleted',
+    'bankActionsFeedNote':
+        'This bank ships with the demo data and cannot be deleted. You can remove the ones you added.',
+    'umaPromptSend': 'I want to send money to a friend.',
+    'umaPromptRequest': 'Help me request money from a friend.',
+    'umaPromptTopUp': 'I want to top up my account.',
+    'umaPromptPay': 'I want to pay my credit card bill.',
+    'umaPromptAnalyze': 'Analyze my spending this month.',
+    'txnDetailWhen': 'When',
+    'txnDetailCategory': 'Category',
+    'txnDetailDirection': 'Direction',
+    'txnDetailIncoming': 'Incoming',
+    'txnDetailOutgoing': 'Outgoing',
+    'txnDetailAskPrompt': 'Look at the {name} transaction — is {amount} normal?',
+    'billDetailPrompt': 'My {name} bill is {amount}, {days} days left. What should I do?',
+    'notifTitle': 'Notifications',
+    'notifSubtitle': '{n} signals Uma is watching',
+    'notifEmpty': 'You\'re all clear. Uma keeps watching quietly.',
+    'notifBlockedDefault': 'Vera flagged this transaction as an anomaly.',
+    'notifPriceIncreaseTitle': '{name} just raised the price',
+    'notifPriceIncreaseBody': 'Monthly +{delta} · now {price}. You can freeze it from Plans.',
+    'notifUnusedTitle': '{name} is going unused',
+    'notifUnusedBody': 'Last seen: {last}. Vera flagged this as a silent leak.',
+    'notifBillTitle': '{name} bill is approaching',
+    'notifBillBody': 'Amount {amount}. Pay through Uma or your bank.',
+    'proactiveBadge': 'VERA SPOTTED',
+    'proactiveBillTitle': '{name} bill is approaching',
+    'proactiveBillBody': '{amount} · {days} days left. Want Uma to prepare the payment plan?',
+    'proactiveBillCta': 'Pay with Uma',
+    'proactiveBillPrompt': 'Help me pay my {name} bill.',
+    'proactivePriceTitle': '{name} got more expensive',
+    'proactivePriceBody': '+{delta} monthly increase. Want to freeze the subscription?',
+    'proactivePriceCta': 'Open subscriptions',
+    'proactiveUnusedTitle': '{name} is unused',
+    'proactiveUnusedBody': 'Last seen: {last}. Could be a silent money leak.',
+    'proactiveUnusedCta': 'Open subscriptions',
+    'exportTile': 'Export my data',
+    'exportTileValue': 'JSON · device-only',
+    'exportTitle': 'Your Vera data',
+    'exportSubtitle': 'Imported transactions, banks you added, your goal and the detected subscriptions. Copy without leaving the device.',
+    'exportCopy': 'Copy JSON',
+    'exportCopied': 'Copied to clipboard',
+    'onbStep1Title': 'Welcome to Vera',
+    'onbStep1Subtitle': 'Pick your language. You can change it anytime in settings.',
+    'onbStep2Title': 'Make it yours',
+    'onbStep2Subtitle': 'Choose the brand palette and mood. Theme is editable later.',
+    'onbStep3Title': 'Bring your data',
+    'onbStep3Subtitle': "Vera doesn't connect to your bank — you bring statements, Vera makes sense of them. Start now or add later.",
+    'onbContinue': 'Continue',
+    'onbStart': 'Start Vera',
+    'onbSkip': 'Skip',
+    'onbBack': 'Back',
+    'onbImportNow': 'Import a statement',
+    'onbScanNow': 'Scan a receipt',
+    'demoResetTile': 'Reset demo data',
+    'demoResetTileValue': 'Clear imports and additions',
+    'demoResetTitle': 'Reset demo data?',
+    'demoResetBody':
+        'Imported transactions, banks you added, and goal progress return to the starting state.',
+    'demoResetConfirm': 'Reset',
+    'demoResetCancel': 'Cancel',
+    'demoResetDone': 'Back to demo state',
     'comingSoon': 'Coming soon',
     'close': 'Close',
   },

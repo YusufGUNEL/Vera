@@ -361,19 +361,22 @@ class _SubscriptionTile extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child:
-                          _MetaItem(label: 'Renewal', value: item.renewalLabel),
+                      child: _MetaItem(
+                          label: context.l10n.subsRenewalLabel,
+                          value: item.renewalLabel),
                     ),
                     Expanded(
                       child: _MetaItem(
-                          label: 'Activity', value: item.lastUsedLabel),
+                          label: context.l10n.subsActivityLabel,
+                          value: item.lastUsedLabel),
                     ),
                   ],
                 ),
                 if (item.priceDelta > 0) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'Up by ${fmtTL(item.priceDelta)} vs last cycle',
+                    context.l10n.notifPriceIncreaseBody(
+                        fmtTL(item.priceDelta), fmtTL(item.monthlyPrice)),
                     style: TextStyle(
                       fontSize: 12,
                       color: t.red,
