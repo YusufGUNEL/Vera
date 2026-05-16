@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +44,17 @@ class FirebaseBootstrap {
       if (Firebase.apps.isEmpty) {
         await Firebase.initializeApp(options: options);
       }
+
+      // App Check: debug modda DebugProvider, production'da PlayIntegrity.
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: kDebugMode
+            ? AndroidProvider.debug
+            : AndroidProvider.playIntegrity,
+        appleProvider: kDebugMode
+            ? AppleProvider.debug
+            : AppleProvider.deviceCheck,
+      );
+
       _state = const FirebaseBootstrapState(
         enabled: true,
         initialized: true,

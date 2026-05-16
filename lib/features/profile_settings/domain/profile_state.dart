@@ -59,21 +59,21 @@ class ProfileState {
       faceIdEnabled: map['faceIdEnabled'] as bool? ?? true,
       fraudAlertsEnabled: map['fraudAlertsEnabled'] as bool? ?? true,
       dailyBriefingEnabled: map['dailyBriefingEnabled'] as bool? ?? true,
-      aiTone: _toneByName(map['aiTone'] as String?),
-      dataSyncMode: _syncModeByName(map['dataSyncMode'] as String?),
+      aiTone: aiToneByName(map['aiTone'] as String?),
+      dataSyncMode: dataSyncModeByName(map['dataSyncMode'] as String?),
       autoApproveLimit: (map['autoApproveLimit'] as num?)?.toInt() ?? 2500,
     );
   }
 }
 
-AiTone _toneByName(String? name) {
+AiTone aiToneByName(String? name) {
   for (final tone in AiTone.values) {
     if (tone.name == name) return tone;
   }
   return AiTone.coach;
 }
 
-DataSyncMode _syncModeByName(String? name) {
+DataSyncMode dataSyncModeByName(String? name) {
   for (final mode in DataSyncMode.values) {
     if (mode.name == name) return mode;
   }

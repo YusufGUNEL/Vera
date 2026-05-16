@@ -1078,7 +1078,7 @@ class _AuditTile extends StatelessWidget {
               if (item.intent != null && item.intent!.isNotEmpty)
                 _AuditPill(label: item.intent!),
               if (item.note != null && item.note!.trim().isNotEmpty)
-                _AuditPill(label: 'Note attached'),
+                const _AuditPill(label: 'Note attached'),
             ],
           ),
         ],

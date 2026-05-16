@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,8 +63,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: email,
             password: password,
           );
+    } on FirebaseAuthException catch (error) {
+      final message = error.message?.trim();
+      setState(() {
+        _error = message == null || message.isEmpty
+            ? 'Firebase sign-in failed: ${error.code}.'
+            : message;
+      });
     } catch (error) {
-      setState(() => _error = 'Firebase sign-in failed. Check credentials.');
+      setState(() => _error = '$error');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -78,12 +86,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: t.bg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Spacer(),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight - 44),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+              const SizedBox(height: 12),
               Container(
                 width: 68,
                 height: 68,
@@ -198,8 +210,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: const Text('Create account'),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 12),
             ],
+              ),
+            ),
           ),
         ),
       ),

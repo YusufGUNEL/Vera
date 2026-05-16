@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -95,8 +96,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               email: email,
             );
       }
-    } catch (_) {
-      setState(() => _error = 'Account creation failed. Please try again.');
+    } on FirebaseAuthException catch (error) {
+      final message = error.message?.trim();
+      setState(() {
+        _error = message == null || message.isEmpty
+            ? 'Account creation failed: ${error.code}.'
+            : message;
+      });
+    } catch (error) {
+      setState(() => _error = '$error');
     } finally {
       if (mounted) setState(() => _busy = false);
     }

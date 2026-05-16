@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/firebase/analytics_service.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/localization/locale_controller.dart';
 import '../../../core/services/gemini_service.dart';
@@ -12,9 +13,9 @@ import '../domain/uma_audit_event.dart';
 import '../domain/uma_feedback.dart';
 import '../domain/uma_intent.dart';
 import '../domain/uma_message.dart';
+import 'firebase_uma_audit_store.dart';
+import 'firebase_uma_feedback_store.dart';
 import 'intent_router.dart';
-import 'uma_audit_store.dart';
-import 'uma_feedback_store.dart';
 
 class UmaRepository {
   UmaRepository(
@@ -22,13 +23,15 @@ class UmaRepository {
     this._router,
     this._feedbackStore,
     this._auditStore,
+    this._analytics,
     this._ref,
   );
 
   final GeminiService _gemini;
   final IntentRouter _router;
-  final UmaFeedbackStore _feedbackStore;
-  final UmaAuditStore _auditStore;
+  final FirebaseUmaFeedbackStore _feedbackStore;
+  final FirebaseUmaAuditStore _auditStore;
+  final AnalyticsService _analytics;
   final Ref _ref;
 
   AppStrings get _strings => AppStrings(_ref.read(localeControllerProvider));
@@ -148,6 +151,10 @@ class UmaRepository {
 
     try {
       final reply = await _gemini.generateText(await buildPrompt(userText));
+      await _analytics.logUmaIntent(
+        intent: intent.type.name,
+        resolvedByGemini: true,
+      );
       return _reply(intent: intent.type.name, text: reply.trim());
     } catch (_) {
       return _reply(intent: intent.type.name, text: l10n.umaReplyFallback);
@@ -285,8 +292,9 @@ final umaRepositoryProvider = Provider<UmaRepository>((ref) {
   return UmaRepository(
     ref.watch(geminiServiceProvider),
     ref.watch(intentRouterProvider),
-    ref.watch(umaFeedbackStoreProvider),
-    ref.watch(umaAuditStoreProvider),
+    ref.watch(firebaseUmaFeedbackStoreProvider),
+    ref.watch(firebaseUmaAuditStoreProvider),
+    ref.watch(analyticsServiceProvider),
     ref,
   );
 });

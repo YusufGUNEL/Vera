@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../config/env.dart';
+import '../firebase/remote_config_service.dart';
 
 /// Gemini API ile tek dokunma noktasi.
 /// Tum feature'lar buradan gecsin - direkt GenerativeModel insantsiate etmeyin.
@@ -18,13 +19,13 @@ class GeminiService {
 
   bool get isAvailable => _model != null;
 
-  factory GeminiService.create() {
+  factory GeminiService.create(RemoteConfigService rc) {
     final apiKey = Env.geminiApiKey;
     if (apiKey == null) {
       return GeminiService._(null);
     }
     final model = GenerativeModel(
-      model: Env.geminiModel,
+      model: rc.geminiModel,
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
@@ -87,5 +88,5 @@ class MissingGeminiKeyException implements Exception {
 
 /// Riverpod provider - tum feature'lar bunu kullansin.
 final geminiServiceProvider = Provider<GeminiService>((ref) {
-  return GeminiService.create();
+  return GeminiService.create(ref.watch(remoteConfigServiceProvider));
 });

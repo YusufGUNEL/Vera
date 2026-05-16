@@ -38,6 +38,37 @@ class RebalanceAction {
       undone: undone ?? this.undone,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'type': type.name,
+      'title': title,
+      'detail': detail,
+      'why': why,
+      'when': when,
+      'amount': amount,
+      'undoable': undoable,
+      'undone': undone,
+    };
+  }
+
+  factory RebalanceAction.fromMap(Map<String, dynamic> map) {
+    return RebalanceAction(
+      id: map['id'] as String? ?? '',
+      type: WealthActionType.values.firstWhere(
+        (e) => e.name == map['type'],
+        orElse: () => WealthActionType.rebalance,
+      ),
+      title: map['title'] as String? ?? '',
+      detail: map['detail'] as String? ?? '',
+      why: map['why'] as String? ?? '',
+      when: map['when'] as String? ?? '',
+      amount: (map['amount'] as num?)?.toDouble() ?? 0,
+      undoable: map['undoable'] as bool? ?? false,
+      undone: map['undone'] as bool? ?? false,
+    );
+  }
 }
 
 class WealthActionVisual {

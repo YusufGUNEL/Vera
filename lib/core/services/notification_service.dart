@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,12 +66,50 @@ class NotificationService {
         importance: Importance.defaultImportance,
       ),
     );
+
+    // FCM foreground mesajlarını local bildirim olarak göster.
+    FirebaseMessaging.onMessage.listen(_handleFcmMessage);
   }
 
   void _handleResponse(NotificationResponse response) {
     final payload = response.payload;
     if (payload != null && payload.isNotEmpty) {
       _taps.add(payload);
+    }
+  }
+
+  /// FCM'den gelen foreground mesajını local bildirime dönüştür.
+  Future<void> _handleFcmMessage(RemoteMessage message) async {
+    final notification = message.notification;
+    if (notification == null) return;
+    final isSecurityChannel =
+        message.data['channel'] == 'security' ||
+        (notification.title?.toLowerCase().contains('güvenlik') ?? false) ||
+        (notification.title?.toLowerCase().contains('fraud') ?? false);
+    if (isSecurityChannel) {
+      await showFraudAlert(
+        title: notification.title ?? 'Vera Güvenlik',
+        body: notification.body ?? '',
+        payload: message.data['route'] ?? '/security',
+      );
+    } else {
+      await _plugin.show(
+        _idCounter++,
+        notification.title,
+        notification.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'vera_bills',
+            'Fatura hatırlatmaları',
+            channelDescription: 'Yaklaşan ödeme bildirimleri',
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+            color: Color(0xFF7C3AED),
+            icon: '@mipmap/ic_launcher',
+          ),
+        ),
+        payload: message.data['route'] ?? '/',
+      );
     }
   }
 

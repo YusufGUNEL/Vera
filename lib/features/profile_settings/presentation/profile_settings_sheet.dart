@@ -551,6 +551,7 @@ class _SessionVaultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final narrow = MediaQuery.of(context).size.width < 390;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -601,43 +602,67 @@ class _SessionVaultCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _VaultStat(
-                  label: context.l10n.profileVaultSignIn,
-                  value: auth.authMethod,
+          if (narrow) ...[
+            _VaultStat(
+              label: context.l10n.profileVaultSignIn,
+              value: auth.authMethod,
+            ),
+            const SizedBox(height: 10),
+            _VaultStat(
+              label: context.l10n.profileVaultProtectedSince,
+              value: _signedInLabel(context, auth.signedInAt),
+            ),
+            const SizedBox(height: 10),
+            _VaultStat(
+              label: context.l10n.profileVaultSyncMode,
+              value: _syncModeLabel(context, profile.dataSyncMode),
+            ),
+            const SizedBox(height: 10),
+            _VaultStat(
+              label: context.l10n.profileVaultApproval,
+              value: profile.autoApproveLimit == 0
+                  ? context.l10n.profileVaultManualOnly
+                  : fmtTL(profile.autoApproveLimit),
+            ),
+          ] else ...[
+            Row(
+              children: [
+                Expanded(
+                  child: _VaultStat(
+                    label: context.l10n.profileVaultSignIn,
+                    value: auth.authMethod,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _VaultStat(
-                  label: context.l10n.profileVaultProtectedSince,
-                  value: _signedInLabel(context, auth.signedInAt),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _VaultStat(
+                    label: context.l10n.profileVaultProtectedSince,
+                    value: _signedInLabel(context, auth.signedInAt),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _VaultStat(
-                  label: context.l10n.profileVaultSyncMode,
-                  value: _syncModeLabel(context, profile.dataSyncMode),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _VaultStat(
+                    label: context.l10n.profileVaultSyncMode,
+                    value: _syncModeLabel(context, profile.dataSyncMode),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _VaultStat(
-                  label: context.l10n.profileVaultApproval,
-                  value: profile.autoApproveLimit == 0
-                      ? context.l10n.profileVaultManualOnly
-                      : fmtTL(profile.autoApproveLimit),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _VaultStat(
+                    label: context.l10n.profileVaultApproval,
+                    value: profile.autoApproveLimit == 0
+                        ? context.l10n.profileVaultManualOnly
+                        : fmtTL(profile.autoApproveLimit),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -673,6 +698,8 @@ class _VaultStat extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

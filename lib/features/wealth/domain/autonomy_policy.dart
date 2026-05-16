@@ -26,4 +26,25 @@ class AutonomyPolicy {
       approvalMode: approvalMode ?? this.approvalMode,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'enabled': enabled,
+      'riskProfile': riskProfile,
+      'monthlyMoveLimit': monthlyMoveLimit,
+      'approvalMode': approvalMode.name,
+    };
+  }
+
+  factory AutonomyPolicy.fromMap(Map<String, dynamic> map) {
+    return AutonomyPolicy(
+      enabled: map['enabled'] as bool? ?? true,
+      riskProfile: map['riskProfile'] as String? ?? 'Dengeli',
+      monthlyMoveLimit: (map['monthlyMoveLimit'] as num?)?.toDouble() ?? 25000,
+      approvalMode: ApprovalMode.values.firstWhere(
+        (e) => e.name == map['approvalMode'],
+        orElse: () => ApprovalMode.confirmLargeMoves,
+      ),
+    );
+  }
 }

@@ -25,8 +25,8 @@ class ProfileRepository {
       faceIdEnabled: prefs.getBool(_kFaceIdKey) ?? true,
       fraudAlertsEnabled: prefs.getBool(_kFraudAlertsKey) ?? true,
       dailyBriefingEnabled: prefs.getBool(_kDailyBriefingKey) ?? true,
-      aiTone: _toneByName(prefs.getString(_kAiToneKey)),
-      dataSyncMode: _syncModeByName(prefs.getString(_kDataSyncModeKey)),
+      aiTone: aiToneByName(prefs.getString(_kAiToneKey)),
+      dataSyncMode: dataSyncModeByName(prefs.getString(_kDataSyncModeKey)),
       autoApproveLimit: prefs.getInt(_kAutoApproveLimitKey) ?? 2500,
     );
 

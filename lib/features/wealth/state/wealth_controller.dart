@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/firebase_wealth_service.dart';
 import '../data/wealth_repository.dart';
 import '../domain/autonomy_policy.dart';
 import '../domain/portfolio_allocation.dart';
@@ -61,36 +62,56 @@ class WealthState {
 }
 
 class WealthController extends StateNotifier<WealthState> {
-  WealthController(this._repository)
+  WealthController(this._service, this._repository)
       : super(
           WealthState(
             policy: _repository.initialPolicy(),
-            allocations: _repository.portfolio(),
-            actions: _repository.actions(),
+            allocations: const [],
+            actions: const [],
             insight: '',
           ),
         ) {
+    _load();
+  }
+
+  final FirebaseWealthService _service;
+  final WealthRepository _repository;
+
+  Future<void> _load() async {
+    final policy = await _service.loadPolicy();
+    final allocations = await _service.loadPortfolio();
+    final actions = await _service.loadActions();
+    
     state = state.copyWith(
-      insight: _repository.insightFor(state.policy, state.actions),
+      policy: policy,
+      allocations: allocations,
+      actions: actions,
+      insight: _repository.insightFor(policy, actions),
     );
   }
 
-  final WealthRepository _repository;
-
-  void setAutonomous(bool enabled) {
-    _updatePolicy(state.policy.copyWith(enabled: enabled));
+  void setAutonomous(bool enabled) async {
+    final p = state.policy.copyWith(enabled: enabled);
+    await _service.savePolicy(p);
+    _updatePolicy(p);
   }
 
-  void setRiskProfile(String riskProfile) {
-    _updatePolicy(state.policy.copyWith(riskProfile: riskProfile));
+  void setRiskProfile(String riskProfile) async {
+    final p = state.policy.copyWith(riskProfile: riskProfile);
+    await _service.savePolicy(p);
+    _updatePolicy(p);
   }
 
-  void setMonthlyMoveLimit(double limit) {
-    _updatePolicy(state.policy.copyWith(monthlyMoveLimit: limit));
+  void setMonthlyMoveLimit(double limit) async {
+    final p = state.policy.copyWith(monthlyMoveLimit: limit);
+    await _service.savePolicy(p);
+    _updatePolicy(p);
   }
 
-  void setApprovalMode(ApprovalMode mode) {
-    _updatePolicy(state.policy.copyWith(approvalMode: mode));
+  void setApprovalMode(ApprovalMode mode) async {
+    final p = state.policy.copyWith(approvalMode: mode);
+    await _service.savePolicy(p);
+    _updatePolicy(p);
   }
 
   void _updatePolicy(AutonomyPolicy policy) {
@@ -114,5 +135,8 @@ class WealthController extends StateNotifier<WealthState> {
 
 final wealthControllerProvider =
     StateNotifierProvider<WealthController, WealthState>((ref) {
-  return WealthController(ref.watch(wealthRepositoryProvider));
+  return WealthController(
+    ref.watch(firebaseWealthServiceProvider),
+    ref.watch(wealthRepositoryProvider),
+  );
 });

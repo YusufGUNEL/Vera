@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../home/data/transaction.dart';
 import '../../home/state/home_controller.dart';
+import '../data/firebase_subscriptions_service.dart';
 import '../data/subscriptions_repository.dart';
 import '../domain/subscription_alert.dart';
 import '../domain/subscription_item.dart';
@@ -58,7 +59,7 @@ class SubscriptionsState {
 }
 
 class SubscriptionsController extends StateNotifier<SubscriptionsState> {
-  SubscriptionsController(this._repository, this._ref)
+  SubscriptionsController(this._service, this._repository, this._ref)
       : super(const SubscriptionsState()) {
     _load();
     _sub = _ref.listen<List<Txn>>(
@@ -67,13 +68,14 @@ class SubscriptionsController extends StateNotifier<SubscriptionsState> {
     );
   }
 
+  final FirebaseSubscriptionsService _service;
   final SubscriptionsRepository _repository;
   final Ref _ref;
   ProviderSubscription<List<Txn>>? _sub;
 
-  void _load() {
+  Future<void> _load() async {
     final txns = _ref.read(homeControllerProvider).transactions;
-    final items = _repository.getSubscriptions(userTxns: txns);
+    final items = await _service.loadSubscriptions(userTxns: txns);
     state = state.copyWith(
       items: items,
       alerts: _repository.buildAlerts(items),
@@ -95,6 +97,7 @@ class SubscriptionsController extends StateNotifier<SubscriptionsState> {
 final subscriptionsControllerProvider =
     StateNotifierProvider<SubscriptionsController, SubscriptionsState>((ref) {
   return SubscriptionsController(
+    ref.watch(firebaseSubscriptionsServiceProvider),
     ref.watch(subscriptionsRepositoryProvider),
     ref,
   );

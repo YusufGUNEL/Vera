@@ -1,5 +1,8 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/firebase/analytics_service.dart';
 import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../profile_settings/data/firebase_profile_service.dart';
 import '../data/auth_storage.dart';
@@ -11,6 +14,7 @@ class AuthController extends StateNotifier<AuthSession> {
     this._storage,
     this._firebaseAuthService,
     this._firebaseProfileService,
+    this._analytics,
   ) : super(const AuthSession(status: AuthStatus.loading)) {
     _restore();
   }
@@ -18,6 +22,7 @@ class AuthController extends StateNotifier<AuthSession> {
   final AuthStorage _storage;
   final FirebaseAuthService _firebaseAuthService;
   final FirebaseProfileService _firebaseProfileService;
+  final AnalyticsService _analytics;
 
   Future<void> _restore() async {
     final firebaseSession = _firebaseAuthService.currentSession;
@@ -64,6 +69,11 @@ class AuthController extends StateNotifier<AuthSession> {
       displayName: session.displayName ?? 'Vera User',
       email: session.email ?? email,
     );
+    await _analytics.logLogin(method: 'firebase_email');
+    await _analytics.setUserId(session.userId);
+    if (!kDebugMode) {
+      await FirebaseCrashlytics.instance.setUserIdentifier(session.userId ?? '');
+    }
     state = session;
   }
 
@@ -82,6 +92,11 @@ class AuthController extends StateNotifier<AuthSession> {
       displayName: displayName,
       email: email,
     );
+    await _analytics.logSignUp(method: 'firebase_email');
+    await _analytics.setUserId(session.userId);
+    if (!kDebugMode) {
+      await FirebaseCrashlytics.instance.setUserIdentifier(session.userId ?? '');
+    }
     state = session;
   }
 
@@ -99,5 +114,6 @@ final authControllerProvider =
     ref.watch(authStorageProvider),
     ref.watch(firebaseAuthServiceProvider),
     ref.watch(firebaseProfileServiceProvider),
+    ref.watch(analyticsServiceProvider),
   );
 });
