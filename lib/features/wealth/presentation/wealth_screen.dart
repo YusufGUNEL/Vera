@@ -11,10 +11,86 @@ import '../../uma_chat/presentation/open_uma.dart';
 import '../domain/autonomy_policy.dart';
 import '../domain/rebalance_action.dart';
 import '../state/wealth_controller.dart';
+import 'widgets/add_holding_sheet.dart';
 import 'widgets/portfolio_donut.dart';
 
 class WealthScreen extends ConsumerWidget {
   const WealthScreen({super.key});
+
+  void _openAddHolding(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const AddHoldingSheet(),
+    );
+  }
+
+  void _openHoldingActions(
+    BuildContext context,
+    WidgetRef ref,
+    String label,
+  ) {
+    final t = context.tokens;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (sheetCtx) => Container(
+        decoration: BoxDecoration(
+          color: t.bg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: t.line,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.delete_outline, color: t.red),
+                  title: Text(
+                    'Bu varlığı kaldır',
+                    style: TextStyle(color: t.red, fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetCtx).pop();
+                    await ref
+                        .read(wealthControllerProvider.notifier)
+                        .removeAllocation(label);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   void _openInsight(BuildContext context, String insight) {
     final t = context.tokens;
@@ -179,32 +255,65 @@ class WealthScreen extends ConsumerWidget {
                     crossAxisSpacing: 10,
                     children: [
                       for (final p in portfolio)
-                        Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: p.color,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
+                        InkWell(
+                          onTap: () => _openHoldingActions(context, ref, p.label),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: p.color,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    p.label,
+                                    overflow: TextOverflow.ellipsis,
+                                    style:
+                                        TextStyle(color: t.ink2, fontSize: 13),
+                                  ),
+                                ),
+                                Text(
+                                  '${p.value.toInt()}%',
+                                  style: TextStyle(
+                                    color: t.muted,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                p.label,
-                                style: TextStyle(color: t.ink2, fontSize: 13),
-                              ),
+                          ),
+                        ),
+                      if (portfolio.isNotEmpty)
+                        InkWell(
+                          onTap: () => _openAddHolding(context),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            child: Row(
+                              children: [
+                                Icon(Icons.add, size: 14, color: t.brand),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Varlık ekle',
+                                  style: TextStyle(
+                                    color: t.brand,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${p.value.toInt()}%',
-                              style: TextStyle(
-                                color: t.muted,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                     ],
                   ),
@@ -351,29 +460,119 @@ class WealthScreen extends ConsumerWidget {
             ),
           ),
           SectionTitle(
-              title: l10n.activityFeed, actionLabel: l10n.explainability),
+            title: l10n.activityFeed,
+            actionLabel: state.allocations.isEmpty
+                ? '+ Varlık ekle'
+                : l10n.explainability,
+            onAction: state.allocations.isEmpty
+                ? () => _openAddHolding(context)
+                : null,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: VeraCard(
-              child: Column(
-                children: [
-                  for (var i = 0; i < state.actions.length; i++)
-                    _ActivityRow(
-                      action: state.actions[i],
-                      isFirst: i == 0,
-                      onUndo:
-                          state.actions[i].undoable && !state.actions[i].undone
-                              ? () => ref
-                                  .read(wealthControllerProvider.notifier)
-                                  .undoAction(state.actions[i].id)
-                              : null,
-                      onDetails: () =>
-                          _openInsight(context, state.actions[i].why),
+            child: state.actions.isEmpty
+                ? _EmptyWealthCard(
+                    hasHoldings: state.allocations.isNotEmpty,
+                    onAddHolding: () => _openAddHolding(context),
+                  )
+                : VeraCard(
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < state.actions.length; i++)
+                          _ActivityRow(
+                            action: state.actions[i],
+                            isFirst: i == 0,
+                            onUndo: state.actions[i].undoable &&
+                                    !state.actions[i].undone
+                                ? () => ref
+                                    .read(wealthControllerProvider.notifier)
+                                    .undoAction(state.actions[i].id)
+                                : null,
+                            onDetails: () =>
+                                _openInsight(context, state.actions[i].why),
+                          ),
+                      ],
                     ),
-                ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyWealthCard extends StatelessWidget {
+  const _EmptyWealthCard({
+    required this.hasHoldings,
+    required this.onAddHolding,
+  });
+
+  final bool hasHoldings;
+  final VoidCallback onAddHolding;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return VeraCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: t.uma.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.savings_outlined, color: t.uma, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasHoldings
+                          ? 'Uma henüz aksiyon almadı'
+                          : 'Portföyünü oluşturmaya başla',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      hasHoldings
+                          ? 'Otonom modu açtığında öneriler ve rebalans hareketleri burada görünür.'
+                          : 'Hisse, altın, nakit veya kripto varlıklarını ekle. Uma sapmayı izleyip önerilerini buraya yazar.',
+                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (!hasHoldings) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onAddHolding,
+                icon: const Icon(Icons.add, size: 16),
+                label: const Text('Varlık ekle'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: t.brand,
+                  foregroundColor: t.brandFG,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

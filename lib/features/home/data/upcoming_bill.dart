@@ -2,40 +2,77 @@ import 'package:flutter/material.dart';
 
 class UpcomingBill {
   const UpcomingBill({
+    required this.id,
     required this.name,
     required this.amount,
-    required this.daysUntilDue,
-    required this.icon,
-    required this.accent,
+    required this.dueDate,
+    required this.iconCode,
+    required this.accentColor,
   });
 
+  final String id;
   final String name;
   final double amount;
-  final int daysUntilDue;
-  final IconData icon;
-  final Color accent;
+  final DateTime dueDate;
+  final int iconCode;
+  final int accentColor;
+
+  /// Days until [dueDate] from now, floored at 0.
+  int get daysUntilDue {
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day);
+    final due = DateTime(dueDate.year, dueDate.month, dueDate.day);
+    final delta = due.difference(start).inDays;
+    return delta < 0 ? 0 : delta;
+  }
+
+  IconData get icon =>
+      IconData(iconCode, fontFamily: 'MaterialIcons');
+
+  Color get accent => Color(accentColor);
+
+  UpcomingBill copyWith({
+    String? id,
+    String? name,
+    double? amount,
+    DateTime? dueDate,
+    int? iconCode,
+    int? accentColor,
+  }) {
+    return UpcomingBill(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      amount: amount ?? this.amount,
+      dueDate: dueDate ?? this.dueDate,
+      iconCode: iconCode ?? this.iconCode,
+      accentColor: accentColor ?? this.accentColor,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'amount': amount,
+      'dueDate': dueDate.toIso8601String(),
+      'iconCode': iconCode,
+      'accentColor': accentColor,
+    };
+  }
+
+  factory UpcomingBill.fromMap(Map<String, dynamic> map) {
+    return UpcomingBill(
+      id: map['id'] as String,
+      name: map['name'] as String,
+      amount: (map['amount'] as num).toDouble(),
+      dueDate: DateTime.tryParse(map['dueDate'] as String? ?? '') ??
+          DateTime.now(),
+      iconCode:
+          map['iconCode'] as int? ?? Icons.receipt_long_outlined.codePoint,
+      accentColor: map['accentColor'] as int? ?? 0xFF7C3AED,
+    );
+  }
 }
 
-const kUpcomingBills = <UpcomingBill>[
-  UpcomingBill(
-    name: 'Akbank Platinum',
-    amount: 12450,
-    daysUntilDue: 3,
-    icon: Icons.credit_card,
-    accent: Color(0xFFE63E5C),
-  ),
-  UpcomingBill(
-    name: 'Türk Telekom',
-    amount: 425,
-    daysUntilDue: 8,
-    icon: Icons.wifi,
-    accent: Color(0xFF1E88E5),
-  ),
-  UpcomingBill(
-    name: 'BEDAŞ Elektrik',
-    amount: 380,
-    daysUntilDue: 12,
-    icon: Icons.bolt,
-    accent: Color(0xFFFFA000),
-  ),
-];
+/// No hardcoded bills. The list is fully managed by the user (add/edit/delete).
+const kUpcomingBills = <UpcomingBill>[];

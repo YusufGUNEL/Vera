@@ -8,50 +8,61 @@ import '../../../core/localization/locale_controller.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/utils/formatters.dart';
 import '../data/upcoming_bill.dart';
+import 'upcoming_bills_controller.dart';
 
-/// One-shot scheduler that registers a local notification for each upcoming
-/// bill 24 hours before it is due. Listens to the active locale so re-
-/// scheduling rewrites the message in the user's language.
-///
-/// We avoid persisting the schedule ourselves — flutter_local_notifications
-/// keeps the pending schedule across app restarts. To stay safe we cancel
-/// any previously scheduled bill ids before re-registering.
+/// Re-schedules a local notification 24h before each user-tracked upcoming
+/// bill. Listens to the bills list and to the active locale so the alert is
+/// always written in the user's language and reflects the live list.
 class BillRemindersScheduler {
   BillRemindersScheduler(this._notifications, this._ref) {
     _bootstrap();
-    _sub = _ref.listen<AppLocale>(
+    _localeSub = _ref.listen<AppLocale>(
       localeControllerProvider,
-      (_, __) => _schedule(),
+      (_, __) => _schedule(_ref.read(upcomingBillsControllerProvider)),
+    );
+    _billsSub = _ref.listen<List<UpcomingBill>>(
+      upcomingBillsControllerProvider,
+      (_, next) => _schedule(next),
     );
   }
 
   static const int _idBase = 4000;
+  // Cap the number of scheduled reminders we track to avoid leaking notification ids.
+  static const int _maxScheduled = 32;
 
   final NotificationService _notifications;
   final Ref _ref;
-  ProviderSubscription<AppLocale>? _sub;
+  ProviderSubscription<AppLocale>? _localeSub;
+  ProviderSubscription<List<UpcomingBill>>? _billsSub;
   bool _disposed = false;
 
   Future<void> _bootstrap() async {
     await _notifications.init();
-    await _schedule();
+    await _schedule(_ref.read(upcomingBillsControllerProvider));
   }
 
-  Future<void> _schedule() async {
+  Future<void> _schedule(List<UpcomingBill> bills) async {
     if (_disposed) return;
     final locale = _ref.read(localeControllerProvider);
     final strings = AppStrings(locale);
-    // Cancel and reschedule a stable id range so locale switches refresh
-    // copy in-place.
-    for (var i = 0; i < kUpcomingBills.length; i++) {
+
+    // Cancel the full reserved id range so removed bills don't keep firing.
+    for (var i = 0; i < _maxScheduled; i++) {
       await _notifications.cancel(_idBase + i);
     }
     final now = DateTime.now();
-    for (var i = 0; i < kUpcomingBills.length; i++) {
-      final bill = kUpcomingBills[i];
+    final count = bills.length > _maxScheduled ? _maxScheduled : bills.length;
+    for (var i = 0; i < count; i++) {
+      final bill = bills[i];
       if (bill.daysUntilDue < 1) continue;
-      final due = DateTime(now.year, now.month, now.day + bill.daysUntilDue, 9);
+      final due = DateTime(
+        bill.dueDate.year,
+        bill.dueDate.month,
+        bill.dueDate.day,
+        9,
+      );
       final remindAt = due.subtract(const Duration(days: 1));
+      if (remindAt.isBefore(now)) continue;
       await _notifications.scheduleAt(
         id: _idBase + i,
         title: strings.notifBillTitle(bill.name),
@@ -64,7 +75,8 @@ class BillRemindersScheduler {
 
   void dispose() {
     _disposed = true;
-    _sub?.close();
+    _localeSub?.close();
+    _billsSub?.close();
   }
 }
 

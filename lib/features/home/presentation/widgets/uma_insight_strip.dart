@@ -6,11 +6,13 @@ import '../../../../core/theme/app_tokens.dart';
 class UmaInsightStrip extends StatelessWidget {
   const UmaInsightStrip({
     required this.text,
+    this.loading = false,
     this.onTap,
     super.key,
   });
 
   final String text;
+  final bool loading;
   final VoidCallback? onTap;
 
   @override
@@ -43,8 +45,17 @@ class UmaInsightStrip extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: const Icon(Icons.auto_awesome,
-                      size: 15, color: Colors.white),
+                  child: loading
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.6,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.auto_awesome,
+                          size: 15, color: Colors.white),
                 ),
                 const SizedBox(width: 10),
                 Expanded(

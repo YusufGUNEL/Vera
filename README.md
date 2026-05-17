@@ -19,20 +19,20 @@ Detay için: [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md), [docs/MIMARI.md](docs
 
 ## Şu an çalışan ana özellikler
 
-- **6 dilli i18n + RTL** — TR / EN / DE / AR / RU / ZH; `context.l10n` extension; SharedPreferences ile kalıcı; AR seçildiğinde otomatik RTL
+- **6 dilli i18n + RTL** — TR / EN / DE / AR / RU / ZH (yeni eklenen empty-state metinleri henüz TR-only; bkz. docs/YAPILACAKLAR.md)
 - **Tema sistemi** — 4 palette × 2 mood × 3 vibe = 24 görsel kombinasyon
-- **Auth (demo)** — SharedPreferences tabanlı sign-in / sign-up
-- **Home** — net worth, savings story, upcoming bills, connected banks, transactions, credit summary, Uma insight
-- **Wealth** — portfolio donut, policy chips, AI aksiyon kartı, activity feed
-- **Subscriptions** — filter chips, AI insight, freeze/ask-Uma aksiyonları
+- **Auth** — Firebase Auth (e-posta) + local fallback (demo); sign-out tüm yerel cache'i temizler
+- **Home** — net worth + sparkline geçmişi, savings story, upcoming bills (CRUD), connected banks, transactions, credit summary, **gerçek veriden Gemini insight strip**
+- **Wealth** — kullanıcının manuel girdiği portföyden donut, varlık ekle/kaldır, otomatik ağırlık hesabı
+- **Subscriptions** — kullanıcı işlemlerinden otomatik tespit, filter chips, AI insight, freeze/ask-Uma
 - **Credit** — score gauge, loan simulation (4 slider), risk faktörleri, alternatif teklif
-- **Security** — fraud feed, "keep blocked / this was me" feedback, Uma fraud raporu
-- **UMA Chat** — intent router, Gemini fallback, order cards, bank deep-linkler
-- **Receipt OCR** — `image_picker` + Gemini multimodal parse; demo fallback
-- **PDF/Excel ekstre import** — `file_picker` + Gemini parser; demo fallback
-- **Profile hub** — palette, mood, vibe, AI tonu, dil, bildirim, fraud-alert tercihleri
-
-Tam liste için: [docs/FEATURES.md](docs/FEATURES.md)
+- **Security** — `FraudHeuristic` import edilen işlemleri analiz eder (outlier, yuvarlak büyük transfer, burst), feedback ile öğrenir
+- **UMA Chat** — kullanıcının gerçek bankaları/işlemleri/faturaları/hedefleri Gemini prompt'una verilir; "ne kadar param var" tipi sorulara gerçek cevap
+- **AI auto-categorization** — manuel işlem girerken Uma kategori önerisi (heuristic + Gemini fallback)
+- **Goal AI advisor** — hedef belirleyince aylık gereken tutar + Gemini ile "şu kategoriden kıs" tavsiyesi
+- **Receipt OCR** — `image_picker` + Gemini multimodal parse
+- **PDF/Excel ekstre import** — `file_picker` + Gemini parser
+- **Profile hub** — palette, mood, vibe, AI tonu, dil, bildirim tercihleri
 
 ## Hızlı başlangıç
 
@@ -51,10 +51,11 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 | [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md) | Ürün konumlandırma, persona, demo hikayesi |
 | [docs/MIMARI.md](docs/MIMARI.md) | Feature-first Flutter mimarisi, AI katmanları, ekip kuralları |
 | [docs/PROMPTS.md](docs/PROMPTS.md) | Vera içinde gerçekten Gemini'ye gönderilen prompt şablonları |
-| [docs/FEATURES.md](docs/FEATURES.md) | ✅/🔜 özellik durumu, lisans matrisi |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 90 saniyelik sahne senaryosu |
 | [docs/SETUP.md](docs/SETUP.md) | Geliştirici ortamı ve build rehberi |
+| [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) | Firebase bağlantı durumu, Storage kurulum adımları |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | Sürüm geçmişi |
+| [docs/YAPILACAKLAR.md](docs/YAPILACAKLAR.md) | Demo öncesi yapılacaklar — adım adım rehber (arkadaşa atılabilir) |
 
 ## Stack
 
@@ -74,7 +75,7 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 
 - **UI değil ürün zekâsı sat** — her ekran AI ile daha anlamlı olsun
 - **Açıkla, güven ver** — her AI çıkışı için açıklama + fallback + user control
-- **Mock veriyi gerçek akış gibi tasarla** — sayı + sebep birlikte gelsin
+- **Sahte veri yok** — uygulama boş başlar; tüm sayılar kullanıcının manuel girişi / PDF ekstre / fiş OCR'undan gelir
 - **Demoda hem "wow" hem "güven"** — sahne dramatik ama ürün dürüst
 
 ## Lisans matrisi (özet)
@@ -89,5 +90,3 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 | Gerçek zamanlı bakiye | ✅ AISP | ❌ (partnership şart) |
 | Banka adına para gönder | ✅ PSP | ❌ (lisans şart) |
 | Kart blokla / fraud durdur | ✅ Banka | ❌ (sadece iletilir) |
-
-Tam matris ve detay: [docs/FEATURES.md](docs/FEATURES.md)

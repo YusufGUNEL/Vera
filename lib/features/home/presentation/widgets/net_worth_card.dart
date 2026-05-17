@@ -5,6 +5,7 @@ import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/font_weight_helper.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/pill.dart';
+import '../../data/net_worth_history_store.dart';
 
 class NetWorthCard extends StatelessWidget {
   const NetWorthCard({
@@ -12,6 +13,7 @@ class NetWorthCard extends StatelessWidget {
     required this.monthDelta,
     required this.lastUpdatedLabel,
     required this.refreshing,
+    this.history = const [],
     this.onSend,
     this.onRequest,
     this.onTopUp,
@@ -23,6 +25,7 @@ class NetWorthCard extends StatelessWidget {
   final double monthDelta;
   final String lastUpdatedLabel;
   final bool refreshing;
+  final List<NetWorthPoint> history;
   final VoidCallback? onSend;
   final VoidCallback? onRequest;
   final VoidCallback? onTopUp;
@@ -151,6 +154,17 @@ class NetWorthCard extends StatelessWidget {
                     fontSize: 11.5,
                   ),
                 ),
+                if (history.length >= 2) ...[
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 36,
+                    child: _SparklinePainter.fromHistory(
+                      history: history,
+                      stroke: t.brandFG,
+                      fill: t.brandFG.withValues(alpha: 0.18),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 18),
                 Row(
                   children: [
@@ -185,6 +199,96 @@ class NetWorthCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _SparklinePainter extends StatelessWidget {
+  const _SparklinePainter({
+    required this.values,
+    required this.stroke,
+    required this.fill,
+  });
+
+  factory _SparklinePainter.fromHistory({
+    required List<NetWorthPoint> history,
+    required Color stroke,
+    required Color fill,
+  }) {
+    return _SparklinePainter(
+      values: history.map((p) => p.amount).toList(),
+      stroke: stroke,
+      fill: fill,
+    );
+  }
+
+  final List<double> values;
+  final Color stroke;
+  final Color fill;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _SparklineCanvas(values: values, stroke: stroke, fill: fill),
+      size: const Size.fromHeight(36),
+    );
+  }
+}
+
+class _SparklineCanvas extends CustomPainter {
+  _SparklineCanvas({
+    required this.values,
+    required this.stroke,
+    required this.fill,
+  });
+
+  final List<double> values;
+  final Color stroke;
+  final Color fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (values.length < 2) return;
+    final maxV = values.reduce((a, b) => a > b ? a : b);
+    final minV = values.reduce((a, b) => a < b ? a : b);
+    final range = (maxV - minV).abs();
+    final span = range < 1 ? 1 : range;
+
+    final stepX = size.width / (values.length - 1);
+    final path = Path();
+    final area = Path();
+    for (var i = 0; i < values.length; i++) {
+      final x = stepX * i;
+      final norm = (values[i] - minV) / span;
+      final y = size.height - (norm * size.height);
+      if (i == 0) {
+        path.moveTo(x, y);
+        area.moveTo(x, size.height);
+        area.lineTo(x, y);
+      } else {
+        path.lineTo(x, y);
+        area.lineTo(x, y);
+      }
+    }
+    area.lineTo(size.width, size.height);
+    area.close();
+
+    final fillPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = fill;
+    canvas.drawPath(area, fillPaint);
+
+    final strokePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..color = stroke
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(path, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SparklineCanvas old) {
+    return old.values != values || old.stroke != stroke || old.fill != fill;
   }
 }
 

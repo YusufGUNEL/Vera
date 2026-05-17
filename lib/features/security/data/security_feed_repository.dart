@@ -6,10 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/env.dart';
 import '../domain/security_feed_data.dart';
-import 'security_check.dart';
 
 const _kSecurityFeedCacheKey = 'security.feed.cache';
 
+/// Provides the security feed used by Fraud Radar.
+///
+/// Sources:
+///   1) An optional remote endpoint (SECURITY_FEED_URL).
+///   2) A locally cached snapshot.
+///   3) An empty feed — the screen then shows the "all clear" state.
 class SecurityFeedRepository {
   const SecurityFeedRepository();
 
@@ -17,7 +22,11 @@ class SecurityFeedRepository {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kSecurityFeedCacheKey);
     if (raw == null || raw.isEmpty) return null;
-    return SecurityFeedData.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return SecurityFeedData.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<SecurityFeedData> refresh() async {
@@ -28,29 +37,12 @@ class SecurityFeedRepository {
       return remote;
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 650));
-    final now = DateTime.now();
-
-    final checks = [
-      SecurityCheck(
-        id: 900 + now.minute,
-        name: now.minute.isEven
-            ? 'Cüzdan tokenı yenilendi'
-            : 'Karta dokunmadan ödeme · 129 TL',
-        location: now.minute.isEven ? 'Apple Wallet' : 'Getir',
-        when: '${(now.second % 50) + 1} sn önce',
-        blocked: !now.minute.isEven,
-        reason: now.minute.isEven
-            ? null
-            : 'Ödeme, son zamanlarda kullanmadığın bir satıcı örüntüsünden geldi ve cihaz imzası bilinen son ödeme yolu ile eşleşmedi.',
-      ),
-      ...kSecurityChecks.take(4),
-    ];
-
-    final data = SecurityFeedData(checks: checks, lastUpdated: now);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kSecurityFeedCacheKey, jsonEncode(data.toMap()));
-    return data;
+    // No remote source: return an empty feed so the UI shows the "all clear"
+    // state instead of inventing fake fraud events.
+    return SecurityFeedData(
+      checks: const [],
+      lastUpdated: DateTime.now(),
+    );
   }
 
   Future<SecurityFeedData?> _fetchRemote() async {

@@ -8,7 +8,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../subscriptions/domain/subscription_status.dart';
 import '../../../subscriptions/state/subscriptions_controller.dart';
 import '../../../uma_chat/presentation/open_uma.dart';
-import '../../data/upcoming_bill.dart';
+import '../../state/upcoming_bills_controller.dart';
 
 /// "Vera fark etti" sized proactive card. Selects the strongest signal from
 /// the current state and points the user to the right module:
@@ -24,8 +24,9 @@ class ProactiveInsightCard extends ConsumerWidget {
     final t = context.tokens;
     final l10n = context.l10n;
     final subs = ref.watch(subscriptionsControllerProvider).items;
+    final bills = ref.watch(upcomingBillsControllerProvider);
 
-    final urgentBill = kUpcomingBills
+    final urgentBill = bills
         .where((b) => b.daysUntilDue <= 3)
         .toList()
       ..sort((a, b) => a.daysUntilDue.compareTo(b.daysUntilDue));

@@ -4,7 +4,7 @@ import '../data/goal.dart';
 import '../data/goals_store.dart';
 
 class GoalsController extends StateNotifier<FinancialGoal> {
-  GoalsController(this._store) : super(FinancialGoal.seed) {
+  GoalsController(this._store) : super(FinancialGoal.empty) {
     _bootstrap();
   }
 
@@ -21,7 +21,7 @@ class GoalsController extends StateNotifier<FinancialGoal> {
 
   Future<void> reset() async {
     await _store.clear();
-    state = FinancialGoal.seed;
+    state = FinancialGoal.empty;
   }
 }
 

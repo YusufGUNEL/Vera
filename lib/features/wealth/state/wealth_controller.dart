@@ -34,16 +34,14 @@ class WealthState {
         .fold<double>(0, (sum, a) => sum + a.amount);
   }
 
-  /// YTD percent estimated from the cumulative net moves Uma executed,
-  /// scaled to total portfolio size. Falls back to 0 when the portfolio is
-  /// empty.
+  /// Lightweight YTD estimate from the cumulative net moves Uma made, scaled
+  /// against total portfolio size. Returns 0 when the portfolio is empty.
   double get ytdPercent {
     if (total <= 0) return 0;
-    final base = 12.0; // baseline market drift the demo assumes
     final movement = actions
         .where((a) => !a.undone)
         .fold<double>(0, (s, a) => s + a.amount);
-    return base + (movement / total) * 100;
+    return (movement / total) * 100;
   }
 
   WealthState copyWith({
@@ -68,7 +66,10 @@ class WealthController extends StateNotifier<WealthState> {
             policy: _repository.initialPolicy(),
             allocations: const [],
             actions: const [],
-            insight: '',
+            insight: _repository.insightFor(
+              _repository.initialPolicy(),
+              const [],
+            ),
           ),
         ) {
     _load();
@@ -81,10 +82,10 @@ class WealthController extends StateNotifier<WealthState> {
     final policy = await _service.loadPolicy();
     final allocations = await _service.loadPortfolio();
     final actions = await _service.loadActions();
-    
+
     state = state.copyWith(
       policy: policy,
-      allocations: allocations,
+      allocations: _recomputeWeights(allocations),
       actions: actions,
       insight: _repository.insightFor(policy, actions),
     );
@@ -114,6 +115,33 @@ class WealthController extends StateNotifier<WealthState> {
     _updatePolicy(p);
   }
 
+  Future<void> addAllocation({
+    required String label,
+    required double amount,
+    required String paletteKey,
+  }) async {
+    if (amount <= 0) return;
+    final merged = [
+      ...state.allocations,
+      PortfolioAllocation(
+        label: label,
+        amount: amount,
+        weight: 0,
+        paletteKey: paletteKey,
+      ),
+    ];
+    final updated = _recomputeWeights(merged);
+    state = state.copyWith(allocations: updated);
+    await _service.savePortfolio(updated);
+  }
+
+  Future<void> removeAllocation(String label) async {
+    final filtered = state.allocations.where((a) => a.label != label).toList();
+    final updated = _recomputeWeights(filtered);
+    state = state.copyWith(allocations: updated);
+    await _service.savePortfolio(updated);
+  }
+
   void _updatePolicy(AutonomyPolicy policy) {
     state = state.copyWith(
       policy: policy,
@@ -130,6 +158,22 @@ class WealthController extends StateNotifier<WealthState> {
       actions: updated,
       insight: _repository.insightFor(state.policy, updated),
     );
+  }
+
+  List<PortfolioAllocation> _recomputeWeights(
+    List<PortfolioAllocation> items,
+  ) {
+    final total = items.fold<double>(0, (s, a) => s + a.amount);
+    if (total <= 0) return items;
+    return [
+      for (final a in items)
+        PortfolioAllocation(
+          label: a.label,
+          amount: a.amount,
+          weight: (a.amount / total) * 100,
+          paletteKey: a.paletteKey,
+        ),
+    ];
   }
 }
 

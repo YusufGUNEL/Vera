@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../data/goal_advisor.dart';
 import '../../state/goals_controller.dart';
+import '../../state/home_controller.dart';
 
 class GoalCard extends ConsumerWidget {
   const GoalCard({super.key});
@@ -16,6 +18,7 @@ class GoalCard extends ConsumerWidget {
     final l10n = context.l10n;
     final goal = ref.watch(goalsControllerProvider);
     final pct = (goal.progress * 100).round();
+    final isEmpty = goal.target <= 0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -73,7 +76,9 @@ class GoalCard extends ConsumerWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '${fmtTL(goal.saved)} · ${fmtTL(goal.target)}',
+                            isEmpty
+                                ? 'Henüz hedef belirlemedin — dokun ve ekle.'
+                                : '${fmtTL(goal.saved)} · ${fmtTL(goal.target)}',
                             style: TextStyle(
                               fontSize: 12,
                               color: t.ink2,
@@ -82,57 +87,63 @@ class GoalCard extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Icon(Icons.edit_outlined, size: 16, color: t.muted),
+                    Icon(
+                      isEmpty ? Icons.add : Icons.edit_outlined,
+                      size: 16,
+                      color: t.muted,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(999),
-                  child: LinearProgressIndicator(
-                    value: goal.progress,
-                    backgroundColor: t.bgSoft,
-                    valueColor: AlwaysStoppedAnimation(t.green),
-                    minHeight: 8,
+                if (!isEmpty) ...[
+                  const SizedBox(height: 14),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: goal.progress,
+                      backgroundColor: t.bgSoft,
+                      valueColor: AlwaysStoppedAnimation(t.green),
+                      minHeight: 8,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: t.green.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        l10n.goalProgress('$pct'),
-                        style: TextStyle(
-                          color: t.green,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: t.green.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          l10n.goalProgress('$pct'),
+                          style: TextStyle(
+                            color: t.green,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        goal.isReached
-                            ? l10n.goalEtaReached
-                            : (goal.etaMonths == null
-                                ? l10n.goalRemaining(fmtTL(goal.remaining))
-                                : '${l10n.goalRemaining(fmtTL(goal.remaining))} · ${l10n.goalEtaMonths(goal.etaMonths!)}'),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: t.muted,
-                          fontWeight: FontWeight.w500,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          goal.isReached
+                              ? l10n.goalEtaReached
+                              : (goal.etaMonths == null
+                                  ? l10n.goalRemaining(fmtTL(goal.remaining))
+                                  : '${l10n.goalRemaining(fmtTL(goal.remaining))} · ${l10n.goalEtaMonths(goal.etaMonths!)}'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: t.muted,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -162,6 +173,9 @@ class GoalEditSheet extends ConsumerStatefulWidget {
 class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
   late final TextEditingController _targetCtrl;
   late final TextEditingController _savedCtrl;
+  int _months = 12;
+  GoalAdviceResult? _advice;
+  bool _busy = false;
 
   @override
   void initState() {
@@ -183,11 +197,25 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
   Future<void> _save() async {
     final target = double.tryParse(_targetCtrl.text.trim()) ?? 0;
     final saved = double.tryParse(_savedCtrl.text.trim()) ?? 0;
+    if (target <= 0) {
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
     await ref.read(goalsControllerProvider.notifier).updateGoal(
-          target: target <= 0 ? null : target,
+          target: target,
           saved: saved.clamp(0, double.infinity).toDouble(),
         );
-    if (mounted) Navigator.of(context).pop();
+    setState(() => _busy = true);
+    final result = await ref.read(goalAdvisorProvider).advise(
+          goal: ref.read(goalsControllerProvider),
+          transactions: ref.read(homeControllerProvider).transactions,
+          targetMonths: _months,
+        );
+    if (!mounted) return;
+    setState(() {
+      _advice = result;
+      _busy = false;
+    });
   }
 
   @override
@@ -240,24 +268,148 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                 _NumField(label: l10n.goalEditTarget, controller: _targetCtrl),
                 const SizedBox(height: 12),
                 _NumField(label: l10n.goalEditSaved, controller: _savedCtrl),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: FilledButton(
-                    onPressed: _save,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: t.brand,
-                      foregroundColor: t.brandFG,
-                    ),
-                    child: Text(
-                      l10n.goalEditSave,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                const SizedBox(height: 12),
+                Text(
+                  'KAÇ AYDA',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: t.muted,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final m in const [3, 6, 12, 18, 24])
+                      InkWell(
+                        onTap: () => setState(() => _months = m),
+                        borderRadius: BorderRadius.circular(999),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _months == m
+                                ? t.brand.withValues(alpha: 0.14)
+                                : t.card,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: _months == m ? t.brand : t.line,
+                            ),
+                          ),
+                          child: Text(
+                            '$m ay',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _months == m ? t.brand : t.ink2,
+                            ),
+                          ),
+                        ),
                       ),
+                  ],
+                ),
+                if (_advice != null) ...[
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: t.umaSoft,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: t.uma.withValues(alpha: 0.18)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: t.uma,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.auto_awesome,
+                              color: Colors.white, size: 15),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Aylık ${_advice!.monthlyRequired.toStringAsFixed(0)} TL · ${_advice!.etaMonths} ay',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: t.ink,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _advice!.aiNarrative,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: t.ink2,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ],
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    if (_advice != null)
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: t.ink,
+                            side: BorderSide(color: t.line),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text('Kapat'),
+                        ),
+                      ),
+                    if (_advice != null) const SizedBox(width: 10),
+                    Expanded(
+                      flex: _advice == null ? 1 : 1,
+                      child: SizedBox(
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: _busy ? null : _save,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: t.brand,
+                            foregroundColor: t.brandFG,
+                          ),
+                          child: _busy
+                              ? SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: t.brandFG,
+                                  ),
+                                )
+                              : Text(
+                                  _advice == null
+                                      ? l10n.goalEditSave
+                                      : 'Hesapla',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

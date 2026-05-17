@@ -13,15 +13,15 @@ class GoalsStore {
   Future<FinancialGoal> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kGoalKey);
-    if (raw == null || raw.isEmpty) return FinancialGoal.seed;
+    if (raw == null || raw.isEmpty) return FinancialGoal.empty;
     try {
       final decoded = jsonDecode(raw);
       if (decoded is Map<String, dynamic>) {
         return FinancialGoal.fromMap(decoded);
       }
-      return FinancialGoal.seed;
+      return FinancialGoal.empty;
     } catch (_) {
-      return FinancialGoal.seed;
+      return FinancialGoal.empty;
     }
   }
 

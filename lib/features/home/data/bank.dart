@@ -58,37 +58,6 @@ class Bank {
   }
 }
 
-const kBanks = <Bank>[
-  Bank(
-    id: 'gr',
-    name: 'Garanti BBVA',
-    shortCode: 'GR',
-    balance: 184250,
-    color: Color(0xFF1B5E20),
-    last4: '••2847',
-  ),
-  Bank(
-    id: 'ak',
-    name: 'Akbank',
-    shortCode: 'AK',
-    balance: 92400,
-    color: Color(0xFFB71C1C),
-    last4: '••1209',
-  ),
-  Bank(
-    id: 'is',
-    name: 'Is Bankasi',
-    shortCode: 'IB',
-    balance: 41680,
-    color: Color(0xFF0D47A1),
-    last4: '••5544',
-  ),
-  Bank(
-    id: 'zb',
-    name: 'Ziraat',
-    shortCode: 'ZB',
-    balance: 28910,
-    color: Color(0xFF3E2723),
-    last4: '••3318',
-  ),
-];
+/// No hardcoded banks. The connected-accounts list is populated entirely from
+/// what the user adds (manual entry, statement import, receipt scan).
+const kBanks = <Bank>[];

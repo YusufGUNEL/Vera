@@ -7,6 +7,8 @@ import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/vera_card.dart';
+import '../../receipt_scan/presentation/receipt_scan_sheet.dart';
+import '../../statement_import/presentation/statement_import_sheet.dart';
 import '../domain/subscription_alert.dart';
 import '../domain/subscription_item.dart';
 import '../domain/subscription_status.dart';
@@ -136,17 +138,19 @@ class SubscriptionsScreen extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: VeraCard(
-              child: Column(
-                children: [
-                  for (var i = 0; i < state.visibleItems.length; i++)
-                    _SubscriptionTile(
-                      item: state.visibleItems[i],
-                      isFirst: i == 0,
+            child: state.visibleItems.isEmpty
+                ? _EmptyPlansCard(showImportCTA: state.items.isEmpty)
+                : VeraCard(
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < state.visibleItems.length; i++)
+                          _SubscriptionTile(
+                            item: state.visibleItems[i],
+                            isFirst: i == 0,
+                          ),
+                      ],
                     ),
-                ],
-              ),
-            ),
+                  ),
           ),
         ],
       ),
@@ -526,6 +530,116 @@ _StatusSpec _statusSpec(SubscriptionStatus status, AppTokens t) {
         softColor: t.blue.withValues(alpha: 0.10),
       ),
   };
+}
+
+class _EmptyPlansCard extends StatelessWidget {
+  const _EmptyPlansCard({required this.showImportCTA});
+  final bool showImportCTA;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return VeraCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: t.uma.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.subscriptions_outlined,
+                    color: t.uma, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      showImportCTA
+                          ? 'Henüz tespit edilen abonelik yok'
+                          : 'Bu filtreyle eşleşen abonelik yok',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      showImportCTA
+                          ? 'Ekstre yükle veya fiş tara — Vera tekrar eden ödemeleri otomatik tespit eder.'
+                          : 'Diğer filtreleri deneyebilirsin.',
+                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (showImportCTA) ...[
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openStatement(context),
+                    icon: const Icon(Icons.upload_file_rounded, size: 16),
+                    label: const Text('Ekstre'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: t.brand,
+                      side: BorderSide(color: t.brand.withValues(alpha: 0.4)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () => _openScan(context),
+                    icon: const Icon(Icons.qr_code_scanner_rounded, size: 16),
+                    label: const Text('Fiş tara'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: t.brand,
+                      foregroundColor: t.brandFG,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _openStatement(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const StatementImportSheet(),
+    );
+  }
+
+  void _openScan(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const ReceiptScanSheet(),
+    );
+  }
 }
 
 String _filterLabel(SubscriptionFilter filter, AppStrings l10n) {

@@ -66,59 +66,6 @@ class Txn {
   }
 }
 
-const kTransactions = <Txn>[
-  Txn(
-    id: 1,
-    name: 'Migros',
-    category: 'Market',
-    icon: Icons.shopping_cart_outlined,
-    amount: -487.20,
-    when: 'Bugün, 14:22',
-    color: Color(0xFFE67E22),
-  ),
-  Txn(
-    id: 2,
-    name: 'Aksoy Yazılım',
-    category: 'Maaş',
-    icon: Icons.work_outline,
-    amount: 48500,
-    when: 'Bugün, 09:00',
-    color: Color(0xFF2F8B5C),
-  ),
-  Txn(
-    id: 3,
-    name: 'Kahve Dünyası',
-    category: 'Yeme & İçme',
-    icon: Icons.local_cafe_outlined,
-    amount: -125,
-    when: 'Dün, 18:40',
-    color: Color(0xFF8E5A3C),
-  ),
-  Txn(
-    id: 4,
-    name: 'Netflix',
-    category: 'Abonelik',
-    icon: Icons.movie_outlined,
-    amount: -149.99,
-    when: 'Dün, 09:10',
-    color: Color(0xFFC03A2B),
-  ),
-  Txn(
-    id: 5,
-    name: 'Ahmet K.',
-    category: 'Transfer',
-    icon: Icons.send_outlined,
-    amount: -1500,
-    when: '11 May, 16:08',
-    color: Color(0xFF2D5FB0),
-  ),
-  Txn(
-    id: 6,
-    name: 'BIM',
-    category: 'Market',
-    icon: Icons.shopping_cart_outlined,
-    amount: -312.40,
-    when: '11 May, 10:14',
-    color: Color(0xFFE67E22),
-  ),
-];
+/// No hardcoded transactions. The list comes from user-managed entries:
+/// manual add, statement import (PDF/Excel), or receipt OCR.
+const kTransactions = <Txn>[];

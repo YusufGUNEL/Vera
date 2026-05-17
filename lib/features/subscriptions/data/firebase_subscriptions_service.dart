@@ -34,25 +34,25 @@ class FirebaseSubscriptionsService {
   Future<List<SubscriptionItem>> loadSubscriptions({
     required List<dynamic> userTxns,
   }) async {
-    // Note: userTxns is dynamic here due to import constraints, but we pass it to local repo correctly.
-    if (!isEnabled) {
-      // It's safe to cast inside if needed or let the local handle it.
-      return _local.getSubscriptions(userTxns: userTxns.cast());
-    }
+    // The cheapest source of truth: re-detect from the user's transactions.
+    // Firestore only persists user-edited overrides on top of that — never a
+    // canned seed of brand names.
+    final detected = _local.getSubscriptions(userTxns: userTxns.cast());
+    if (!isEnabled) return detected;
 
     try {
       final snap = await _collection!.get();
-      if (snap.docs.isEmpty) {
-        // İlk giriş: local mock/detected datayı toplayıp kaydet
-        final initialItems = _local.getSubscriptions(userTxns: userTxns.cast());
-        await _seedSubscriptions(initialItems);
-        return initialItems;
-      }
-      return snap.docs
+      final stored = snap.docs
           .map((doc) => SubscriptionItem.fromMap(doc.data()))
           .toList();
+      // Stored overrides win by id; new detections are appended.
+      final byId = {for (final s in stored) s.id: s};
+      for (final d in detected) {
+        byId.putIfAbsent(d.id, () => d);
+      }
+      return byId.values.toList();
     } catch (_) {
-      return _local.getSubscriptions(userTxns: userTxns.cast());
+      return detected;
     }
   }
 
@@ -63,23 +63,6 @@ class FirebaseSubscriptionsService {
         ...item.toMap(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
-    } catch (_) {}
-  }
-
-  Future<void> _seedSubscriptions(List<SubscriptionItem> items) async {
-    if (!isEnabled) return;
-    try {
-      final batch = FirebaseFirestore.instance.batch();
-      for (final item in items) {
-        batch.set(
-          _collection!.doc(item.id),
-          {
-            ...item.toMap(),
-            'syncedAt': FieldValue.serverTimestamp(),
-          },
-        );
-      }
-      await batch.commit();
     } catch (_) {}
   }
 }

@@ -13,15 +13,15 @@ class CategoryBudgetStore {
   Future<Map<String, double>> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kBudgetKey);
-    if (raw == null || raw.isEmpty) return _seed;
+    if (raw == null || raw.isEmpty) return const {};
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is! Map) return _seed;
+      if (decoded is! Map) return const {};
       return decoded.map(
         (k, v) => MapEntry('$k', (v as num).toDouble()),
       );
     } catch (_) {
-      return _seed;
+      return const {};
     }
   }
 
@@ -42,16 +42,6 @@ class CategoryBudgetStore {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_kBudgetKey);
   }
-
-  /// Default seed limits so the card is meaningful before the user customizes.
-  static const Map<String, double> _seed = {
-    'Market': 4000,
-    'Yeme & İçme': 1500,
-    'Abonelik': 500,
-    'Akaryakıt': 1200,
-    'Transfer': 5000,
-    'Fatura': 2500,
-  };
 }
 
 final categoryBudgetStoreProvider =

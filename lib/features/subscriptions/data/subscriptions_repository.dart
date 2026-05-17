@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../home/data/transaction.dart';
@@ -7,87 +6,19 @@ import '../domain/subscription_item.dart';
 import '../domain/subscription_status.dart';
 import 'recurring_transaction_parser.dart';
 
+/// Builds the subscription catalogue for the user.
+///
+/// We do not seed any "famous brand" subscriptions. Everything must come from
+/// the user's own transactions (manual entry, statement import, receipt OCR)
+/// so the list reflects real spending — never a marketing demo.
 class SubscriptionsRepository {
   SubscriptionsRepository(this._parser);
 
   final RecurringTransactionParser _parser;
 
   List<SubscriptionItem> getSubscriptions({List<Txn> userTxns = const []}) {
-    // Merge user transactions with the seeded sample so the catalog matching
-    // still works in a totally fresh install.
-    final allTxns = [...userTxns, ...kTransactions];
-    final detectedVendors =
-        _parser.detectVendors(allTxns.map((txn) => txn.name).toList());
-
-    final items = <SubscriptionItem>[
-      SubscriptionItem(
-        id: 'netflix',
-        name: 'Netflix Premium',
-        vendor: 'Netflix',
-        category: 'Eğlence',
-        monthlyPrice: 150,
-        previousPrice: detectedVendors.contains('Netflix') ? 129 : 150,
-        renewalLabel: '2 gün içinde yenilenir',
-        lastUsedLabel: '18 gündür izlenmedi',
-        status: SubscriptionStatus.priceIncreased,
-        recommendation: 'Bir alt pakete düş veya bu ay dondur.',
-        icon: Icons.movie_outlined,
-      ),
-      const SubscriptionItem(
-        id: 'spotify',
-        name: 'Spotify Aile',
-        vendor: 'Spotify',
-        category: 'Müzik',
-        monthlyPrice: 100,
-        previousPrice: 100,
-        renewalLabel: '12 gün içinde yenilenir',
-        lastUsedLabel: 'Bu sabah kullanıldı',
-        status: SubscriptionStatus.healthy,
-        recommendation: 'Aktif kalsın. Tüm hane sıkı kullanıyor.',
-        icon: Icons.headphones_outlined,
-      ),
-      const SubscriptionItem(
-        id: 'youtube-premium',
-        name: 'YouTube Premium',
-        vendor: 'Google',
-        category: 'Video',
-        monthlyPrice: 58,
-        previousPrice: 58,
-        renewalLabel: 'Yarın yenilenir',
-        lastUsedLabel: '27 gündür aktivite yok',
-        status: SubscriptionStatus.unused,
-        recommendation:
-            'Bu planı dondur, geçmişini kaybetmeden aylık tasarruf et.',
-        icon: Icons.smart_display_outlined,
-        canFreeze: true,
-      ),
-      const SubscriptionItem(
-        id: 'icloud',
-        name: 'iCloud+ 200 GB',
-        vendor: 'Apple',
-        category: 'Depolama',
-        monthlyPrice: 40,
-        previousPrice: 40,
-        renewalLabel: '5 gün içinde yenilenir',
-        lastUsedLabel: 'Depolama %92 dolu',
-        status: SubscriptionStatus.renewalSoon,
-        recommendation:
-            'Aktif kalsın ama yıllık depolama maliyetini sonraki dönemde gözden geçir.',
-        icon: Icons.cloud_outlined,
-      ),
-    ];
-
-    // Detect additional subscriptions in the user's imported transactions
-    // (receipt OCR + statement import). Dedupe against the seed by vendor.
-    final detected = _parser.detectSubscriptions(userTxns);
-    final seedVendors =
-        items.map((s) => s.vendor.toLowerCase()).toSet();
-    for (final d in detected) {
-      if (seedVendors.contains(d.vendor.toLowerCase())) continue;
-      items.add(d);
-    }
-
-    return items;
+    if (userTxns.isEmpty) return const [];
+    return _parser.detectSubscriptions(userTxns);
   }
 
   List<SubscriptionAlert> buildAlerts(List<SubscriptionItem> items) {
@@ -100,8 +31,9 @@ class SubscriptionsRepository {
     return [
       SubscriptionAlert(
         title: 'Aylık tasarruf potansiyeli',
-        message:
-            'Vera, rutinini bozmadan dondurabileceğin veya alt pakete düşürebileceğin abonelikler buldu.',
+        message: items.isEmpty
+            ? 'Henüz abonelik tespit edilmedi. Ekstre yükle veya manuel ekle, Vera takip etsin.'
+            : 'Vera, rutinini bozmadan dondurabileceğin veya alt pakete düşürebileceğin abonelikler buldu.',
         metricLabel: 'KAZANÇ',
         metricValue: '${savings.toStringAsFixed(0)} TL',
       ),
@@ -125,6 +57,9 @@ class SubscriptionsRepository {
   }
 
   String buildInsight(List<SubscriptionItem> items) {
+    if (items.isEmpty) {
+      return 'Vera ekstreni veya fişlerini analiz edip aboneliklerini bu listede toplar.';
+    }
     final savings = estimatedMonthlySavings(items);
     final needsAttention =
         items.where((item) => item.status.needsAttention).length;

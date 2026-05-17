@@ -7,7 +7,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../security/state/security_controller.dart';
 import '../../../subscriptions/domain/subscription_status.dart';
 import '../../../subscriptions/state/subscriptions_controller.dart';
-import '../../data/upcoming_bill.dart';
+import '../../state/upcoming_bills_controller.dart';
 
 class _Notice {
   const _Notice({
@@ -34,6 +34,7 @@ class NotificationCenterSheet extends ConsumerWidget {
     final l10n = context.l10n;
     final security = ref.watch(securityControllerProvider);
     final subs = ref.watch(subscriptionsControllerProvider);
+    final bills = ref.watch(upcomingBillsControllerProvider);
 
     final notices = <_Notice>[
       for (final check
@@ -65,7 +66,7 @@ class NotificationCenterSheet extends ConsumerWidget {
           accent: t.muted,
           when: sub.renewalLabel,
         ),
-      for (final bill in kUpcomingBills.where((b) => b.daysUntilDue <= 5))
+      for (final bill in bills.where((b) => b.daysUntilDue <= 5))
         _Notice(
           icon: bill.icon,
           title: l10n.notifBillTitle(bill.name),

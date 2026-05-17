@@ -1,17 +1,23 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/env.dart';
 import '../domain/home_feed_data.dart';
-import 'bank.dart';
-import 'transaction.dart';
 
 const _kHomeFeedCacheKey = 'home.feed.cache';
 
+/// Loads the home feed (banks + transactions + insight) for the user.
+///
+/// The app does not have AISP licensing, so we never fabricate bank data.
+/// Sources, in order:
+///   1) An optional remote endpoint (HOME_FEED_URL) — useful for users who
+///      run their own ingestion bridge.
+///   2) A locally cached snapshot from a prior session.
+///   3) An empty feed — the UI then nudges the user to add a bank manually,
+///      import a statement, or scan a receipt.
 class HomeFeedRepository {
   const HomeFeedRepository();
 
@@ -19,7 +25,11 @@ class HomeFeedRepository {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kHomeFeedCacheKey);
     if (raw == null || raw.isEmpty) return null;
-    return HomeFeedData.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return HomeFeedData.fromMap(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<HomeFeedData> refresh() async {
@@ -30,49 +40,16 @@ class HomeFeedRepository {
       return remote;
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    final now = DateTime.now();
-    final minuteShift = now.minute % 5;
-
-    final banks = [
-      kBanks[0].copyWith(balance: kBanks[0].balance + minuteShift * 280),
-      kBanks[1].copyWith(balance: kBanks[1].balance - minuteShift * 90),
-      kBanks[2].copyWith(balance: kBanks[2].balance + minuteShift * 55),
-      kBanks[3].copyWith(balance: kBanks[3].balance + minuteShift * 32),
-    ];
-
-    final transactions = [
-      Txn(
-        id: 1000 + now.minute,
-        name: now.minute.isEven ? 'Yemeksepeti' : 'Martı',
-        category: now.minute.isEven ? 'Yeme & İçme' : 'Ulaşım',
-        icon: now.minute.isEven
-            ? kTransactions[2].icon
-            : const IconData(0xe1d5, fontFamily: 'MaterialIcons'),
-        amount: now.minute.isEven ? -184 : -96,
-        when:
-            'Bugün, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-        color: now.minute.isEven
-            ? const Color(0xFF8E5A3C)
-            : const Color(0xFF2D5FB0),
-      ),
-      ...kTransactions.take(5),
-    ];
-
-    final total = banks.fold<double>(0, (sum, bank) => sum + bank.balance);
-    final insight =
-        'Canlı senkron tamamlandı. Vera ${banks.length} hesabı yeniledi ve şu an ${transactions.length} son işlemi takip ediyor. Son güncellemeden sonra nakit pozisyonu ${total > 340000 ? 'sağlıklı' : 'gözden geçirilmeli'}.';
-
-    final data = HomeFeedData(
-      banks: banks,
-      transactions: transactions,
-      insight: insight,
-      lastUpdated: now,
+    // No remote source configured: the home feed is whatever the user has
+    // already stored locally (banks + imported transactions). The controller
+    // merges those in. We just return an empty snapshot with no insight so
+    // the UI surfaces the empty state.
+    return HomeFeedData(
+      banks: const [],
+      transactions: const [],
+      insight: '',
+      lastUpdated: DateTime.now(),
     );
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kHomeFeedCacheKey, jsonEncode(data.toMap()));
-    return data;
   }
 
   Future<HomeFeedData?> _fetchRemote() async {

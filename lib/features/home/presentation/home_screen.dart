@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_strings.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../receipt_scan/presentation/receipt_scan_sheet.dart';
 import '../../statement_import/presentation/statement_import_sheet.dart';
@@ -12,7 +11,11 @@ import '../data/savings_summary.dart';
 import '../data/transaction.dart';
 import '../data/upcoming_bill.dart';
 import '../state/home_controller.dart';
+import '../state/spending_insight_controller.dart';
+import '../state/upcoming_bills_controller.dart';
 import 'widgets/add_bank_sheet.dart';
+import 'widgets/add_bill_sheet.dart';
+import 'widgets/add_manual_transaction_sheet.dart';
 import 'widgets/bank_actions_sheet.dart';
 import 'widgets/category_budget_card.dart';
 import 'widgets/connected_banks.dart';
@@ -92,18 +95,40 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _openBillDetail(BuildContext context, WidgetRef ref, UpcomingBill bill) {
-    final l10n = context.l10n;
-    openUma(
-      context,
-      ref,
-      prompt:
-          l10n.billDetailPrompt(bill.name, fmtTL(bill.amount), bill.daysUntilDue),
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => AddBillSheet(initial: bill),
+    );
+  }
+
+  void _openAddBill(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const AddBillSheet(),
+    );
+  }
+
+  void _openAddManualTransaction(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => const AddManualTransactionSheet(),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeControllerProvider);
+    final bills = ref.watch(upcomingBillsControllerProvider);
+    final insight = ref.watch(spendingInsightControllerProvider);
     final l10n = context.l10n;
     final savings = summarizeSavings(state.transactions);
     final hasTransactions = state.transactions.isNotEmpty;
@@ -130,6 +155,7 @@ class HomeScreen extends ConsumerWidget {
                   ? l10n.firstSyncPending
                   : l10n.updatedAt(state.lastUpdatedTime!),
               refreshing: state.refreshing,
+              history: state.history,
               onSend: () =>
                   openUma(context, ref, prompt: l10n.umaPromptSend),
               onRequest: () =>
@@ -147,10 +173,15 @@ class HomeScreen extends ConsumerWidget {
               ),
             const GoalCard(),
             const ProactiveInsightCard(),
-            SectionTitle(title: l10n.upcomingBills),
+            SectionTitle(
+              title: l10n.upcomingBills,
+              actionLabel: bills.isEmpty ? '+ Ekle' : '+ Yeni',
+              onAction: () => _openAddBill(context),
+            ),
             UpcomingBillsStrip(
-              bills: kUpcomingBills,
+              bills: bills,
               onBillTap: (bill) => _openBillDetail(context, ref, bill),
+              onAddTap: () => _openAddBill(context),
             ),
             SectionTitle(
               title: l10n.connectedAccounts,
@@ -165,7 +196,8 @@ class HomeScreen extends ConsumerWidget {
               onAddBankTap: () => _openAddBank(context),
             ),
             UmaInsightStrip(
-              text: state.insight,
+              text: insight.text.isEmpty ? state.insight : insight.text,
+              loading: insight.loading,
               onTap: () => openUma(context, ref),
             ),
             CategoryBudgetCard(
@@ -176,11 +208,17 @@ class HomeScreen extends ConsumerWidget {
             const CreditSummaryCard(),
             SectionTitle(
               title: l10n.recentTransactions,
-              actionLabel: l10n.itemsCount(state.transactions.length),
+              actionLabel: state.transactions.isEmpty
+                  ? '+ İşlem ekle'
+                  : '+ Ekle (${state.transactions.length})',
+              onAction: () => _openAddManualTransaction(context),
             ),
             TransactionList(
               transactions: state.transactions,
               onTap: (txn) => _openTxnDetail(context, txn),
+              onAddManual: () => _openAddManualTransaction(context),
+              onScan: () => _openScanner(context),
+              onImport: () => _openStatementImport(context),
             ),
           ],
         ),

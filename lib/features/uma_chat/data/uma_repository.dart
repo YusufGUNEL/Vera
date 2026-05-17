@@ -8,7 +8,9 @@ import '../../../core/utils/formatters.dart';
 import '../../home/data/category_summary.dart';
 import '../../home/state/goals_controller.dart';
 import '../../home/state/home_controller.dart';
+import '../../home/state/upcoming_bills_controller.dart';
 import '../../subscriptions/state/subscriptions_controller.dart';
+import '../../wealth/state/wealth_controller.dart';
 import '../domain/uma_audit_event.dart';
 import '../domain/uma_feedback.dart';
 import '../domain/uma_intent.dart';
@@ -221,20 +223,98 @@ class UmaRepository {
 
   Future<String> buildPrompt(String userText) async {
     final feedbackContext = await _feedbackStore.buildPromptContext();
+    final userContext = _buildUserContext();
     return '''
 You are Uma, the AI coach inside Vera, a Turkish personal finance app.
 Vera does NOT execute bank transactions itself. It analyzes the user's data
 (imported statements, receipts, screenshots, manual entries) and forwards
 real actions to the user's bank app for them to confirm.
 
-Tone: warm, concise (1-3 sentences), helpful. Use TL when relevant.
-Never invent specific transaction history or prices the user hasn't asked about.
+Tone: warm, concise (1-3 sentences), helpful. Reply in the same language the
+user wrote in. Use TL (Turkish Lira) when amounts are relevant.
+
+Ground every answer in USER_CONTEXT below. If the answer truly is not
+derivable from that context, say so politely and ask what to import / add.
+Never invent specific transaction history or prices the user hasn't entered.
 Never claim Vera will move money. If the user wants an action, say you will
 open the right bank app and that they'll confirm there.
+
+USER_CONTEXT:
+$userContext
 ${feedbackContext.isEmpty ? '' : '\n$feedbackContext\n'}
 
 User: $userText
 Uma:''';
+  }
+
+  /// Compact JSON-like snapshot of the user's current state. Kept small so it
+  /// fits comfortably inside the prompt and isn't billed per turn.
+  String _buildUserContext() {
+    final home = _ref.read(homeControllerProvider);
+    final bills = _ref.read(upcomingBillsControllerProvider);
+    final goal = _ref.read(goalsControllerProvider);
+    final subs = _ref.read(subscriptionsControllerProvider);
+    final wealth = _ref.read(wealthControllerProvider);
+
+    final totalCash =
+        home.banks.fold<double>(0, (s, b) => s + b.balance);
+    final txns = home.transactions.take(15).toList();
+    final spending = summarizeSpending(home.transactions, otherLabel: 'Diğer');
+
+    final buf = StringBuffer()
+      ..writeln('- cashTL: ${totalCash.toStringAsFixed(0)}')
+      ..writeln(
+          '- banks: ${home.banks.map((b) => '${b.name}(${b.balance.toStringAsFixed(0)})').join(', ')}');
+
+    if (bills.isNotEmpty) {
+      buf.writeln('- upcomingBills:');
+      for (final b in bills.take(8)) {
+        buf.writeln(
+            '   - ${b.name}: ${b.amount.toStringAsFixed(0)} TL, ${b.daysUntilDue} gün sonra');
+      }
+    }
+
+    if (goal.target > 0) {
+      buf.writeln(
+          '- goal: hedef ${goal.target.toStringAsFixed(0)} TL, biriken ${goal.saved.toStringAsFixed(0)} TL, kalan ${goal.remaining.toStringAsFixed(0)} TL');
+    }
+
+    if (spending.isNotEmpty) {
+      final top = spending.take(5).map((s) =>
+          '${s.category}=${s.amount.toStringAsFixed(0)}TL');
+      buf.writeln('- topSpendingByCategory: ${top.join(', ')}');
+    }
+
+    if (subs.items.isNotEmpty) {
+      buf.writeln(
+          '- subscriptions(${subs.items.length}, total ${subs.monthlyTotal.toStringAsFixed(0)}TL/ay):');
+      for (final s in subs.items.take(8)) {
+        buf.writeln(
+            '   - ${s.name}: ${s.monthlyPrice.toStringAsFixed(0)} TL/ay (${s.status.name})');
+      }
+    }
+
+    if (wealth.allocations.isNotEmpty) {
+      final w = wealth.allocations
+          .map((a) =>
+              '${a.label}(${a.amount.toStringAsFixed(0)}TL,%${a.weight.toStringAsFixed(0)})')
+          .join(', ');
+      buf.writeln('- portfolio: $w');
+    }
+
+    if (txns.isNotEmpty) {
+      buf.writeln('- recentTransactions:');
+      for (final t in txns) {
+        final sign = t.isCredit ? '+' : '-';
+        buf.writeln(
+            '   - ${t.when} ${t.name} [${t.category}] $sign${t.amount.abs().toStringAsFixed(0)} TL');
+      }
+    }
+
+    final result = buf.toString().trim();
+    return result.isEmpty
+        ? '(user has not added any data yet — gently suggest they import a statement, scan a receipt, or add a transaction manually)'
+        : result;
   }
 
   UmaMessage _reply({

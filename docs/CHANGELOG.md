@@ -4,141 +4,75 @@ Hackathon prototipi olduğu için semantic versioning yerine commit bazlı krono
 
 ---
 
-## 2026-05-16 — FEATURES.md cleanup: yapılamayanları sil (round 3)
+## 2026-05-17 — Mock veriyi tamamen sil + AI özelliklerini kullanıcı verisine bağla
 
-**Notu:** "Vera bunu yapacak" izlenimi veren ama lisans / partnership / scope dışı olduğu için yapılamayacak maddeler doc'tan silindi. Geriye kalan: gerçekten çalışan + gerçekten yapılabilir olanlar.
+**Notu:** İki aşamada büyük dönüşüm. (1) Demo amaçlı tüm hardcoded seed veriler kaldırıldı, uygulama boş başlar. (2) Üzerine, kullanıcının gerçek verisi üzerinde çalışan AI özellikleri eklendi.
 
-### 🗑 Silinenler (FEATURES.md'den)
+### 🗑 Silinenler (mock seed'ler)
 
-- **⚠ Kısmi liste tamamen kaldırıldı** — içindeki yapısal sınır maddeleri (home feed mock, security feed katalogu, wealth allocations, database, login design choice, deep-link web limit, push FCM, gemini key) ya gerçeği zaten çalıştığı için ✅'a taşındı, ya da "yapılacak" listesinden çıkarıldı.
-- **🔜 P2 partnership/lisans maddeleri:** Lisanslı AISP partnership, Vera Card (white-label), Yatırım partneri (SPK).
-- **🔜 P3 vision tamamen:** Vera kendi AISP lisansını alır, Direkt banka API'lerine entegrasyon, B2B Vera for SMEs, Vera Coach yıllık plan (LLM scope dışı).
-- **🔜 P1 duplikeler:** "Tekrarlayan ödeme akıllı tespiti" (zaten yapıldı), "Local notifications fraud" (zaten yapıldı).
-- **Vera Pro abonelik / Vera Family** — business model maddeleri; ürün özellikleri değil, silindi.
+- `kBanks` (Garanti/Akbank/İş Bank/Ziraat hardcoded bakiyeler) → `const kBanks = <Bank>[]`
+- `kTransactions` (Migros/Aksoy/Netflix vb. 6 sahte işlem) → boş liste
+- `kSecurityChecks` (5 sahte fraud event) → boş liste
+- `kUpcomingBills` (3 sahte fatura) → kullanıcı yönetir
+- `FinancialGoal.seed` (50k hedef, 38k saved) → `FinancialGoal.empty` (sıfırlar)
+- `WealthRepository.portfolio()` / `actions()` (hardcoded 167k hisse, 3 "Uma X yaptı" eylemi) → boş
+- `SubscriptionsRepository.getSubscriptions()` 4 hardcoded plan → sadece kullanıcı işlemlerinden tespit
+- `home_feed_repository.refresh()` "Yemeksepeti / Martı" fabrikasyon → empty feed
+- `security_feed_repository.refresh()` rastgele üretilen fraud mock'ları → empty feed
+- `CreditController` default 150k/36ay/48.5k → 0/12ay/0/0
+- `category_budget_store._seed` (Market 4k, Yeme 1.5k vb.) → kullanıcı her limiti kendi girer
+- `FirebaseWealthService` / `FirebaseSubscriptionsService` `_seedX` çağrıları (Firestore'a sahte seed yazmayı bırakır)
+- `docs/FEATURES.md` (201 satır, bayatlamış, README ile çakışıyordu)
+
+### ✨ Eklenenler — Kullanıcı verisi akışları
+
+- **`UpcomingBill`** modeli `DateTime dueDate + id` ile; `UpcomingBillsStore` + `FirebaseUpcomingBillsService` + `UpcomingBillsController`.
+- **`AddBillSheet`** — yeni/edit fatura: ad, tutar, son ödeme tarihi (date picker), 7 kategori chip'i.
+- **`AddManualTransactionSheet`** — manuel işlem girişi: Gider/Gelir segment, ad, tutar, tarih, 11 kategori.
+- **`AddHoldingSheet`** — manuel portföy varlığı: 6 bucket (Hisse/Altın/Nakit/Kripto/Fon/Tahvil); `WealthController.addAllocation` otomatik ağırlık hesabı.
+- **Empty-state CTA'lar:** Home (Manuel/Fiş/Ekstre), Faturalar, Wealth, Subscriptions, Security — hepsinde boş durumda CTA.
+- **`AuthController.signOut()`** artık `_clearLocalCaches()` çağırır: tüm local store'lar silinir.
+
+### ✨ Eklenenler — AI özellikleri (kullanıcı verisi üzerinde)
+
+- **Context-aware Uma chat** — Gemini prompt'una kullanıcının gerçek bankaları, son 15 işlemi, faturaları, hedefleri, abonelikleri, portföyü JSON snapshot olarak veriliyor. "Ne kadar param var?", "Geçen ay en çok ne harcadım?" gerçek cevap verir.
+- **`AiCategorizer`** (`lib/core/services/ai_categorizer.dart`) — manuel işlem girişinde kategori önerisi; önce 15+ Türk marka heuristic'i, sonra Gemini fallback. Sheet'te "Uma önerisi: X · Kabul et" chip.
+- **`SpendingInsightController`** — Home insight strip artık gerçek harcama özetinden hesaplanır; Gemini varsa daha zengin yorum arka planda swap edilir.
+- **`NetWorthHistoryStore`** — günlük bakiye snapshot (60 nokta rolling); NetWorthCard'da sparkline.
+- **`GoalAdvisor`** — hedef belirleyince 3/6/12/18/24 ay seçimi; aylık gereken tutar + Gemini ile "şu kategoriden kıs" tavsiyesi.
+- **`FraudHeuristic`** — import edilen işlemleri analiz eder: outlier (median × 3+), yuvarlak büyük transfer (10k+), aynı gün burst (3+). Security feed'e push.
+- **Wealth holding kaldırma** — donut altındaki varlığa tap → "Bu varlığı kaldır" sheet'i.
 
 ### 🔁 Değişenler
 
-- ⚠ kategorisi yerine **iki kategori:** ✅ çalışıyor, 🔜 yapılacak (hackathon scope'unda gerçekçi).
-- Kalan 🔜 maddeleri P0 (6) + P1 (9) — hepsi lisans/partnership olmadan implement edilebilir.
-- Lisans matrisi → "positioning" başlığı altında küçültüldü; ❌ olan satırlar (AISP/PSP/SPK gerektirenler) tek paragraf olarak özetlendi (jüri için pozisyonu net tutar ama "yapacağız" izlenimi vermez).
+- **`BillRemindersScheduler`** sahte `kUpcomingBills` yerine `UpcomingBillsController`'a abone; locale + bills değişince re-schedule.
+- **`SecurityController`** transaction stream'ine abone; her import sonrası `FraudHeuristic` çalışır.
+- **`SubscriptionsRepository`** sadece user txns üzerinden tespit yapar.
+- **`WealthController._recomputeWeights()`** — eklenen her holding'de ağırlıklar yeniden hesaplanır; `ytdPercent` baseline 12% kaldırıldı.
 
 ### 🎯 Sonuç
 
-Doc artık iki şey söylüyor: **(1) Bugün şu şu çalışıyor**, **(2) Yarın şu şu eklenebilir.** "Bir gün lisanslı olunca yapılır" türü romantik vaadler yok.
+Uygulama dürüst bir **boş tuval** olarak başlar. Kullanıcı veri ekledikçe AI katmanları (Gemini insight, AI categorizer, goal advisor, fraud heuristic, Uma chat) **gerçek veri üzerinde** çalışır. `flutter analyze` temiz, debug APK build başarılı.
 
 ---
 
-## 2026-05-16 — FEATURES.md ⚠ listesini gerçeğe çevirme (round 2)
+## 2026-05-16 — Firebase auth + cloud sync
 
-**Notu:** "Kısmi / mock" listesindeki maddelerin yapılabilir olanları gerçek koda dönüştürüldü; yapılamayanlar (banka API, real-time balance, ML fraud) için ürün dilini dürüstleştirdik.
+**Notu:** Firebase Core/Auth/Firestore/Storage/Messaging/Analytics/Crashlytics/Remote Config tam entegre. Bütün store'lar local-first + Firestore senkron (key girilirse aktif).
 
 ### ✨ Eklenenler
 
-- **"Banka ekle" sheet** (`lib/features/home/presentation/widgets/add_bank_sheet.dart`) — kullanıcı banka ekler, `BanksStore` SharedPreferences'a persist; ad / son 4 hane / bakiye / 8 renk swatch.
-- **`HomeController.addBank` / `removeCustomBank`** — feed banks + user banks birleşik; toplam bakiye otomatik.
-- **Fraud → Local notification** — `SecurityController` yeni blocked event'lerde `NotificationService.showFraudAlert` fırlatır; bootstrap seed'leri için duplicate atmaz; tap → `/security`.
-- **Profile account tile sheet'leri** (`AccountInfoSheet` widget) — Personal info / Email / Security / Storage / Help tile'ları artık tıklanabilir, generic 3-bölümlü info sheet açar.
-- **Help & support FAQ** — 3 soru (banka bağlantısı / veri saklama / Gemini key yok) + iletişim bilgisi.
-- **Subscription detection** — `RecurringTransactionParser.detectSubscriptions(List<Txn>)` import edilen transaction'larda 14 bilinen vendor (Netflix/Spotify/YouTube/iCloud/Apple/Amazon/Disney/Exxen/BluTV/Gain/tabii/GitHub/OpenAI/Anthropic) match'i + 2+ tekrarlı işlem tespiti yapar; seed listesine eklenir.
-- **`SubscriptionsController` reactive** — `homeControllerProvider` değiştiğinde otomatik refresh.
-- **L10n key'leri** (6 dil): `addBankTitle/Subtitle/Name/Last4/Balance/Color/Save/NameRequired/bankAdded`, `infoDisplayName/Member/MemberDescription/EmailLabel/EmailUsage/EmailDescription/SessionVault/SessionVaultDescription/FaceId/FaceIdOn/FaceIdOff/FraudAlerts/FraudAlertsOn/FraudAlertsOff/SyncMode/LocalData/LocalDataDescription`, `helpFaqQ1/A1/Q2/A2/Q3/A3/helpContact`.
+- `lib/core/firebase/` — bootstrap, analytics, fcm, remote config service.
+- `lib/features/auth/data/firebase_auth_service.dart` — e-posta sign-in/sign-up; `currentSession` getter; sign-out cloud + local.
+- Firestore servisleri: banks, importedTransactions, importArtifacts, subscriptions, wealth, profile, uma audit/feedback.
+- `.firebaserc`, `firebase.json`, `firestore.rules`, `storage.rules`.
 
 ### 🔁 Değişenler
 
-- `_AccountTile` artık `onTap` callback alır; eski no-op `onTap: () {}` kaldırıldı.
-- `SubscriptionsRepository.getSubscriptions({userTxns})` artık parametre alır, detected items'ı seed'e ekler (vendor bazlı dedupe).
-- `RecurringTransactionParser` keyword listesi 4'ten 14 vendor'a genişletildi.
-- `HomeController` constructor üç argüman yerine `BanksStore` dahil dört argüman alır.
+- Tüm `BanksStore`, `ImportedTransactionsStore`, `SubscriptionsController`, `WealthController` → Firebase servisini watch eder.
+- `main.dart` — `FirebaseBootstrap.ensureInitialized()` + Crashlytics handler.
 
-### 🗑 Silinenler
-
-- UMA chat'teki sahte mic ikonu (`Icons.mic_none_rounded`) — STT bağlı olmadığı için yanıltıcıydı; `_Input.onUseMicHint` callback'i ve placeholder snackbar kaldırıldı.
-
-### 📝 Docs
-
-- `FEATURES.md` "⚠ Kısmi / mock veri" listesi 14 maddeden 10'a indi; kalan maddeler **yapısal sınır** (banka API'si lisans gerektiriyor, ML fraud out of scope) olarak dürüstçe belgelendi.
-- Yeni "Profile / Account tiles (gerçek detail sheet'leri)", "Banka yönetimi", "Fraud → Local notification" bölümleri "Tam çalışan özellikler" altında.
-
----
-
-## 2026-05-16 — Receipt + Statement → Transactions gerçek wire
-
-**Notu:** OCR ve PDF ekstre import sonuçları artık snackbar yerine **gerçekten** home transaction listesine yazılıyor ve app restart'larında korunuyor.
-
-### ✨ Eklenenler
-
-- **`lib/features/home/data/imported_transactions_store.dart`** — SharedPreferences ile persist; `ParsedReceipt.toTxn()` ve `ParsedStatement.toTxns()` extension'ları; kategori → (ikon, renk) helper'ı.
-- **`HomeController.addImportedTransactions(List<Txn>)`** — yeni işlemleri prepend eder, feed verisi yenilense bile import edilen işlemler en üstte kalır.
-- **L10n key'leri** (6 dil): `scanNoTotal`, `statementNoTransactions`.
-
-### 🔁 Değişenler
-
-- Receipt scan sheet "İşlemlerime ekle" CTA'sı: snackbar gösterip kapanmak yerine gerçek `Txn` üretip controller'a yazar; sonra snackbar.
-- Statement import sheet "Vera'ya aktar" CTA'sı: 20 işleme kadar tüm transaction'lar home listesine eklenir.
-- `HomeController` — `ImportedTransactionsStore`'u bootstrap'ta yükler, feed refresh'lerinde import edilen listeyi korur.
-
----
-
-## 2026-05-16 — Merge: receipt scan, statement import, lokalizasyon, web target
-
-**Upstream commit:** `9dccb5c`
-**Notu:** Yerel iki paralel iş kolunun manuel merge'i. Çakışmalar elle çözüldü; lokalizasyon olarak `core/localization/` (upstream, 1116 satır, 6 dil) seçildi.
-
-### ✨ Eklenenler
-
-- **Receipt OCR feature** (`lib/features/receipt_scan/`) — domain / data / state / presentation tam yapı; `image_picker` ile kamera + galeri; Gemini multimodal parse; fallback mock fişi.
-- **PDF/Excel ekstre import** (`lib/features/statement_import/`) — `file_picker` ile dosya seçimi; Gemini multimodal parser; Garanti BBVA mock ekstre fallback.
-- **6 dilli i18n + RTL** (`lib/core/localization/`) — TR/EN/DE/AR/RU/ZH; `context.l10n` extension; `stringsProvider`; SharedPreferences ile kalıcı; AR seçildiğinde otomatik RTL.
-- **Web hedefi** (`web/`) — favicon, icons, manifest, index.html.
-- **Yeni home widget'ları** — `SavingsStoryCard`, `UpcomingBillsStrip`, `CreditSummaryCard`.
-- **Yeni dokümanlar** — `docs/FEATURES.md`, `docs/DEMO_SCRIPT.md`, `docs/ICON_SPLASH_PROMPT.md`.
-- **Local notification + branding** (yerelden) — `flutter_local_notifications`, `flutter_launcher_icons`, `flutter_native_splash`; `assets/branding/`; Android night/v31/xml kaynakları.
-- **Auth genişlemesi** (yerelden) — `signup_screen.dart`, `AuthField` widget.
-- **NotificationService** (yerelden) — fraud alert için local notification + tap routing.
-
-### 🔁 Değişenler
-
-- `pubspec.yaml` — `image_picker`, `file_picker`, `url_launcher`, `flutter_local_notifications`, `timezone`, `flutter_launcher_icons`, `flutter_native_splash` eklendi; `flutter_localizations` upstream'den geldi.
-- `CreditDecision.bandLabel` ve `SubscriptionStatus.label` getter'ları eklendi (upstream UI bunları çağırıyordu, yerel modeller bunları taşımıyordu).
-- `app_router.dart` — `/signup` route'u + `NotificationService.onTap` listener.
-
-### 🗑 Manuel merge sonucu silinen (yerel-tek, upstream'e wire edilmemiş)
-
-Aşağıdaki widget'lar yerel branch'te vardı ama merge sonrası ekranlara bağlı kalmadı (upstream'in `top_bar`/`transaction_list` versiyonu farklı bir akış kullanıyor). Yeniden eklenmek istenirse `git reflog` üzerinden bulunabilir:
-
-- `lib/features/home/presentation/widgets/notifications_sheet.dart` — bildirim listesi sheet'i (snackbar yerine)
-- `lib/features/home/presentation/widgets/transaction_detail_sheet.dart` — işleme tap edince detay sheet
-- `lib/features/home/presentation/widgets/bank_detail_sheet.dart` — banka kartına tap edince detay
-- `lib/features/home/presentation/widgets/credit_health_card.dart` — credit summary'nin alternatif sunumu
-- `lib/features/wealth/presentation/widgets/policy_edit_sheet.dart` — wealth policy düzenleme sheet'i
-- `lib/shared/utils/open_uma.dart` — Uma chat'i prompt'la açan helper
-- `lib/core/l10n/` — alternatif lokalizasyon altyapısı (upstream'in `core/localization/` ile çakışıyordu)
-
-> Bunlar tek tek yeniden gerekiyorsa: upstream API'sine adapte ederek geri eklemek gerekir (`s.foo` → `context.l10n.foo`).
-
----
-
-## 2026-XX-XX — `754188c` Harden auth storage and expand profile hub
-
-**Author:** Casper
-
-Auth saklama güçlendirildi, profile hub genişledi.
-
----
-
-## 2026-XX-XX — `593b5ea` Build auth, live data, and AI finance flows
-
-**Author:** Casper
-
-Auth, canlı veri ve AI finans akışları kuruldu.
-
----
-
-## 2026-XX-XX — `38fa834` Initial commit
-
-**Author:** Yusuf GÜNEL
-
-Gemini destekli Uma asistanıyla Vera mobil bankacılık iskeleti.
+> **Blocker:** Firebase Storage bucket setup, billing eklenmediği için yarım. Bkz. `docs/FIREBASE_SETUP.md`.
 
 ---
 
@@ -147,7 +81,7 @@ Gemini destekli Uma asistanıyla Vera mobil bankacılık iskeleti.
 Her yeni commit için bu dosyaya bir başlık ekle:
 
 ```markdown
-## YYYY-MM-DD — `<hash>` Kısa başlık
+## YYYY-MM-DD — Kısa başlık
 
 ### ✨ Eklenenler
 - ...
@@ -161,5 +95,3 @@ Her yeni commit için bu dosyaya bir başlık ekle:
 ### ⚠ Breaking
 - ...
 ```
-
-Geliştirme hızlı olduğu için her küçük commit'i listelemek yerine **kullanıcıya görünen / mimari etki yaratan** değişiklikleri öne çıkar.

@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/notification_service.dart';
+import '../../home/data/transaction.dart';
+import '../../home/state/home_controller.dart';
+import '../data/fraud_heuristic.dart';
 import '../data/security_check.dart';
 import '../data/security_feed_repository.dart';
 import '../domain/security_feed_data.dart';
@@ -75,17 +78,30 @@ class SecurityState {
 }
 
 class SecurityController extends StateNotifier<SecurityState> {
-  SecurityController(this._repository, this._notifications)
-      : super(const SecurityState()) {
+  SecurityController(
+    this._repository,
+    this._notifications,
+    this._heuristic,
+    this._ref,
+  ) : super(const SecurityState()) {
     _bootstrap();
     _timer = Timer.periodic(const Duration(seconds: 35), (_) => refresh());
+    _txnSub = _ref.listen<List<Txn>>(
+      homeControllerProvider.select((s) => s.transactions),
+      (_, next) => _runHeuristic(next),
+    );
   }
 
   final SecurityFeedRepository _repository;
   final NotificationService _notifications;
+  final FraudHeuristic _heuristic;
+  final Ref _ref;
   Timer? _timer;
+  ProviderSubscription<List<Txn>>? _txnSub;
   final Set<int> _notifiedIds = <int>{};
   bool _firstApplyDone = false;
+  List<SecurityCheck> _baseFeed = const [];
+  List<SecurityCheck> _heuristicFeed = const [];
 
   Future<void> _bootstrap() async {
     final cached = await _repository.loadCached();
@@ -119,28 +135,49 @@ class SecurityController extends StateNotifier<SecurityState> {
   }
 
   void _apply(SecurityFeedData data) {
+    _baseFeed = data.checks;
+    final merged = _mergedChecks();
     final expanded = {
       ...state.expandedIds,
-      for (final check in data.checks)
+      for (final check in merged)
         if (check.blocked && check.reason != null) check.id,
     };
     state = state.copyWith(
-      checks: data.checks,
+      checks: merged,
       lastUpdated: data.lastUpdated,
       expandedIds: expanded,
     );
-    // Fire one local notification per newly-blocked check. Bootstrap counts as
-    // first surface — we still want the demo to feel real on app launch.
+    // Fire one local notification per newly-blocked check.
     if (_firstApplyDone) {
-      _fireNotificationsForNewBlocks(data.checks);
+      _fireNotificationsForNewBlocks(merged);
     } else {
       // On bootstrap, seed the notified set with existing blocked ids so we
-      // don't spam the device with notifications for the seeded demo data.
+      // don't spam the device with notifications on app launch.
       _notifiedIds.addAll(
-        data.checks.where((c) => c.blocked).map((c) => c.id),
+        merged.where((c) => c.blocked).map((c) => c.id),
       );
       _firstApplyDone = true;
     }
+  }
+
+  void _runHeuristic(List<Txn> txns) {
+    _heuristicFeed = _heuristic.analyze(txns);
+    if (!mounted) return;
+    final merged = _mergedChecks();
+    state = state.copyWith(
+      checks: merged,
+      lastUpdated: state.lastUpdated ?? DateTime.now(),
+    );
+    if (_firstApplyDone) _fireNotificationsForNewBlocks(merged);
+  }
+
+  List<SecurityCheck> _mergedChecks() {
+    final seen = <int>{};
+    final out = <SecurityCheck>[];
+    for (final c in [..._heuristicFeed, ..._baseFeed]) {
+      if (seen.add(c.id)) out.add(c);
+    }
+    return out;
   }
 
   Future<void> _fireNotificationsForNewBlocks(
@@ -164,6 +201,7 @@ class SecurityController extends StateNotifier<SecurityState> {
   @override
   void dispose() {
     _timer?.cancel();
+    _txnSub?.close();
     super.dispose();
   }
 }
@@ -173,5 +211,7 @@ final securityControllerProvider =
   return SecurityController(
     ref.watch(securityFeedRepositoryProvider),
     ref.watch(notificationServiceProvider),
+    ref.watch(fraudHeuristicProvider),
+    ref,
   );
 });

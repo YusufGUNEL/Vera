@@ -51,11 +51,7 @@ class FirebaseWealthService {
     try {
       final snap = await _wealthDoc!.get();
       final data = snap.data();
-      if (data == null) {
-        // İlk kez: seed verisini Firestore'a yaz.
-        await _seedPortfolio();
-        return _local.portfolio();
-      }
+      if (data == null) return const [];
       final rawList = (data['portfolio'] as List?) ?? [];
       return rawList
           .whereType<Map<String, dynamic>>()
@@ -79,10 +75,6 @@ class FirebaseWealthService {
     } catch (_) {}
   }
 
-  Future<void> _seedPortfolio() async {
-    await savePortfolio(_local.portfolio());
-  }
-
   // ─── Otonom Politika ──────────────────────────────────────────────────────
 
   Future<AutonomyPolicy> loadPolicy() async {
@@ -92,7 +84,6 @@ class FirebaseWealthService {
       final snap = await _wealthDoc!.get();
       final data = snap.data();
       if (data == null || data['policy'] == null) {
-        await _seedPolicy();
         return _local.initialPolicy();
       }
       return AutonomyPolicy.fromMap(data['policy'] as Map<String, dynamic>);
@@ -114,10 +105,6 @@ class FirebaseWealthService {
     } catch (_) {}
   }
 
-  Future<void> _seedPolicy() async {
-    await savePolicy(_local.initialPolicy());
-  }
-
   // ─── Rebalance Aksiyonları ────────────────────────────────────────────────
 
   Future<List<RebalanceAction>> loadActions() async {
@@ -128,33 +115,12 @@ class FirebaseWealthService {
           .orderBy('when', descending: true)
           .limit(50)
           .get();
-      if (snap.docs.isEmpty) {
-        await _seedActions();
-        return _local.actions();
-      }
       return snap.docs
           .map((doc) => RebalanceAction.fromMap(doc.data()))
           .toList();
     } catch (_) {
       return _local.actions();
     }
-  }
-
-  Future<void> _seedActions() async {
-    if (!isEnabled) return;
-    try {
-      final batch = FirebaseFirestore.instance.batch();
-      for (final action in _local.actions()) {
-        batch.set(
-          _actionsCollection!.doc(action.id),
-          {
-            ...action.toMap(),
-            'syncedAt': FieldValue.serverTimestamp(),
-          },
-        );
-      }
-      await batch.commit();
-    } catch (_) {}
   }
 }
 

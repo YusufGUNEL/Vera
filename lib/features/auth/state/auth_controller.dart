@@ -1,6 +1,7 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/firebase/analytics_service.dart';
 import '../../../core/firebase/firebase_bootstrap.dart';
@@ -103,7 +104,30 @@ class AuthController extends StateNotifier<AuthSession> {
   Future<void> signOut() async {
     await _firebaseAuthService.signOut();
     await _storage.clearSession();
+    await _clearLocalCaches();
     state = const AuthSession(status: AuthStatus.signedOut);
+  }
+
+  /// Removes every per-user piece of state we keep in SharedPreferences so
+  /// the next account cannot see traces of the previous one.
+  Future<void> _clearLocalCaches() async {
+    final prefs = await SharedPreferences.getInstance();
+    const keys = <String>[
+      'home.feed.cache',
+      'home.imported.txns',
+      'home.custom.banks',
+      'home.upcoming.bills',
+      'home.goal.emergency',
+      'home.category.budgets',
+      'security.feed.cache',
+      'subscriptions.cache',
+      'uma.history',
+      'uma.audit',
+      'uma.feedback',
+    ];
+    for (final k in keys) {
+      await prefs.remove(k);
+    }
   }
 }
 

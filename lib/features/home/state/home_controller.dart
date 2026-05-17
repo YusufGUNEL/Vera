@@ -6,6 +6,7 @@ import '../data/bank.dart';
 import '../data/banks_store.dart';
 import '../data/home_feed_repository.dart';
 import '../data/imported_transactions_store.dart';
+import '../data/net_worth_history_store.dart';
 import '../data/transaction.dart';
 import '../domain/home_feed_data.dart';
 import 'balance_controller.dart';
@@ -17,6 +18,7 @@ class HomeState {
     this.insight = '',
     this.lastUpdated,
     this.refreshing = false,
+    this.history = const [],
   });
 
   final List<Bank> banks;
@@ -24,6 +26,7 @@ class HomeState {
   final String insight;
   final DateTime? lastUpdated;
   final bool refreshing;
+  final List<NetWorthPoint> history;
 
   String? get lastUpdatedTime {
     final dt = lastUpdated;
@@ -37,6 +40,7 @@ class HomeState {
     String? insight,
     DateTime? lastUpdated,
     bool? refreshing,
+    List<NetWorthPoint>? history,
   }) {
     return HomeState(
       banks: banks ?? this.banks,
@@ -44,13 +48,19 @@ class HomeState {
       insight: insight ?? this.insight,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       refreshing: refreshing ?? this.refreshing,
+      history: history ?? this.history,
     );
   }
 }
 
 class HomeController extends StateNotifier<HomeState> {
-  HomeController(this._repository, this._imports, this._banksStore, this._ref)
-      : super(const HomeState()) {
+  HomeController(
+    this._repository,
+    this._imports,
+    this._banksStore,
+    this._historyStore,
+    this._ref,
+  ) : super(const HomeState()) {
     _bootstrap();
     _timer = Timer.periodic(const Duration(seconds: 30), (_) => refresh());
   }
@@ -58,15 +68,19 @@ class HomeController extends StateNotifier<HomeState> {
   final HomeFeedRepository _repository;
   final ImportedTransactionsStore _imports;
   final BanksStore _banksStore;
+  final NetWorthHistoryStore _historyStore;
   final Ref _ref;
   Timer? _timer;
   List<Txn> _imported = const [];
   List<Bank> _customBanks = const [];
   HomeFeedData? _feed;
+  List<NetWorthPoint> _history = const [];
 
   Future<void> _bootstrap() async {
     _imported = await _imports.load();
     _customBanks = await _banksStore.load();
+    _history = await _historyStore.load();
+    state = state.copyWith(history: _history);
     final cached = await _repository.loadCached();
     if (cached != null) {
       _feed = cached;
@@ -137,7 +151,18 @@ class HomeController extends StateNotifier<HomeState> {
       transactions: [..._imported, ...data.transactions],
       insight: data.insight,
       lastUpdated: data.lastUpdated,
+      history: _history,
     );
+    if (totalBalance > 0) {
+      _recordHistory(totalBalance);
+    }
+  }
+
+  Future<void> _recordHistory(double amount) async {
+    _history = await _historyStore.record(amount);
+    if (mounted) {
+      state = state.copyWith(history: _history);
+    }
   }
 
   @override
@@ -153,6 +178,7 @@ final homeControllerProvider =
     ref.watch(homeFeedRepositoryProvider),
     ref.watch(importedTransactionsStoreProvider),
     ref.watch(banksStoreProvider),
+    ref.watch(netWorthHistoryStoreProvider),
     ref,
   );
 });

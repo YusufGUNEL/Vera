@@ -10,14 +10,30 @@ class TransactionList extends StatelessWidget {
   const TransactionList({
     required this.transactions,
     this.onTap,
+    this.onAddManual,
+    this.onScan,
+    this.onImport,
     super.key,
   });
 
   final List<Txn> transactions;
   final ValueChanged<Txn>? onTap;
+  final VoidCallback? onAddManual;
+  final VoidCallback? onScan;
+  final VoidCallback? onImport;
 
   @override
   Widget build(BuildContext context) {
+    if (transactions.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        child: _EmptyTransactionsCard(
+          onAddManual: onAddManual,
+          onScan: onScan,
+          onImport: onImport,
+        ),
+      );
+    }
     final groups = _groupTransactions(transactions);
 
     return Padding(
@@ -34,6 +50,143 @@ class TransactionList extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyTransactionsCard extends StatelessWidget {
+  const _EmptyTransactionsCard({
+    this.onAddManual,
+    this.onScan,
+    this.onImport,
+  });
+
+  final VoidCallback? onAddManual;
+  final VoidCallback? onScan;
+  final VoidCallback? onImport;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return VeraCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: t.uma.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.receipt_long_outlined,
+                    color: t.uma, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Henüz işlem yok',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'İlk işlemini ekle, ekstre yükle veya fiş fotoğrafı çek.',
+                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              if (onAddManual != null)
+                Expanded(
+                  child: _EmptyAction(
+                    icon: Icons.add,
+                    label: 'Manuel',
+                    onTap: onAddManual!,
+                  ),
+                ),
+              if (onScan != null) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _EmptyAction(
+                    icon: Icons.qr_code_scanner_rounded,
+                    label: 'Fiş tara',
+                    onTap: onScan!,
+                  ),
+                ),
+              ],
+              if (onImport != null) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _EmptyAction(
+                    icon: Icons.upload_file_rounded,
+                    label: 'Ekstre',
+                    onTap: onImport!,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyAction extends StatelessWidget {
+  const _EmptyAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Material(
+      color: t.bgSoft,
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: t.brand, size: 18),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: t.ink,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

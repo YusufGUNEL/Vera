@@ -46,16 +46,18 @@ class FinancialGoal {
 
   factory FinancialGoal.fromMap(Map<String, dynamic> map) {
     return FinancialGoal(
-      target: (map['target'] as num?)?.toDouble() ?? 50000,
-      saved: (map['saved'] as num?)?.toDouble() ?? 38000,
+      target: (map['target'] as num?)?.toDouble() ?? 0,
+      saved: (map['saved'] as num?)?.toDouble() ?? 0,
       monthlyContribution:
-          (map['monthlyContribution'] as num?)?.toDouble() ?? 2500,
+          (map['monthlyContribution'] as num?)?.toDouble() ?? 0,
     );
   }
 
-  static const seed = FinancialGoal(
-    target: 50000,
-    saved: 38000,
-    monthlyContribution: 2500,
+  /// Empty goal: nothing targeted, nothing saved. Used as the initial state
+  /// before the user enters their own savings goal.
+  static const empty = FinancialGoal(
+    target: 0,
+    saved: 0,
+    monthlyContribution: 0,
   );
 }

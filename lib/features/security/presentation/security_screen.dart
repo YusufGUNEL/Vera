@@ -169,39 +169,92 @@ class SecurityScreen extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: VeraCard(
-                child: Column(
-                  children: [
-                    for (var i = 0; i < state.checks.length; i++)
-                      _CheckTile(
-                        check: state.checks[i],
-                        isFirst: i == 0,
-                        expanded:
-                            state.expandedIds.contains(state.checks[i].id),
-                        decision: state.decisions[state.checks[i].id] ??
-                            ReviewDecision.pending,
-                        onToggleExpand: () => ref
-                            .read(securityControllerProvider.notifier)
-                            .toggleExpanded(state.checks[i].id),
-                        onKeepBlocked: () => ref
-                            .read(securityControllerProvider.notifier)
-                            .setDecision(
-                              state.checks[i].id,
-                              ReviewDecision.keptBlocked,
+              child: state.checks.isEmpty
+                  ? _EmptySecurityCard()
+                  : VeraCard(
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < state.checks.length; i++)
+                            _CheckTile(
+                              check: state.checks[i],
+                              isFirst: i == 0,
+                              expanded:
+                                  state.expandedIds.contains(state.checks[i].id),
+                              decision: state.decisions[state.checks[i].id] ??
+                                  ReviewDecision.pending,
+                              onToggleExpand: () => ref
+                                  .read(securityControllerProvider.notifier)
+                                  .toggleExpanded(state.checks[i].id),
+                              onKeepBlocked: () => ref
+                                  .read(securityControllerProvider.notifier)
+                                  .setDecision(
+                                    state.checks[i].id,
+                                    ReviewDecision.keptBlocked,
+                                  ),
+                              onApprove: () => ref
+                                  .read(securityControllerProvider.notifier)
+                                  .setDecision(
+                                    state.checks[i].id,
+                                    ReviewDecision.approvedByUser,
+                                  ),
                             ),
-                        onApprove: () => ref
-                            .read(securityControllerProvider.notifier)
-                            .setDecision(
-                              state.checks[i].id,
-                              ReviewDecision.approvedByUser,
-                            ),
+                        ],
                       ),
-                  ],
-                ),
-              ),
+                    ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _EmptySecurityCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return VeraCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: t.green.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.check_circle_outline,
+                    color: t.green, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Şu an inceleyecek bir uyarı yok',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Vera fraud radar her cihazını ve ithal işlemlerini sessizce izliyor. Bir şey olduğunda burada görünür.',
+                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

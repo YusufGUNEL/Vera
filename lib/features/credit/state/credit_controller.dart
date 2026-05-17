@@ -29,17 +29,17 @@ class CreditController extends StateNotifier<CreditState> {
       : super(
           CreditState(
             application: const LoanApplication(
-              amount: 150000,
-              months: 36,
-              monthlyIncome: 48500,
-              monthlyDebt: 6200,
+              amount: 0,
+              months: 12,
+              monthlyIncome: 0,
+              monthlyDebt: 0,
             ),
             decision: _repository.evaluate(
               const LoanApplication(
-                amount: 150000,
-                months: 36,
-                monthlyIncome: 48500,
-                monthlyDebt: 6200,
+                amount: 0,
+                months: 12,
+                monthlyIncome: 0,
+                monthlyDebt: 0,
               ),
             ),
           ),

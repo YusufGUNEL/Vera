@@ -56,42 +56,6 @@ class SecurityCheck {
   }
 }
 
-const kSecurityChecks = <SecurityCheck>[
-  SecurityCheck(
-    id: 1,
-    name: 'MacBook Pro\'dan giriş',
-    location: 'İstanbul, TR',
-    when: '2 dk önce',
-    blocked: false,
-  ),
-  SecurityCheck(
-    id: 2,
-    name: 'Havale · 48.000 TL',
-    location: 'Alıcı: Bilinmeyen hesap',
-    when: '1 sa önce',
-    blocked: true,
-    reason:
-        'Bu transfer sırasında alışılmadık bir cihaz konumu tespit edildi. Alıcı hesap 3 gün önce açıldı ve daha önceki dolandırıcılık raporlarındaki örüntülerle eşleşiyor. Transfer Lagos IP\'sinden geldi; normal aktiviteniz ise İstanbul merkezli.',
-  ),
-  SecurityCheck(
-    id: 3,
-    name: 'Karta dokunmadan ödeme · 349 TL',
-    location: 'Trendyol.com',
-    when: '3 sa önce',
-    blocked: false,
-  ),
-  SecurityCheck(
-    id: 4,
-    name: 'Yeni cihaz girişi',
-    location: 'iPhone 17 Pro · İstanbul',
-    when: 'Bugün, 09:14',
-    blocked: false,
-  ),
-  SecurityCheck(
-    id: 5,
-    name: 'ATM çekimi · 2.000 TL',
-    location: 'Garanti BBVA Levent',
-    when: 'Dün',
-    blocked: false,
-  ),
-];
+/// No hardcoded fraud events. The feed comes only from real signals analyzed
+/// by Uma over the user's imported transactions and live session activity.
+const kSecurityChecks = <SecurityCheck>[];
