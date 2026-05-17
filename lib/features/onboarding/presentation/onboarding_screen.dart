@@ -66,13 +66,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ),
                     ),
                   const Spacer(),
-                  TextButton(
-                    onPressed: _finish,
-                    child: Text(
-                      l10n.onbSkip,
-                      style: TextStyle(color: t.muted, fontSize: 13),
-                    ),
+                  _StepBadge(
+                    current: _step + 1,
+                    total: 3,
                   ),
+                  if (_step < 2) ...[
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: _finish,
+                      child: Text(
+                        l10n.onbSkip,
+                        style: TextStyle(color: t.muted, fontSize: 13),
+                      ),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 6),
@@ -120,6 +127,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                 ),
               ),
+              if (_step == 2) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _finish,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: t.ink2,
+                      side: BorderSide(color: t.line),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(l10n.onbContinueWithoutImport),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -269,6 +291,11 @@ class _ThemeStep extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 18),
+          _PreviewCard(
+            title: l10n.onbPalettePreviewTitle,
+            body: l10n.onbPalettePreviewBody,
+          ),
         ],
       ),
     );
@@ -325,6 +352,117 @@ class _ImportStep extends StatelessWidget {
               isScrollControlled: true,
               barrierColor: Colors.black.withValues(alpha: 0.45),
               builder: (_) => const ReceiptScanSheet(),
+            ),
+          ),
+          const SizedBox(height: 14),
+          _PreviewCard(
+            title: l10n.onbBlankCanvasTitle,
+            body: l10n.onbBlankCanvasBody,
+            icon: Icons.landscape_outlined,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepBadge extends StatelessWidget {
+  const _StepBadge({
+    required this.current,
+    required this.total,
+  });
+
+  final int current;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: t.line),
+      ),
+      child: Text(
+        '$current / $total',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: t.ink2,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+}
+
+class _PreviewCard extends StatelessWidget {
+  const _PreviewCard({
+    required this.title,
+    required this.body,
+    this.icon = Icons.auto_awesome,
+  });
+
+  final String title;
+  final String body;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: const Alignment(-1, -1),
+          end: const Alignment(1, 1),
+          colors: [
+            t.brand.withValues(alpha: 0.08),
+            t.uma.withValues(alpha: 0.12),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: t.line),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: t.card,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: t.uma, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  body,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: t.ink2,
+                    height: 1.45,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -140,6 +140,7 @@ class _AddCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(t.vibe.radius - 2),
@@ -159,7 +160,7 @@ class _AddCard extends StatelessWidget {
                 Icon(Icons.add, color: t.brand, size: 22),
                 const SizedBox(height: 6),
                 Text(
-                  'Fatura ekle',
+                  l10n.addBillCta,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -182,6 +183,7 @@ class _EmptyAddCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(t.vibe.radius - 2),
@@ -214,7 +216,7 @@ class _EmptyAddCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Henüz takip edilen fatura yok',
+                        l10n.noTrackedBillsTitle,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -223,7 +225,7 @@ class _EmptyAddCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Ödeme tarihinden 1 gün önce Vera sana hatırlatır.',
+                        l10n.noTrackedBillsBody,
                         style: TextStyle(fontSize: 11, color: t.muted),
                       ),
                     ],

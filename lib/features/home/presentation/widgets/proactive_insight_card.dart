@@ -5,9 +5,11 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../statement_import/presentation/statement_import_sheet.dart';
 import '../../../subscriptions/domain/subscription_status.dart';
 import '../../../subscriptions/state/subscriptions_controller.dart';
 import '../../../uma_chat/presentation/open_uma.dart';
+import '../../state/home_controller.dart';
 import '../../state/upcoming_bills_controller.dart';
 
 /// "Vera fark etti" sized proactive card. Selects the strongest signal from
@@ -25,6 +27,7 @@ class ProactiveInsightCard extends ConsumerWidget {
     final l10n = context.l10n;
     final subs = ref.watch(subscriptionsControllerProvider).items;
     final bills = ref.watch(upcomingBillsControllerProvider);
+    final transactions = ref.watch(homeControllerProvider).transactions;
 
     final urgentBill = bills
         .where((b) => b.daysUntilDue <= 3)
@@ -76,10 +79,50 @@ class ProactiveInsightCard extends ConsumerWidget {
       accent = t.uma;
       onTap = () => Navigator.of(context).pushNamed(Routes.subscriptions);
     } else {
-      return const SizedBox.shrink();
+      final hasData = transactions.isNotEmpty || bills.isNotEmpty || subs.isNotEmpty;
+      if (hasData) {
+        title = l10n.proactiveHealthyTitle;
+        body = l10n.proactiveHealthyBody;
+        cta = l10n.proactiveHealthyCta;
+        icon = Icons.verified_outlined;
+        accent = t.green;
+        onTap = () => openUma(
+              context,
+              ref,
+              prompt: l10n.umaPromptAnalyze,
+            );
+      } else {
+        title = l10n.proactiveEmptyTitle;
+        body = l10n.proactiveEmptyBody;
+        cta = l10n.proactiveEmptyCta;
+        icon = Icons.insights_outlined;
+        accent = t.brand;
+        onTap = () {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            barrierColor: Colors.black.withValues(alpha: 0.45),
+            builder: (_) => const StatementImportSheet(),
+          );
+        };
+      }
     }
 
-    return Padding(
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 15 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Material(
         color: Colors.transparent,
@@ -174,6 +217,7 @@ class ProactiveInsightCard extends ConsumerWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

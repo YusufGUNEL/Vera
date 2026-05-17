@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/services/ai_categorizer.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../data/imported_transactions_store.dart';
@@ -119,6 +120,7 @@ class _AddManualTransactionSheetState
   }
 
   Future<void> _save() async {
+    final l10n = context.l10n;
     final name = _name.text.trim();
     final raw = _amount.text.trim().replaceAll(',', '.');
     final amount = double.tryParse(raw) ?? 0;
@@ -131,19 +133,19 @@ class _AddManualTransactionSheetState
       category: _category,
       icon: palette.icon,
       amount: _isExpense ? -amount : amount,
-      when: _formatWhen(_date),
+      when: _formatWhen(_date, l10n),
       color: palette.color,
     );
     await ref.read(homeControllerProvider.notifier).addImportedTransactions([txn]);
     if (mounted) Navigator.of(context).pop();
   }
 
-  String _formatWhen(DateTime dt) {
+  String _formatWhen(DateTime dt, AppStrings l10n) {
     final today = DateTime.now();
     if (dt.year == today.year &&
         dt.month == today.month &&
         dt.day == today.day) {
-      return 'Bugün, ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      return '${l10n.today}, ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     }
     return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
   }
@@ -151,6 +153,7 @@ class _AddManualTransactionSheetState
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final mq = MediaQuery.of(context);
 
     return Padding(
@@ -181,7 +184,7 @@ class _AddManualTransactionSheetState
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Manuel işlem ekle',
+                    l10n.addManualTxnTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -194,7 +197,7 @@ class _AddManualTransactionSheetState
                     children: [
                       Expanded(
                         child: _Segment(
-                          label: 'Gider',
+                          label: l10n.txnTypeExpense,
                           selected: _isExpense,
                           color: t.red,
                           onTap: () => setState(() => _isExpense = true),
@@ -203,7 +206,7 @@ class _AddManualTransactionSheetState
                       const SizedBox(width: 8),
                       Expanded(
                         child: _Segment(
-                          label: 'Gelir',
+                          label: l10n.txnTypeIncome,
                           selected: !_isExpense,
                           color: t.green,
                           onTap: () => setState(() => _isExpense = false),
@@ -212,15 +215,15 @@ class _AddManualTransactionSheetState
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const _Label(label: 'Tanım'),
+                  _Label(label: l10n.fieldDescription),
                   const SizedBox(height: 6),
                   TextField(
                     controller: _name,
                     style: TextStyle(fontSize: 14, color: t.ink),
-                    decoration: _decoration(t, 'Örn. Migros'),
+                    decoration: _decoration(t, l10n.addManualTxnNameHint),
                   ),
                   const SizedBox(height: 12),
-                  const _Label(label: 'Tutar (TL)'),
+                  _Label(label: l10n.fieldAmountTl),
                   const SizedBox(height: 6),
                   TextField(
                     controller: _amount,
@@ -233,7 +236,7 @@ class _AddManualTransactionSheetState
                     decoration: _decoration(t, '0'),
                   ),
                   const SizedBox(height: 12),
-                  const _Label(label: 'Tarih'),
+                  _Label(label: l10n.fieldDate),
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: _pickDate,
@@ -259,7 +262,7 @@ class _AddManualTransactionSheetState
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const _Label(label: 'Kategori'),
+                  _Label(label: l10n.fieldCategory),
                   const SizedBox(height: 6),
                   if (_aiSuggestion != null && !_userPickedCategory)
                     _AiSuggestionChip(
@@ -293,7 +296,7 @@ class _AddManualTransactionSheetState
                               ),
                             ),
                             child: Text(
-                              c,
+                              _categoryLabel(c, l10n),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -314,9 +317,9 @@ class _AddManualTransactionSheetState
                         backgroundColor: t.brand,
                         foregroundColor: t.brandFG,
                       ),
-                      child: const Text(
-                        'Ekle',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.actionAdd,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -468,7 +471,7 @@ class _AiSuggestionChip extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Uma önerisi',
+                    context.l10n.aiSuggestionLabel,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -493,9 +496,9 @@ class _AiSuggestionChip extends StatelessWidget {
                 color: t.uma,
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: const Text(
-                'Kabul et',
-                style: TextStyle(
+              child: Text(
+                context.l10n.acceptSuggestion,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -507,4 +510,20 @@ class _AiSuggestionChip extends StatelessWidget {
       ),
     );
   }
+}
+
+String _categoryLabel(String category, AppStrings l10n) {
+  return switch (category) {
+    'Market' => l10n.categoryMarket,
+    'Yeme & İçme' => l10n.categoryFood,
+    'Akaryakıt' => l10n.categoryFuel,
+    'Fatura' => l10n.categoryBill,
+    'Sağlık' => l10n.categoryHealth,
+    'Eğitim' => l10n.categoryEducation,
+    'Eğlence' => l10n.categoryEntertainment,
+    'Transfer' => l10n.categoryTransfer,
+    'Maaş' => l10n.categorySalary,
+    'Abonelik' => l10n.categorySubscription,
+    _ => l10n.categoryOther,
+  };
 }

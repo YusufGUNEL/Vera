@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../home/data/transaction.dart';
 import '../domain/subscription_item.dart';
 import '../domain/subscription_status.dart';
@@ -10,77 +11,77 @@ import '../domain/subscription_status.dart';
 const _kSubscriptionCatalog = <String, _CatalogEntry>{
   'netflix': _CatalogEntry(
     name: 'Netflix',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'spotify': _CatalogEntry(
     name: 'Spotify',
-    category: 'Müzik',
+    categoryKey: 'music',
     icon: Icons.headphones_outlined,
   ),
   'youtube': _CatalogEntry(
     name: 'YouTube Premium',
-    category: 'Video',
+    categoryKey: 'video',
     icon: Icons.smart_display_outlined,
   ),
   'icloud': _CatalogEntry(
     name: 'iCloud+',
-    category: 'Depolama',
+    categoryKey: 'storage',
     icon: Icons.cloud_outlined,
   ),
   'apple': _CatalogEntry(
     name: 'Apple Services',
-    category: 'Depolama',
+    categoryKey: 'storage',
     icon: Icons.apple,
   ),
   'amazon prime': _CatalogEntry(
     name: 'Amazon Prime',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.shopping_bag_outlined,
   ),
   'disney': _CatalogEntry(
     name: 'Disney+',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'exxen': _CatalogEntry(
     name: 'Exxen',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'blutv': _CatalogEntry(
     name: 'BluTV',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'gain': _CatalogEntry(
     name: 'Gain',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'tabii': _CatalogEntry(
     name: 'tabii',
-    category: 'Eğlence',
+    categoryKey: 'entertainment',
     icon: Icons.movie_outlined,
   ),
   'github': _CatalogEntry(
     name: 'GitHub',
-    category: 'Geliştirici',
+    categoryKey: 'developer',
     icon: Icons.code_outlined,
   ),
   'openai': _CatalogEntry(
     name: 'OpenAI',
-    category: 'AI',
+    categoryKey: 'ai',
     icon: Icons.smart_toy_outlined,
   ),
   'anthropic': _CatalogEntry(
     name: 'Anthropic',
-    category: 'AI',
+    categoryKey: 'ai',
     icon: Icons.smart_toy_outlined,
   ),
   'claude': _CatalogEntry(
     name: 'Claude',
-    category: 'AI',
+    categoryKey: 'ai',
     icon: Icons.smart_toy_outlined,
   ),
 };
@@ -108,7 +109,7 @@ class RecurringTransactionParser {
   ///
   /// Returns synthesized [SubscriptionItem]s with sane defaults. Caller is
   /// responsible for deduping against the seed list.
-  List<SubscriptionItem> detectSubscriptions(List<Txn> txns) {
+  List<SubscriptionItem> detectSubscriptions(List<Txn> txns, AppStrings l10n) {
     final outgoing = txns.where((t) => t.amount < 0).toList();
 
     final grouped = <String, _Group>{};
@@ -139,16 +140,15 @@ class RecurringTransactionParser {
           id: id,
           name: display,
           vendor: display,
-          category: catalog?.category ?? 'Diğer',
+          category: catalog?.categoryKey ?? 'other',
           monthlyPrice: group.amount,
           previousPrice: group.amount,
-          renewalLabel: 'İçe aktarılan işlemden tespit edildi',
+          renewalLabel: l10n.subsDetectedFromImport,
           lastUsedLabel: isRecurring
-              ? '${group.count}× son işlemlerinde göründü'
-              : 'Bilinen abonelik vendor\'ı',
+              ? l10n.subsSeenInRecentTransactions(group.count)
+              : l10n.subsKnownVendorLabel,
           status: SubscriptionStatus.unused,
-          recommendation:
-              'Vera bu aboneliği import edilen ekstreden tespit etti. Hâlâ kullanıyor musun?',
+          recommendation: l10n.subsRecommendationDetected,
           icon: catalog?.icon ?? Icons.subscriptions_outlined,
           canFreeze: true,
         ),
@@ -187,11 +187,11 @@ class _Group {
 class _CatalogEntry {
   const _CatalogEntry({
     required this.name,
-    required this.category,
+    required this.categoryKey,
     required this.icon,
   });
 
   final String name;
-  final String category;
+  final String categoryKey;
   final IconData icon;
 }

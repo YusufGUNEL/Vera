@@ -57,7 +57,7 @@ class SubscriptionsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${state.attentionCount} plans need attention this cycle',
+                    l10n.subscriptionsAttentionCount(state.attentionCount),
                     style: TextStyle(color: t.red, fontSize: 13),
                   ),
                   const SizedBox(height: 14),
@@ -308,6 +308,7 @@ class _SubscriptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final spec = _statusSpec(item.status, t);
 
     return Container(
@@ -349,7 +350,7 @@ class _SubscriptionTile extends StatelessWidget {
                       ),
                     ),
                     Pill(
-                      label: item.status.label,
+                      label: _statusLabel(item.status, l10n),
                       color: spec.color,
                       background: spec.softColor,
                       fontSize: 9,
@@ -358,7 +359,7 @@ class _SubscriptionTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${item.vendor} · ${item.category}',
+                  '${item.vendor} · ${_categoryLabel(item.category, l10n)}',
                   style: TextStyle(fontSize: 12, color: t.muted),
                 ),
                 const SizedBox(height: 10),
@@ -540,22 +541,22 @@ class _EmptyPlansCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     return VeraCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: t.uma.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
                 child: Icon(Icons.subscriptions_outlined,
-                    color: t.uma, size: 18),
+                    color: t.uma, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -564,8 +565,8 @@ class _EmptyPlansCard extends StatelessWidget {
                   children: [
                     Text(
                       showImportCTA
-                          ? 'Henüz tespit edilen abonelik yok'
-                          : 'Bu filtreyle eşleşen abonelik yok',
+                          ? context.l10n.noSubscriptionsDetectedTitle
+                          : context.l10n.noSubscriptionsForFilterTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -575,8 +576,8 @@ class _EmptyPlansCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       showImportCTA
-                          ? 'Ekstre yükle veya fiş tara — Vera tekrar eden ödemeleri otomatik tespit eder.'
-                          : 'Diğer filtreleri deneyebilirsin.',
+                          ? context.l10n.noSubscriptionsDetectedBody
+                          : context.l10n.noSubscriptionsForFilterBody,
                       style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],
@@ -592,7 +593,7 @@ class _EmptyPlansCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _openStatement(context),
                     icon: const Icon(Icons.upload_file_rounded, size: 16),
-                    label: const Text('Ekstre'),
+                    label: Text(context.l10n.statementImport),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: t.brand,
                       side: BorderSide(color: t.brand.withValues(alpha: 0.4)),
@@ -605,7 +606,7 @@ class _EmptyPlansCard extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () => _openScan(context),
                     icon: const Icon(Icons.qr_code_scanner_rounded, size: 16),
-                    label: const Text('Fiş tara'),
+                    label: Text(context.l10n.scanReceipt),
                     style: FilledButton.styleFrom(
                       backgroundColor: t.brand,
                       foregroundColor: t.brandFG,
@@ -648,5 +649,29 @@ String _filterLabel(SubscriptionFilter filter, AppStrings l10n) {
     SubscriptionFilter.attention => l10n.filterAttention,
     SubscriptionFilter.unused => l10n.filterUnused,
     SubscriptionFilter.priceChanges => l10n.filterPriceChanges,
+  };
+}
+
+String _statusLabel(SubscriptionStatus status, AppStrings l10n) {
+  return switch (status) {
+    SubscriptionStatus.healthy => l10n.subsStatusActive,
+    SubscriptionStatus.priceIncreased => l10n.subsStatusPriceUp,
+    SubscriptionStatus.unused => l10n.subsStatusUnused,
+    SubscriptionStatus.renewalSoon => l10n.subsStatusRenewsSoon,
+  };
+}
+
+String _categoryLabel(String category, AppStrings l10n) {
+  final normalized = category.trim().toLowerCase();
+  return switch (normalized) {
+    'entertainment' || 'eglence' => l10n.categoryEntertainment,
+    'music' || 'muzik' => l10n.categoryMusic,
+    'video' => l10n.categoryVideo,
+    'storage' || 'depolama' => l10n.categoryStorage,
+    'developer' || 'gelistirici' => l10n.categoryDeveloper,
+    'ai' => l10n.categoryAi,
+    'subscription' || 'abonelik' => l10n.categorySubscription,
+    'other' || 'diger' => l10n.categoryOther,
+    _ => category,
   };
 }

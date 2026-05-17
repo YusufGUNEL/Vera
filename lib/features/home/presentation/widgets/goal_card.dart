@@ -77,7 +77,7 @@ class GoalCard extends ConsumerWidget {
                           const SizedBox(height: 2),
                           Text(
                             isEmpty
-                                ? 'Henüz hedef belirlemedin — dokun ve ekle.'
+                                ? l10n.goalEmptyPrompt
                                 : '${fmtTL(goal.saved)} · ${fmtTL(goal.target)}',
                             style: TextStyle(
                               fontSize: 12,
@@ -94,6 +94,63 @@ class GoalCard extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (isEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    l10n.goalEmptyHint,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: t.muted,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      for (final m in const [3, 6, 12]) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: t.card,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: t.line),
+                          ),
+                          child: Text(
+                            l10n.goalMonthsOption(m),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: t.ink2,
+                            ),
+                          ),
+                        ),
+                        if (m != 12) const SizedBox(width: 8),
+                      ],
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: t.uma,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          l10n.goalEmptyCta,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (!isEmpty) ...[
                   const SizedBox(height: 14),
                   ClipRRect(
@@ -194,6 +251,13 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
     super.dispose();
   }
 
+  void _applyPreset(double amount, int targetMonths) {
+    setState(() {
+      _targetCtrl.text = amount.round().toString();
+      _months = targetMonths;
+    });
+  }
+
   Future<void> _save() async {
     final target = double.tryParse(_targetCtrl.text.trim()) ?? 0;
     final saved = double.tryParse(_savedCtrl.text.trim()) ?? 0;
@@ -265,12 +329,34 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                   style: TextStyle(fontSize: 12, color: t.muted, height: 1.4),
                 ),
                 const SizedBox(height: 18),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _PresetChip(
+                        label: l10n.goalPresetEmergency('50.000 TL'),
+                        onTap: () => _applyPreset(50000, 6),
+                      ),
+                      const SizedBox(width: 8),
+                      _PresetChip(
+                        label: l10n.goalPresetVacation('20.000 TL'),
+                        onTap: () => _applyPreset(20000, 3),
+                      ),
+                      const SizedBox(width: 8),
+                      _PresetChip(
+                        label: l10n.goalPresetCar('150.000 TL'),
+                        onTap: () => _applyPreset(150000, 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
                 _NumField(label: l10n.goalEditTarget, controller: _targetCtrl),
                 const SizedBox(height: 12),
                 _NumField(label: l10n.goalEditSaved, controller: _savedCtrl),
                 const SizedBox(height: 12),
                 Text(
-                  'KAÇ AYDA',
+                  l10n.goalMonthsLabel,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -299,7 +385,7 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                             ),
                           ),
                           child: Text(
-                            '$m ay',
+                            l10n.goalMonthsOption(m),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -339,7 +425,10 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Aylık ${_advice!.monthlyRequired.toStringAsFixed(0)} TL · ${_advice!.etaMonths} ay',
+                                l10n.goalAdviceSummary(
+                                  fmtTL(_advice!.monthlyRequired),
+                                  _advice!.etaMonths,
+                                ),
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -374,7 +463,7 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                             side: BorderSide(color: t.line),
                             padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
-                          child: const Text('Kapat'),
+                          child: Text(l10n.close),
                         ),
                       ),
                     if (_advice != null) const SizedBox(width: 10),
@@ -400,7 +489,7 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                               : Text(
                                   _advice == null
                                       ? l10n.goalEditSave
-                                      : 'Hesapla',
+                                      : l10n.goalCalculate,
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -469,6 +558,48 @@ class _NumField extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PresetChip extends StatelessWidget {
+  const _PresetChip({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Material(
+      color: t.umaSoft,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: t.uma.withValues(alpha: 0.16)),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: 12, color: t.uma),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: t.uma,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

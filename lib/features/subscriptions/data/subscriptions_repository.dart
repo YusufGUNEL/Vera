@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../home/data/transaction.dart';
 import '../domain/subscription_alert.dart';
 import '../domain/subscription_item.dart';
@@ -16,12 +17,18 @@ class SubscriptionsRepository {
 
   final RecurringTransactionParser _parser;
 
-  List<SubscriptionItem> getSubscriptions({List<Txn> userTxns = const []}) {
+  List<SubscriptionItem> getSubscriptions({
+    List<Txn> userTxns = const [],
+    required AppStrings l10n,
+  }) {
     if (userTxns.isEmpty) return const [];
-    return _parser.detectSubscriptions(userTxns);
+    return _parser.detectSubscriptions(userTxns, l10n);
   }
 
-  List<SubscriptionAlert> buildAlerts(List<SubscriptionItem> items) {
+  List<SubscriptionAlert> buildAlerts(
+    List<SubscriptionItem> items,
+    AppStrings l10n,
+  ) {
     final savings = estimatedMonthlySavings(items);
     final priceUpItems =
         items.where((item) => item.status == SubscriptionStatus.priceIncreased);
@@ -30,45 +37,48 @@ class SubscriptionsRepository {
 
     return [
       SubscriptionAlert(
-        title: 'Aylık tasarruf potansiyeli',
+        title: l10n.subsAlertSavingsTitle,
         message: items.isEmpty
-            ? 'Henüz abonelik tespit edilmedi. Ekstre yükle veya manuel ekle, Vera takip etsin.'
-            : 'Vera, rutinini bozmadan dondurabileceğin veya alt pakete düşürebileceğin abonelikler buldu.',
-        metricLabel: 'KAZANÇ',
+            ? l10n.subsAlertSavingsMessageEmpty
+            : l10n.subsAlertSavingsMessageActive,
+        metricLabel: l10n.subsAlertSavingsMetric,
         metricValue: '${savings.toStringAsFixed(0)} TL',
       ),
       SubscriptionAlert(
-        title: 'Fiyat artışı tespit edildi',
+        title: l10n.subsAlertPriceTitle,
         message: priceUpItems.isEmpty
-            ? 'Bu dönem alışılmadık fiyat sıçraması yok.'
-            : 'Bir veya daha fazla planın fiyatı geçen aya göre arttı.',
-        metricLabel: 'ARTAN',
+            ? l10n.subsAlertPriceMessageNone
+            : l10n.subsAlertPriceMessageSome,
+        metricLabel: l10n.subsAlertPriceMetric,
         metricValue: '${priceUpItems.length}',
       ),
       SubscriptionAlert(
-        title: 'Az kullanılan planlar',
+        title: l10n.subsAlertUnusedTitle,
         message: unusedItems == 0
-            ? 'Tüm abonelikler sağlıklı kullanılıyor.'
-            : 'Son aktivite örüntüne göre $unusedItems plan az kullanılıyor görünüyor.',
-        metricLabel: 'BOŞTA',
+            ? l10n.subsAlertUnusedMessageNone
+            : l10n.subsAlertUnusedMessageSome(unusedItems),
+        metricLabel: l10n.subsAlertUnusedMetric,
         metricValue: '$unusedItems',
       ),
     ];
   }
 
-  String buildInsight(List<SubscriptionItem> items) {
+  String buildInsight(List<SubscriptionItem> items, AppStrings l10n) {
     if (items.isEmpty) {
-      return 'Vera ekstreni veya fişlerini analiz edip aboneliklerini bu listede toplar.';
+      return l10n.subsInsightEmpty;
     }
     final savings = estimatedMonthlySavings(items);
     final needsAttention =
         items.where((item) => item.status.needsAttention).length;
 
     if (needsAttention == 0) {
-      return 'Abonelikler bu ay sağlıklı görünüyor. Acil bir tasarruf kaçağı yok.';
+      return l10n.subsInsightHealthy;
     }
 
-    return 'Hızlıca incelemen gereken $needsAttention abonelik var. Vera, kullanılmayanları dondurarak ve fiyat artışı olanları alt pakete düşürerek aylık ${savings.toStringAsFixed(0)} TL kadar geri kazanabileceğini hesaplıyor.';
+    return l10n.subsInsightNeedsAttention(
+      needsAttention,
+      '${savings.toStringAsFixed(0)} TL',
+    );
   }
 
   double estimatedMonthlySavings(List<SubscriptionItem> items) {

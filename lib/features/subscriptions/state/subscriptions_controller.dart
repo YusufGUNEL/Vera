@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/locale_controller.dart';
 import '../../home/data/transaction.dart';
 import '../../home/state/home_controller.dart';
 import '../data/firebase_subscriptions_service.dart';
@@ -75,11 +76,15 @@ class SubscriptionsController extends StateNotifier<SubscriptionsState> {
 
   Future<void> _load() async {
     final txns = _ref.read(homeControllerProvider).transactions;
-    final items = await _service.loadSubscriptions(userTxns: txns);
+    final l10n = _ref.read(stringsProvider);
+    final items = await _service.loadSubscriptions(
+      userTxns: txns,
+      l10n: l10n,
+    );
     state = state.copyWith(
       items: items,
-      alerts: _repository.buildAlerts(items),
-      insight: _repository.buildInsight(items),
+      alerts: _repository.buildAlerts(items, l10n),
+      insight: _repository.buildInsight(items, l10n),
     );
   }
 

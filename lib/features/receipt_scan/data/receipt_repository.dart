@@ -6,9 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/gemini_service.dart';
 import '../domain/parsed_receipt.dart';
 
-/// Fis veya banka ekran goruntusu parser'i. Gemini multimodal cagrisi yapar,
-/// JSON cikti bekler. AI cagrisi basarisiz olursa deterministic mock fallback
-/// doner (docs/PROMPTS.md fallback prensibine uygun).
+/// Fis veya banka ekran goruntusu parser'i. Gemini multimodal cagrisi yapar
+/// ve JSON cikti bekler. AI cagrisi basarisiz olursa bos bir fallback doner.
 class ReceiptRepository {
   ReceiptRepository(this._gemini);
 
@@ -64,19 +63,13 @@ class ReceiptRepository {
 
   ParsedReceipt _fallback({String? rawText}) {
     return ParsedReceipt(
-      merchant: 'Migros M.Pro',
-      total: 642.80,
-      category: 'Market',
-      date: 'Bugün',
+      merchant: null,
+      total: null,
+      category: null,
+      date: null,
       rawText: rawText,
       source: ReceiptSource.fallback,
-      lines: const [
-        ParsedReceiptLine(name: 'Süt 1 lt', amount: 38.50),
-        ParsedReceiptLine(name: 'Ekmek', amount: 12.00),
-        ParsedReceiptLine(name: 'Tavuk göğüs 1 kg', amount: 154.90),
-        ParsedReceiptLine(name: 'Mevsim sebze', amount: 287.40),
-        ParsedReceiptLine(name: 'Diğer', amount: 150.00),
-      ],
+      lines: const [],
     );
   }
 

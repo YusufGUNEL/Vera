@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/vera_card.dart';
 import '../../data/bank.dart';
 
 class ConnectedBanks extends StatelessWidget {
@@ -21,6 +22,13 @@ class ConnectedBanks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (banks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _EmptyBanksCard(onTap: onAddBankTap),
+      );
+    }
+
     return SizedBox(
       height: 124,
       child: ListView.separated(
@@ -41,6 +49,68 @@ class ConnectedBanks extends StatelessWidget {
                 : () => onBankLongPress!(bank),
           );
         },
+      ),
+    );
+  }
+}
+
+class _EmptyBanksCard extends StatelessWidget {
+  const _EmptyBanksCard({this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    return VeraCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: t.brand.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.account_balance_outlined,
+              color: t.brand,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.connectedAccountsEmptyTitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.connectedAccountsEmptyBody,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: t.muted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.add_circle, color: t.brand, size: 24),
+        ],
       ),
     );
   }

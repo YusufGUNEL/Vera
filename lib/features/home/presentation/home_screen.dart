@@ -21,6 +21,7 @@ import 'widgets/category_budget_card.dart';
 import 'widgets/connected_banks.dart';
 import 'widgets/credit_summary_card.dart';
 import 'widgets/goal_card.dart';
+import 'widgets/home_first_steps_card.dart';
 import 'widgets/net_worth_card.dart';
 import 'widgets/notification_center_sheet.dart';
 import 'widgets/proactive_insight_card.dart';
@@ -164,6 +165,12 @@ class HomeScreen extends ConsumerWidget {
                   openUma(context, ref, prompt: l10n.umaPromptTopUp),
               onPay: () => openUma(context, ref, prompt: l10n.umaPromptPay),
             ),
+            if (!hasTransactions && state.banks.isEmpty)
+              HomeFirstStepsCard(
+                onImport: () => _openStatementImport(context),
+                onScan: () => _openScanner(context),
+                onAddBank: () => _openAddBank(context),
+              ),
             if (hasTransactions)
               SavingsStoryCard(
                 savedAmount: savings.saved,
@@ -175,7 +182,7 @@ class HomeScreen extends ConsumerWidget {
             const ProactiveInsightCard(),
             SectionTitle(
               title: l10n.upcomingBills,
-              actionLabel: bills.isEmpty ? '+ Ekle' : '+ Yeni',
+              actionLabel: '+ ${l10n.actionAdd}',
               onAction: () => _openAddBill(context),
             ),
             UpcomingBillsStrip(
@@ -185,9 +192,12 @@ class HomeScreen extends ConsumerWidget {
             ),
             SectionTitle(
               title: l10n.connectedAccounts,
-              actionLabel: state.refreshing ? l10n.syncingDots : l10n.refresh,
-              onAction: () =>
-                  ref.read(homeControllerProvider.notifier).refresh(),
+              actionLabel: state.banks.isEmpty
+                  ? '+ ${l10n.actionAdd}'
+                  : (state.refreshing ? l10n.syncingDots : l10n.refresh),
+              onAction: () => state.banks.isEmpty
+                  ? _openAddBank(context)
+                  : ref.read(homeControllerProvider.notifier).refresh(),
             ),
             ConnectedBanks(
               banks: state.banks,
@@ -198,7 +208,22 @@ class HomeScreen extends ConsumerWidget {
             UmaInsightStrip(
               text: insight.text.isEmpty ? state.insight : insight.text,
               loading: insight.loading,
-              onTap: () => openUma(context, ref),
+              ctaLabel: !hasTransactions
+                  ? (state.banks.isEmpty
+                      ? l10n.umaInsightImportCta
+                      : l10n.umaInsightAddFirstTxnCta)
+                  : l10n.umaInsightDeepenCta,
+              onTap: () {
+                if (!hasTransactions && state.banks.isEmpty) {
+                  _openStatementImport(context);
+                  return;
+                }
+                if (!hasTransactions) {
+                  _openAddManualTransaction(context);
+                  return;
+                }
+                openUma(context, ref, prompt: l10n.umaPromptAnalyze);
+              },
             ),
             CategoryBudgetCard(
               transactions: state.transactions,
@@ -209,8 +234,8 @@ class HomeScreen extends ConsumerWidget {
             SectionTitle(
               title: l10n.recentTransactions,
               actionLabel: state.transactions.isEmpty
-                  ? '+ İşlem ekle'
-                  : '+ Ekle (${state.transactions.length})',
+                  ? '+ ${l10n.actionAdd}'
+                  : '+ ${l10n.actionAdd} (${state.transactions.length})',
               onAction: () => _openAddManualTransaction(context),
             ),
             TransactionList(

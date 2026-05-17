@@ -235,6 +235,7 @@ class StatementImportSheet extends ConsumerWidget {
   Widget _result(BuildContext context, WidgetRef ref, AppTokens t,
       AppStrings l10n, ParsedStatement s) {
     final importState = ref.watch(statementControllerProvider);
+    final isFallback = s.source == StatementSource.fallback;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -270,6 +271,35 @@ class StatementImportSheet extends ConsumerWidget {
           ),
         ],
         const SizedBox(height: 14),
+        if (isFallback) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: t.gold.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: t.gold.withValues(alpha: 0.25)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.warning_amber_rounded, color: t.gold, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.statementFallbackWarning,
+                    style: TextStyle(
+                      color: t.ink2,
+                      fontSize: 12,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
         if (s.closingBalance != null)
           Container(
             width: double.infinity,
@@ -344,7 +374,9 @@ class StatementImportSheet extends ConsumerWidget {
             const SizedBox(width: 10),
             Expanded(
               child: FilledButton(
-                onPressed: () async {
+                onPressed: isFallback
+                    ? null
+                    : () async {
                   final messenger = ScaffoldMessenger.of(context);
                   final txns = s.toTxns();
                   if (txns.isEmpty) {
@@ -390,7 +422,11 @@ class StatementImportSheet extends ConsumerWidget {
                   foregroundColor: t.brandFG,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: Text(l10n.importToVera),
+                child: Text(
+                  isFallback
+                      ? l10n.statementFallbackAction
+                      : l10n.importToVera,
+                ),
               ),
             ),
           ],

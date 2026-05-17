@@ -7,19 +7,34 @@ class UmaInsightStrip extends StatelessWidget {
   const UmaInsightStrip({
     required this.text,
     this.loading = false,
+    this.ctaLabel,
     this.onTap,
     super.key,
   });
 
   final String text;
   final bool loading;
+  final String? ctaLabel;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final l10n = context.l10n;
-    return Padding(
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 10 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Material(
         color: Colors.transparent,
@@ -80,6 +95,23 @@ class UmaInsightStrip extends StatelessWidget {
                           height: 1.4,
                         ),
                       ),
+                      if (ctaLabel != null) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              ctaLabel!,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: t.uma,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward, size: 14, color: t.uma),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -88,6 +120,7 @@ class UmaInsightStrip extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

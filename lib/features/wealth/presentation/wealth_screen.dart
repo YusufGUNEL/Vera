@@ -33,6 +33,7 @@ class WealthScreen extends ConsumerWidget {
     String label,
   ) {
     final t = context.tokens;
+    final l10n = context.l10n;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -74,7 +75,7 @@ class WealthScreen extends ConsumerWidget {
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(Icons.delete_outline, color: t.red),
                   title: Text(
-                    'Bu varlığı kaldır',
+                    l10n.removeHolding,
                     style: TextStyle(color: t.red, fontWeight: FontWeight.w600),
                   ),
                   onTap: () async {
@@ -304,7 +305,7 @@ class WealthScreen extends ConsumerWidget {
                                 Icon(Icons.add, size: 14, color: t.brand),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Varlık ekle',
+                                  l10n.addHoldingTitle,
                                   style: TextStyle(
                                     color: t.brand,
                                     fontSize: 12,
@@ -392,7 +393,7 @@ class WealthScreen extends ConsumerWidget {
                       Expanded(
                         child: _PolicyChip(
                           label: l10n.approval,
-                          value: _approvalLabel(state.policy.approvalMode),
+                          value: _approvalLabel(state.policy.approvalMode, l10n),
                         ),
                       ),
                     ],
@@ -462,7 +463,7 @@ class WealthScreen extends ConsumerWidget {
           SectionTitle(
             title: l10n.activityFeed,
             actionLabel: state.allocations.isEmpty
-                ? '+ Varlık ekle'
+                ? '+ ${l10n.addHoldingTitle}'
                 : l10n.explainability,
             onAction: state.allocations.isEmpty
                 ? () => _openAddHolding(context)
@@ -514,21 +515,21 @@ class _EmptyWealthCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     return VeraCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: t.uma.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.savings_outlined, color: t.uma, size: 18),
+                child: Icon(Icons.savings_outlined, color: t.uma, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -537,8 +538,8 @@ class _EmptyWealthCard extends StatelessWidget {
                   children: [
                     Text(
                       hasHoldings
-                          ? 'Uma henüz aksiyon almadı'
-                          : 'Portföyünü oluşturmaya başla',
+                          ? context.l10n.noWealthActionsTitle
+                          : context.l10n.startPortfolioTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -548,8 +549,8 @@ class _EmptyWealthCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       hasHoldings
-                          ? 'Otonom modu açtığında öneriler ve rebalans hareketleri burada görünür.'
-                          : 'Hisse, altın, nakit veya kripto varlıklarını ekle. Uma sapmayı izleyip önerilerini buraya yazar.',
+                          ? context.l10n.noWealthActionsBody
+                          : context.l10n.startPortfolioBody,
                       style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],
@@ -564,7 +565,7 @@ class _EmptyWealthCard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onAddHolding,
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('Varlık ekle'),
+                label: Text(context.l10n.addHoldingTitle),
                 style: FilledButton.styleFrom(
                   backgroundColor: t.brand,
                   foregroundColor: t.brandFG,
@@ -705,7 +706,9 @@ class _ActivityRow extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Pill(
-                      label: action.undone ? 'REVERSED' : 'UMA',
+                      label: action.undone
+                          ? context.l10n.wealthActionReversed
+                          : 'UMA',
                       color: action.undone ? t.muted : t.uma,
                       fontSize: 9,
                     ),
@@ -830,10 +833,10 @@ class _SmallBtn extends StatelessWidget {
   }
 }
 
-String _approvalLabel(ApprovalMode mode) {
+String _approvalLabel(ApprovalMode mode, AppStrings l10n) {
   return switch (mode) {
-    ApprovalMode.autoWithinGuardrails => 'Auto',
-    ApprovalMode.confirmLargeMoves => 'Hybrid',
+    ApprovalMode.autoWithinGuardrails => l10n.wealthApprovalAuto,
+    ApprovalMode.confirmLargeMoves => l10n.wealthApprovalHybrid,
   };
 }
 

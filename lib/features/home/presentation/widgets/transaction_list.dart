@@ -70,6 +70,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     return VeraCard(
       padding: const EdgeInsets.all(18),
       child: Column(
@@ -94,7 +95,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Henüz işlem yok',
+                      l10n.noTransactionsTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -103,7 +104,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'İlk işlemini ekle, ekstre yükle veya fiş fotoğrafı çek.',
+                      l10n.noTransactionsBody,
                       style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],
@@ -118,7 +119,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
                 Expanded(
                   child: _EmptyAction(
                     icon: Icons.add,
-                    label: 'Manuel',
+                    label: l10n.actionManual,
                     onTap: onAddManual!,
                   ),
                 ),
@@ -127,7 +128,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
                 Expanded(
                   child: _EmptyAction(
                     icon: Icons.qr_code_scanner_rounded,
-                    label: 'Fiş tara',
+                    label: l10n.scanReceipt,
                     onTap: onScan!,
                   ),
                 ),
@@ -137,7 +138,7 @@ class _EmptyTransactionsCard extends StatelessWidget {
                 Expanded(
                   child: _EmptyAction(
                     icon: Icons.upload_file_rounded,
-                    label: 'Ekstre',
+                    label: l10n.statementImport,
                     onTap: onImport!,
                   ),
                 ),

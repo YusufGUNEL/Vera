@@ -17,6 +17,7 @@ import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/state/goals_controller.dart';
 import '../../home/state/home_controller.dart';
 import '../../home/state/upcoming_bills_controller.dart';
+import '../../onboarding/state/onboarding_controller.dart';
 import '../../uma_chat/data/uma_audit_store.dart';
 import '../../uma_chat/data/uma_feedback_store.dart';
 import '../domain/profile_state.dart';
@@ -329,6 +330,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
     await ref.read(homeControllerProvider.notifier).resetDemoState();
     await ref.read(upcomingBillsControllerProvider.notifier).clear();
     await ref.read(goalsControllerProvider.notifier).reset();
+    await ref.read(onboardingControllerProvider.notifier).reset();
     await ref.read(umaFeedbackStoreProvider).clear();
     await ref.read(umaAuditStoreProvider).clear();
     await ref.read(firebaseImportArtifactsServiceProvider).clearAll();

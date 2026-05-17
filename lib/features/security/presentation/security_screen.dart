@@ -237,7 +237,7 @@ class _EmptySecurityCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Şu an inceleyecek bir uyarı yok',
+                      context.l10n.securityEmptyTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -246,7 +246,7 @@ class _EmptySecurityCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Vera fraud radar her cihazını ve ithal işlemlerini sessizce izliyor. Bir şey olduğunda burada görünür.',
+                      context.l10n.securityEmptyBody,
                       style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],

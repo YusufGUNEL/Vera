@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../data/upcoming_bill.dart';
 import '../../state/upcoming_bills_controller.dart';
@@ -89,6 +90,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final mq = MediaQuery.of(context);
     final isEdit = widget.initial != null;
 
@@ -119,7 +121,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  isEdit ? 'Faturayı düzenle' : 'Yeni fatura ekle',
+                  isEdit ? l10n.editBillTitle : l10n.addBillTitle,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -129,16 +131,16 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                 ),
                 const SizedBox(height: 14),
                 _Field(
-                  label: 'Adı',
+                  label: l10n.fieldName,
                   child: TextField(
                     controller: _name,
                     style: TextStyle(fontSize: 14, color: t.ink),
-                    decoration: _inputDecoration(t, hint: 'Örn. Türk Telekom'),
+                    decoration: _inputDecoration(t, hint: l10n.addBillNameHint),
                   ),
                 ),
                 const SizedBox(height: 12),
                 _Field(
-                  label: 'Tutar (TL)',
+                  label: l10n.fieldAmountTl,
                   child: TextField(
                     controller: _amount,
                     keyboardType:
@@ -152,7 +154,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                 ),
                 const SizedBox(height: 12),
                 _Field(
-                  label: 'Son ödeme tarihi',
+                  label: l10n.dueDateLabel,
                   child: InkWell(
                     onTap: _pickDate,
                     borderRadius: BorderRadius.circular(10),
@@ -180,7 +182,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                 ),
                 const SizedBox(height: 12),
                 _Field(
-                  label: 'Kategori',
+                  label: l10n.fieldCategory,
                   child: SizedBox(
                     height: 44,
                     child: ListView.separated(
@@ -212,7 +214,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                                     size: 16, color: kind.color),
                                 const SizedBox(width: 6),
                                 Text(
-                                  kind.label,
+                                  kind.label(l10n),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -240,7 +242,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                                 color: t.red.withValues(alpha: 0.35)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text('Sil'),
+                          child: Text(l10n.actionDelete),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -253,7 +255,9 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                           foregroundColor: t.brandFG,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: Text(isEdit ? 'Güncelle' : 'Ekle'),
+                        child: Text(
+                          isEdit ? l10n.actionUpdate : l10n.actionAdd,
+                        ),
                       ),
                     ),
                   ],
@@ -318,21 +322,31 @@ class _Field extends StatelessWidget {
 }
 
 enum _BillKind {
-  card(label: 'Kart', iconCode: 0xe19f, color: Color(0xFFE63E5C)),
-  internet(label: 'İnternet', iconCode: 0xe63e, color: Color(0xFF1E88E5)),
-  electric(label: 'Elektrik', iconCode: 0xe1b8, color: Color(0xFFFFA000)),
-  water(label: 'Su', iconCode: 0xe798, color: Color(0xFF26A69A)),
-  gas(label: 'Doğalgaz', iconCode: 0xe546, color: Color(0xFFEF6C00)),
-  rent(label: 'Kira', iconCode: 0xe88a, color: Color(0xFF8E44AD)),
-  other(label: 'Diğer', iconCode: 0xe9b9, color: Color(0xFF607D8B));
+  card(iconCode: 0xe19f, color: Color(0xFFE63E5C)),
+  internet(iconCode: 0xe63e, color: Color(0xFF1E88E5)),
+  electric(iconCode: 0xe1b8, color: Color(0xFFFFA000)),
+  water(iconCode: 0xe798, color: Color(0xFF26A69A)),
+  gas(iconCode: 0xe546, color: Color(0xFFEF6C00)),
+  rent(iconCode: 0xe88a, color: Color(0xFF8E44AD)),
+  other(iconCode: 0xe9b9, color: Color(0xFF607D8B));
 
   const _BillKind({
-    required this.label,
     required this.iconCode,
     required this.color,
   });
 
-  final String label;
   final int iconCode;
   final Color color;
+
+  String label(AppStrings l10n) {
+    return switch (this) {
+      _BillKind.card => l10n.billKindCard,
+      _BillKind.internet => l10n.billKindInternet,
+      _BillKind.electric => l10n.billKindElectric,
+      _BillKind.water => l10n.billKindWater,
+      _BillKind.gas => l10n.billKindGas,
+      _BillKind.rent => l10n.billKindRent,
+      _BillKind.other => l10n.billKindOther,
+    };
+  }
 }

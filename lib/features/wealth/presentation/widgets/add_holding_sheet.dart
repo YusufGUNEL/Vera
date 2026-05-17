@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../state/wealth_controller.dart';
 
@@ -28,7 +29,9 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
   }
 
   Future<void> _save() async {
-    final label = _label.text.trim().isEmpty ? _bucket.label : _label.text.trim();
+    final label = _label.text.trim().isEmpty
+        ? _bucket.label(context.l10n)
+        : _label.text.trim();
     final raw = _amount.text.trim().replaceAll(',', '.');
     final amount = double.tryParse(raw) ?? 0;
     if (amount <= 0) return;
@@ -44,6 +47,7 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final mq = MediaQuery.of(context);
 
     return Padding(
@@ -74,7 +78,7 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'Portföye varlık ekle',
+                    l10n.addHoldingTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -84,7 +88,7 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Aşağıdaki bucket\'lardan birini seçip TL değerini gir. Uma ağırlıkları otomatik hesaplar.',
+                    l10n.addHoldingSubtitle,
                     style: TextStyle(fontSize: 12, color: t.muted, height: 1.4),
                   ),
                   const SizedBox(height: 14),
@@ -109,7 +113,7 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                               ),
                             ),
                             child: Text(
-                              b.label,
+                              b.label(l10n),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -121,15 +125,15 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  const _Label(label: 'Etiket (opsiyonel)'),
+                  _Label(label: l10n.fieldLabelOptional),
                   const SizedBox(height: 6),
                   TextField(
                     controller: _label,
                     style: TextStyle(fontSize: 14, color: t.ink),
-                    decoration: _deco(t, 'Örn. THYAO veya XU100 ETF'),
+                    decoration: _deco(t, l10n.addHoldingHint),
                   ),
                   const SizedBox(height: 12),
-                  const _Label(label: 'Değer (TL)'),
+                  _Label(label: l10n.holdingValueLabel),
                   const SizedBox(height: 6),
                   TextField(
                     controller: _amount,
@@ -152,9 +156,9 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                         backgroundColor: t.brand,
                         foregroundColor: t.brandFG,
                       ),
-                      child: const Text(
-                        'Ekle',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.actionAdd,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -213,14 +217,24 @@ class _Label extends StatelessWidget {
 }
 
 enum _HoldingBucket {
-  equity(label: 'Hisse', paletteKey: 'brand'),
-  gold(label: 'Altın', paletteKey: 'gold'),
-  cash(label: 'Nakit', paletteKey: 'blueSoft'),
-  crypto(label: 'Kripto', paletteKey: 'uma'),
-  funds(label: 'Fon', paletteKey: 'green'),
-  bonds(label: 'Tahvil', paletteKey: 'blue');
+  equity(paletteKey: 'brand'),
+  gold(paletteKey: 'gold'),
+  cash(paletteKey: 'blueSoft'),
+  crypto(paletteKey: 'uma'),
+  funds(paletteKey: 'green'),
+  bonds(paletteKey: 'blue');
 
-  const _HoldingBucket({required this.label, required this.paletteKey});
-  final String label;
+  const _HoldingBucket({required this.paletteKey});
   final String paletteKey;
+
+  String label(AppStrings l10n) {
+    return switch (this) {
+      _HoldingBucket.equity => l10n.holdingBucketEquity,
+      _HoldingBucket.gold => l10n.holdingBucketGold,
+      _HoldingBucket.cash => l10n.holdingBucketCash,
+      _HoldingBucket.crypto => l10n.holdingBucketCrypto,
+      _HoldingBucket.funds => l10n.holdingBucketFunds,
+      _HoldingBucket.bonds => l10n.holdingBucketBonds,
+    };
+  }
 }

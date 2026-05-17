@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/firebase/firebase_bootstrap.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../domain/subscription_item.dart';
 import 'subscriptions_repository.dart';
@@ -33,11 +34,15 @@ class FirebaseSubscriptionsService {
 
   Future<List<SubscriptionItem>> loadSubscriptions({
     required List<dynamic> userTxns,
+    required AppStrings l10n,
   }) async {
     // The cheapest source of truth: re-detect from the user's transactions.
     // Firestore only persists user-edited overrides on top of that — never a
     // canned seed of brand names.
-    final detected = _local.getSubscriptions(userTxns: userTxns.cast());
+    final detected = _local.getSubscriptions(
+      userTxns: userTxns.cast(),
+      l10n: l10n,
+    );
     if (!isEnabled) return detected;
 
     try {

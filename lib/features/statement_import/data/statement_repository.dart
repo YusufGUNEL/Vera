@@ -8,7 +8,7 @@ import '../domain/parsed_statement.dart';
 
 /// Banka ekstresi (PDF veya gorsel) parser'i.
 /// Gemini multimodal cagrisi yapar, JSON cikti bekler.
-/// API key yoksa veya parse hata verirse deterministic mock fallback doner.
+/// API key yoksa veya parse hata verirse bos bir fallback doner.
 class StatementRepository {
   StatementRepository(this._gemini);
 
@@ -66,41 +66,14 @@ class StatementRepository {
 
   ParsedStatement _fallback({String? rawText}) {
     return ParsedStatement(
-      bank: 'Garanti BBVA',
-      accountLast4: '2847',
-      period: '01.05 - 14.05.2026',
-      openingBalance: 48230.50,
-      closingBalance: 52410.30,
+      bank: null,
+      accountLast4: null,
+      period: null,
+      openingBalance: null,
+      closingBalance: null,
       rawText: rawText,
       source: StatementSource.fallback,
-      transactions: const [
-        ParsedStatementTxn(
-            date: '14.05', description: 'Maaş yatışı', amount: 32500),
-        ParsedStatementTxn(
-            date: '13.05',
-            description: 'Migros M.Pro',
-            amount: -642.80,
-            category: 'Market'),
-        ParsedStatementTxn(
-            date: '12.05',
-            description: 'Netflix Premium',
-            amount: -224.99,
-            category: 'Abonelik'),
-        ParsedStatementTxn(
-            date: '11.05',
-            description: 'Shell Yenibosna',
-            amount: -1280,
-            category: 'Akaryakit'),
-        ParsedStatementTxn(
-            date: '09.05',
-            description: 'BEDAŞ Elektrik',
-            amount: -380,
-            category: 'Fatura'),
-        ParsedStatementTxn(
-            date: '07.05',
-            description: 'EFT Yapı Kredi → kendi hesap',
-            amount: -5000),
-      ],
+      transactions: const [],
     );
   }
 
