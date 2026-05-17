@@ -1,20 +1,19 @@
 # Yapılacaklar — Vera Demo Hazırlığı
 
-> **Amaç:** Demo öncesi kalan 8 eksiği kapatmak.
-> **Tahmini süre:** 3-4 saat.
+> **Amaç:** Demo öncesi kalan 6 eksiği kapatmak.
+> **Tahmini süre:** ~2 saat.
+> **Durum (2026-05-17):** Gemini API key `.env`'e yazıldı, ilk büyük commit ve push tamamlandı (`353eb48`). Buradan devam ediyoruz.
 > **Kullanım:** Sırayla oku, sırayla uygula. Her adımda hangi dosya, hangi komut, ne beklendiği yazıyor. Takıldığında ilgili **"Takılırsa"** kutusuna bak.
 >
 > ## İçindekiler
 >
 > 0. [Hızlı Sağlık Kontrolü](#0-hızlı-sağlık-kontrolü-5-dk--başlamadan-önce) — başlamadan önce
-> 1. ~~[Gemini API Key al ve `.env`'e yaz](#-adım-1--gemini-api-key-al-ve-enve-yaz-10-dk)~~ ✅ **TAMAMLANDI** (2026-05-17)
-> 2. [Mevcut çalışmayı commit'le](#-adım-2--mevcut-çalışmayı-commitle-2-dk) — 2 dk
-> 3. [Receipt OCR fallback'ini düzelt](#-adım-3--receipt-ocr-fallbackini-düzelt-15-dk--kritik) — 15 dk, kritik
-> 4. [Statement Import fallback'ini düzelt](#-adım-4--statement-import-fallbackini-düzelt-10-dk--kritik) — 10 dk, kritik
-> 5. [TR-hardcoded string'leri 6 dile lokalize et](#-adım-5--yeni-tr-hardcoded-stringleri-6-dile-lokalize-et-60-90-dk--kritik) — 60-90 dk, kritik
-> 6. [Remote'a push](#-adım-6--remotea-push-2-dk) — 2 dk
-> 7. [Onboarding flow'unu test et](#-adım-7--onboarding-flowunu-test-et-10-dk) — 10 dk
-> 8. [Vakit kalırsa: ek iyileştirmeler](#-adım-8--vakit-kalırsa-ek-iyileştirmeler)
+> 1. [Receipt OCR fallback'ini düzelt](#adım-1--receipt-ocr-fallbackini-düzelt-15-dk--kritik) — 15 dk, kritik
+> 2. [Statement Import fallback'ini düzelt](#adım-2--statement-import-fallbackini-düzelt-10-dk--kritik) — 10 dk, kritik
+> 3. [TR-hardcoded string'leri 6 dile lokalize et](#adım-3--yeni-tr-hardcoded-stringleri-6-dile-lokalize-et-60-90-dk--kritik) — 60-90 dk, kritik
+> 4. [Remote'a push](#adım-4--remotea-push-2-dk) — 2 dk
+> 5. [Onboarding flow'unu test et](#adım-5--onboarding-flowunu-test-et-10-dk) — 10 dk
+> 6. [Vakit kalırsa: ek iyileştirmeler](#adım-6--vakit-kalırsa-ek-iyileştirmeler)
 
 ---
 
@@ -28,7 +27,7 @@ flutter analyze          # 0 issue beklenir
 flutter test             # all passed beklenir
 ```
 
-- Üçü de yeşilse → devam et, adım 1'e geç.
+- Üçü de yeşilse → devam et, Adım 1'e geç.
 - Birinde hata varsa → bana yaz, durum farklı olabilir. **Hatayı görmeden bir şey commit etme.**
 
 ---
@@ -44,7 +43,8 @@ flutter test             # all passed beklenir
   - Net worth sparkline (`net_worth_history_store.dart`).
   - Goal advisor (Gemini'ya aylık plan sorduran `goal_advisor.dart`).
   - Fraud heuristic (`fraud_heuristic.dart`).
-- **~47 dosya commit edilmedi**, working tree'de duruyor. Adım 2'de commit'leyeceğiz.
+- Gemini API key `.env`'e yazıldı; `.gitignore` sayesinde remote'ta yok. Demo sonrası key rotate edilmeli (key kısa süreliğine sohbete yapıştırıldığı için).
+- 50 dosyalık commit (`353eb48`) GitHub'a push edildi.
 
 Detay için: `docs/CHANGELOG.md` → `2026-05-17` girdisi.
 
@@ -52,88 +52,7 @@ Detay için: `docs/CHANGELOG.md` → `2026-05-17` girdisi.
 
 # YAPILACAKLAR — sırayla
 
-## Adım 1 — Gemini API Key al ve `.env`'e yaz (10 dk)
-
-> ✅ **TAMAMLANDI — 2026-05-17.** `.env` dosyasına `GEMINI_API_KEY` yazıldı, Gemini 2.0 Flash modeli aktif. `.env` git takibinde değil (`.gitignore` satır 26). Aşağıdaki adımlar referans olarak duruyor; aynı işi tekrar yapman gerekmiyor. **Adım 2'den devam et.**
-
-**Neden ilk bu?** Tüm AI özellikleri (Uma chat, kategorize, insight, goal advisor, receipt/ekstre parse) bu key'e bağlı. Key yokken kod çalışır ama **heuristic fallback'e düşer**. Demoda "AI-native" görünmesi için key şart.
-
-### 1.1 Key'i Google AI Studio'dan al
-
-1. Tarayıcıda aç: **https://aistudio.google.com/apikey**
-2. Google hesabınla giriş yap (Gmail yeterli).
-3. Sayfada **"Create API key"** butonuna bas.
-4. Açılan pencerede:
-   - "Create API key in new project" seçeneğini seç (basit yol).
-   - Veya mevcut bir Google Cloud projen varsa onu seç.
-5. Bir kaç saniye bekle → ekrana **"AIzaSy..."** ile başlayan uzun bir string gelir.
-6. Sağdaki **kopyala** ikonuna bas. Bu key'i kimseye gösterme, GitHub'a pushlama.
-
-> **Önemli:** Bu key ücretsiz tier'da. Günde belirli limit var (Gemini 2.0 Flash için cömerttir, demoda sorun olmaz). Faturalandırma açmana gerek yok.
-
-### 1.2 Key'i `.env` dosyasına yaz
-
-1. Repo kökünde `.env` dosyasını aç (VS Code: `Ctrl+P` → `.env` yaz).
-2. İçinde şu an şu satır var:
-   ```
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-3. `your_gemini_api_key_here` kısmını sildirip, **kopyaladığın key'i** yapıştır. Tırnak işareti **kullanma**, boşluk bırakma:
-   ```
-   GEMINI_API_KEY=AIzaSy.....................................
-   GEMINI_MODEL=gemini-2.0-flash-exp
-   ```
-4. Kaydet (`Ctrl+S`).
-
-### 1.3 Doğrula — key gerçekten okunuyor mu?
-
-```powershell
-flutter run -d windows         # veya hangi platforma denersen
-```
-
-Uygulamayı açtığında:
-1. Profil sayfası → "Demo verisini sıfırla"ya bas (boş başlayalım).
-2. Bir bank ekle → bir-iki transaction gir.
-3. Ana sayfada **Uma**'ya gir, "bu ay ne kadar harcamışım?" diye sor.
-   - **Cevap akıllıca geliyorsa** → key çalışıyor. ✅
-   - **"AI key tanımsız, fallback'teyim"** gibi bir cevap geliyorsa → key okunmamış, `.env`'i tekrar kontrol et.
-
-### Takılırsa:
-
-- **".env not found"** veya benzeri hata → repo kökünde mi `.env`? `pubspec.yaml`'da `flutter: assets: - .env` var mı? (Var olmalı, kontrol için: `Grep "- .env" pubspec.yaml`).
-- **Key var ama hâlâ fallback** → `Env.geminiApiKey` getter'ı placeholder kontrolü yapıyor (`env.dart:12`). Key gerçekten yapıştırıldı mı?
-- **403/429 hatası loglarda** → key yanlış kopyalandı veya quota doldu. Yeni key oluştur.
-
-### Sen yapmadan geçemeyiz:
-
-> **Bu adımı sadece SEN yapabilirsin.** Ben (AI) senin Google hesabına giremem, API key isteyemem. Diğer her adımı ben yapabilirim ama bu key'i sen yazacaksın.
-
----
-
-## Adım 2 — Mevcut çalışmayı commit'le (2 dk)
-
-Bugünkü ~47 dosya henüz commit edilmedi. Önce bunu kaydetmemiz lazım.
-
-```powershell
-git status              # değişiklikleri gör
-git add -A              # hepsini stage'le
-git commit -m "Remove all mock data; add AI categorization, insight, fraud heuristic, goal advisor, sparkline"
-```
-
-Ardından doğrula:
-```powershell
-git log -1              # son commit görünmeli
-git status              # "nothing to commit, working tree clean" demeli
-```
-
-### Takılırsa:
-
-- **Pre-commit hook hatası** → hatayı oku, ilgili dosyayı düzelt, sonra **yeni** bir commit at (asla `--amend` veya `--no-verify` kullanma).
-- **`.env` commit edildi mi diye endişeleniyorsan** → `.gitignore`'da `.env` zaten var, commit'e girmemiş olmalı. `git show --stat HEAD | grep .env` ile kontrol et — boş çıkmalı.
-
----
-
-## Adım 3 — Receipt OCR fallback'ini düzelt (15 dk) — KRİTİK
+## Adım 1 — Receipt OCR fallback'ini düzelt (15 dk) — KRİTİK
 
 ### Problem
 
@@ -184,11 +103,11 @@ git status              # "nothing to commit, working tree clean" demeli
 ### Takılırsa:
 
 - Eğer receipt scan ekranı confirm butonunu bulamazsan: `Grep "_confirm\|onConfirm" lib/features/receipt_scan` ile bul.
-- UI değişikliğini `app_strings.dart`'a key ekleyerek lokalize etmek daha temiz. Vakit varsa: Adım 5 ile beraber yap.
+- UI değişikliğini `app_strings.dart`'a key ekleyerek lokalize etmek daha temiz. Vakit varsa: Adım 3 ile beraber yap.
 
 ---
 
-## Adım 4 — Statement Import fallback'ini düzelt (10 dk) — KRİTİK
+## Adım 2 — Statement Import fallback'ini düzelt (10 dk) — KRİTİK
 
 ### Problem
 
@@ -223,7 +142,7 @@ Aynı mantık. `_fallback()` boş bir `ParsedStatement` dönsün:
 
 ---
 
-## Adım 5 — Yeni TR-hardcoded string'leri 6 dile lokalize et (60-90 dk) — KRİTİK
+## Adım 3 — Yeni TR-hardcoded string'leri 6 dile lokalize et (60-90 dk) — KRİTİK
 
 ### Problem
 
@@ -302,9 +221,9 @@ Text(context.l10n.addBillTitle)
 
 ---
 
-## Adım 6 — Remote'a push (2 dk)
+## Adım 4 — Remote'a push (2 dk)
 
-Üstteki 4 adımı bitirdikten sonra commit + push:
+Üstteki 3 adımı bitirdikten sonra commit + push:
 
 ```powershell
 git status                                    # değişikliklere bak
@@ -321,7 +240,7 @@ git push origin main
 
 ---
 
-## Adım 7 — Onboarding flow'unu test et (10 dk)
+## Adım 5 — Onboarding flow'unu test et (10 dk)
 
 ### Neden
 
@@ -342,21 +261,21 @@ git push origin main
 
 ---
 
-## Adım 8 — Vakit kalırsa: ek iyileştirmeler
+## Adım 6 — Vakit kalırsa: ek iyileştirmeler
 
-### 8a) Subscription detection eşiğini düşür (15 dk)
+### 6a) Subscription detection eşiğini düşür (15 dk)
 
 `lib/features/subscriptions/` altında bir parser var (`recurring_transaction_parser.dart` muhtemelen). Şu an "**en az 2 görünüm**" eşiği muhtemelen yüksek — tek aylık ekstrede çoğu abonelik tek görünür → tespit edilmez.
 
 Çözüm: 1 görünüm + Gemini'a "bu Netflix/Spotify/YouTube Premium gibi bilinen bir abonelik mi?" diye sorduran bir helper. Veya isim eşleştirme listesi (`netflix|spotify|youtube premium|disney|hbo|amazon prime`).
 
-### 8b) CategoryBudgetCard akıllı tavsiye (20 dk)
+### 6b) CategoryBudgetCard akıllı tavsiye (20 dk)
 
 Seed limitler kaldırıldığı için, ilk kullanıcı her kategori için manuel limit girmek zorunda. UX iyileştirmesi: kategori için **geçmiş 30 gün harcamanın %110'u** önerilsin (input placeholder olarak).
 
 Dosya: `lib/features/home/data/category_budget_store.dart` + UI tarafı.
 
-### 8c) Unit testler (30 dk)
+### 6c) Unit testler (30 dk)
 
 `test/` altında sadece `widget_test.dart` placeholder var. Şu fonksiyonlar için unit test eklenebilir (deterministik, side-effect yok):
 
@@ -365,17 +284,25 @@ Dosya: `lib/features/home/data/category_budget_store.dart` + UI tarafı.
 - `GoalAdvisor` — input/output testi
 - `RecurringTransactionParser.detectSubscriptions()`
 
-### 8d) iOS hazırlığı (büyük iş — ayrı gün)
+### 6d) iOS hazırlığı (büyük iş — ayrı gün)
 
 - `pubspec.yaml`: `flutter_launcher_icons: ios: true`, `flutter_native_splash: ios: true`.
 - iOS Firebase config: `GoogleService-Info.plist` ekle (Firebase Console → iOS app ekle → indir → `ios/Runner/`).
 - Apple Developer sertifikası: sen halletmen lazım.
 
-### 8e) Firebase Storage bucket (büyük iş — billing gerekir)
+### 6e) Firebase Storage bucket (büyük iş — billing gerekir)
 
 - Firebase Console → Project → Storage → "Get started" → Cloud Billing eklemek gerekiyor (free tier var ama kart kaydı şart).
 - Bucket olmadan: çoklu cihaz sync, receipt image yedekleme, push notification production'da çalışmaz.
 - Demo için kritik değil — README'de "P2 — partnership/billing gerekli" diye dürüst işaretle.
+
+### 6f) Gemini API key rotate et (5 dk — DEMO SONRASI)
+
+Mevcut key (`AIzaSy...nTU`) bir noktada sohbete yapıştırıldı, log'larda olabilir. Demo sonrası:
+1. https://aistudio.google.com/apikey
+2. Mevcut key → ⋮ → **Delete**
+3. **Create API key** → yenisini al
+4. `.env`'i yeni key'le güncelle (commit etme, gitignore'da).
 
 ---
 
@@ -383,12 +310,11 @@ Dosya: `lib/features/home/data/category_budget_store.dart` + UI tarafı.
 
 | İş | Neden ben yapamam |
 | --- | --- |
-| Gemini API key al | Google hesabına giriş yapmam lazım, yapamam |
-| `.env`'e key yaz | Yapabilirim ama key'i sen yapıştırırsan daha güvenli |
 | Firebase Console / Cloud Billing | Kredi kartı/hesap senin |
 | iOS sertifikası | Apple Developer hesabı senin |
 | Play Store / TestFlight upload | Hesaplar senin |
-| GitHub push (credential gerekiyorsa) | Auth senin yapman lazım, ama push komutunu ben verirsin |
+| GitHub credential prompt'u | İlk push'ta auth gerekirse sen yapacaksın |
+| Gemini key rotate (demo sonrası) | Google hesabına giriş gerekir |
 
 ---
 
@@ -423,8 +349,8 @@ lib/features/security/state/security_controller.dart   — txn stream'e abone
 lib/features/uma_chat/data/uma_repository.dart         — _buildUserContext() Gemini context
 lib/features/auth/state/auth_controller.dart           — signOut tüm cache temizler
 
-lib/features/receipt_scan/data/receipt_repository.dart — _fallback() düzeltilecek (Adım 3)
-lib/features/statement_import/data/statement_repository.dart — _fallback() düzeltilecek (Adım 4)
+lib/features/receipt_scan/data/receipt_repository.dart — _fallback() düzeltilecek (Adım 1)
+lib/features/statement_import/data/statement_repository.dart — _fallback() düzeltilecek (Adım 2)
 ```
 
 ---
@@ -445,4 +371,4 @@ Hepsi yeşilse → demo'ya hazırız. ✅
 
 # Devam komutu — bir AI ajana yaptırmak istersen
 
-> Claude, `docs/YAPILACAKLAR.md` dosyasını oku. Adım 1'i ben yaptım (Gemini key `.env`'e yazıldı). 2'den 7'ye kadar olan adımları sırayla yap, her adımı bitirince commit at, sonuçları bana özetle. Adım 5'te (lokalizasyon) çevirileri yaparken Gemini'dan toplu çeviri iste, EN'den önce sor.
+> Claude, `docs/YAPILACAKLAR.md` dosyasını oku. Gemini key + ilk commit/push hallolmuş durumda; Adım 1'den (Receipt OCR fallback) başla, sırayla 5'e kadar git, her adımı bitirince commit at, sonuçları bana özetle. Adım 3'te (lokalizasyon) çevirileri yaparken Gemini'dan toplu çeviri iste, EN'i önce sor.
