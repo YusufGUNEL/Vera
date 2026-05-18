@@ -1,0 +1,57 @@
+{
+  "conditions": [],
+  "parameters": {
+    "gemini_model": {
+      "defaultValue": {
+        "value": "gemini-2.0-flash-exp"
+      },
+      "description": "Gemini model used by Vera services",
+      "valueType": "STRING"
+    },
+    "uma_fallback_message": {
+      "defaultValue": {
+        "value": "Su an yardimci olamiyorum, lütfen tekrar dene."
+      },
+      "description": "Fallback message when Uma cannot answer",
+      "valueType": "STRING"
+    },
+    "fraud_alert_threshold": {
+      "defaultValue": {
+        "value": "85"
+      },
+      "description": "Fraud confidence threshold from 0 to 100",
+      "valueType": "NUMBER"
+    },
+    "receipt_ocr_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Feature flag for receipt OCR",
+      "valueType": "BOOLEAN"
+    },
+    "wealth_autonomy_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Feature flag for autonomous wealth behaviors",
+      "valueType": "BOOLEAN"
+    },
+    "statement_import_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Feature flag for statement import",
+      "valueType": "BOOLEAN"
+    },
+    "max_import_transactions": {
+      "defaultValue": {
+        "value": "500"
+      },
+      "description": "Maximum number of transactions to import from a statement",
+      "valueType": "NUMBER"
+    }
+  },
+  "version": {
+    "description": "Hackathon baseline config for Vera"
+  }
+}

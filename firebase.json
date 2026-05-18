@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json",
   "hosting": {
     "public": "build/web",
     "ignore": [
@@ -18,5 +19,8 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "remoteconfig": {
+    "template": "remoteconfig.template.json"
   }
 }
