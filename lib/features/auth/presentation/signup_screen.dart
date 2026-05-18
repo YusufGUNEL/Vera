@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/firebase/firebase_bootstrap.dart';
+import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../state/auth_controller.dart';
 import 'widgets/auth_field.dart';
@@ -50,6 +51,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _signUp() async {
+    final l10n = context.l10n;
     final firebase = ref.read(firebaseBootstrapProvider);
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
@@ -57,23 +59,23 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final confirm = _confirmController.text;
 
     if (name.isEmpty) {
-      setState(() => _error = 'Please enter your full name.');
+      setState(() => _error = l10n.signupErrorNameRequired);
       return;
     }
     if (!email.contains('@') || !email.contains('.')) {
-      setState(() => _error = 'Please enter a valid email.');
+      setState(() => _error = l10n.signupErrorInvalidEmail);
       return;
     }
     if (password.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters.');
+      setState(() => _error = l10n.signupErrorShortPassword);
       return;
     }
     if (password != confirm) {
-      setState(() => _error = 'Passwords do not match.');
+      setState(() => _error = l10n.signupErrorPasswordMismatch);
       return;
     }
     if (!_accepted) {
-      setState(() => _error = 'Please accept the terms to continue.');
+      setState(() => _error = l10n.signupErrorAcceptTerms);
       return;
     }
 
@@ -100,7 +102,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       final message = error.message?.trim();
       setState(() {
         _error = message == null || message.isEmpty
-            ? 'Account creation failed: ${error.code}.'
+            ? l10n.signupFailedTemplate(error.code)
             : message;
       });
     } catch (error) {
@@ -121,16 +123,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     return score.clamp(0.0, 1.0);
   }
 
-  String _strengthLabel(double value) {
+  String _strengthLabel(double value, AppStrings l10n) {
     if (value == 0) return ' ';
-    if (value < 0.4) return 'Weak';
-    if (value < 0.7) return 'Medium';
-    return 'Strong';
+    if (value < 0.4) return l10n.signupStrengthWeak;
+    if (value < 0.7) return l10n.signupStrengthMedium;
+    return l10n.signupStrengthStrong;
   }
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
     final firebase = ref.watch(firebaseBootstrapProvider);
     final strength = _strength(_passwordController.text);
     final strengthColor = strength < 0.4
@@ -157,7 +160,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Create your account',
+                l10n.signupTitle,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -168,20 +171,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               const SizedBox(height: 6),
               Text(
                 firebase.ready
-                    ? 'Your Vera identity and profile will sync through Firebase.'
-                    : 'Firebase is not configured yet. This flow will continue in local demo mode.',
+                    ? l10n.signupSubtitleFirebase
+                    : l10n.signupSubtitleLocal,
                 style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
               ),
               const SizedBox(height: 24),
               AuthField(
-                label: 'Full name',
+                label: l10n.signupFieldFullName,
                 controller: _nameController,
                 prefixIcon: Icons.person_outline,
                 autofillHints: const [AutofillHints.name],
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'Email',
+                label: l10n.signupFieldEmail,
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: Icons.mail_outline,
@@ -189,7 +192,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'Password',
+                label: l10n.signupFieldPassword,
                 controller: _passwordController,
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
@@ -221,7 +224,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    _strengthLabel(strength),
+                    _strengthLabel(strength, l10n),
                     style: TextStyle(
                       fontSize: 11,
                       color: strengthColor,
@@ -232,7 +235,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               ),
               const SizedBox(height: 14),
               AuthField(
-                label: 'Confirm password',
+                label: l10n.signupFieldConfirmPassword,
                 controller: _confirmController,
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
@@ -263,7 +266,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'I accept Vera terms and the local demo data policy.',
+                        l10n.signupTerms,
                         style: TextStyle(
                           fontSize: 12.5,
                           color: t.ink2,
@@ -322,7 +325,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           ),
                         )
                       : Text(
-                          firebase.ready ? 'Create Firebase account' : 'Continue locally',
+                          firebase.ready
+                              ? l10n.signupCtaCreate
+                              : l10n.signupCtaContinueLocal,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -336,14 +341,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      l10n.signupAlreadyHaveAccount,
                       style: TextStyle(fontSize: 13.5, color: t.muted),
                     ),
                     GestureDetector(
                       onTap: () => context.pop(),
                       behavior: HitTestBehavior.opaque,
                       child: Text(
-                        'Sign in',
+                        l10n.signupSignIn,
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,

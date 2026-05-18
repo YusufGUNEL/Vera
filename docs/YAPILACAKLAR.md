@@ -1,11 +1,53 @@
 # Yapılacaklar — Vera Demo Hazırlığı
 
 > **Durum (2026-05-18):** Demo öncesi kritik adımların hepsi tamamlandı.
-> Sahte/mock veri sızıntısı yok; hardcoded locale sızıntıları temizlendi;
-> ölü kod (`comingSoon` ve yanıltıcı yorumlar) kaldırıldı.
+> Sahte/mock veri sızıntısı yok (örnek hesap hariç — orası bilinçli);
+> hardcoded locale sızıntıları temizlendi; ölü kod (`comingSoon`,
+> `someKey`, `dart`, yanıltıcı yorumlar) kaldırıldı; signup ekranı 6
+> dile çevrildi; Android release config Play Store yüklemeye hazır.
 >
 > Aşağıda kalan **opsiyonel** iyileştirmeler var — demo için kritik değil,
 > vakit kalırsa P1 → P2 → P3 sırasıyla yap.
+
+## Play Store yüklemesi için tek yapılması gereken
+
+1. Upload keystore üret:
+   ```powershell
+   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA `
+     -keysize 2048 -validity 10000 -alias vera-upload
+   ```
+2. `android/key.properties` dosyasını oluştur (gitignore'da):
+   ```
+   storeFile=C:/path/to/upload-keystore.jks
+   storePassword=...
+   keyAlias=vera-upload
+   keyPassword=...
+   ```
+3. `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`
+4. Play Console → Internal testing track'e yükle.
+
+`key.properties` yoksa release build debug key ile imzalanır (lokal test için
+çalışır ama Play Store reddeder). Bu dosya hiçbir zaman commit edilmez.
+
+## Demo hesabı
+
+Login ekranında ayrı bir "demo" butonu **yok** — normal sign-in/sign-up
+deneyimi. Demo'yu denemek için:
+
+| Alan | Değer |
+| --- | --- |
+| E-posta | `a` |
+| Şifre | `b` |
+
+Bu credential'lar `login_screen.dart`'ta intercept ediliyor; Firebase'e
+gitmiyor, doğrudan seed'li yerel hesabı aktive ediyor: 2 banka, 16 işlem
+(Netflix×2 / Spotify×2 abonelik tespitini, 15.000 TL yuvarlak EFT fraud
+heuristic'i tetikler), 3 fatura, kısmen biriken acil durum hedefi.
+Onboarding atlanır, ana sayfa dolu açılır. Login ekranında bu
+credential'lar bilgi kutusunda da gösteriliyor.
+
+Diğer her e-posta/şifre kombinasyonu Firebase Auth'a gider — orada
+kayıtlı gerçek hesap gerekir.
 
 ---
 

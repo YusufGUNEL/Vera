@@ -291,15 +291,16 @@ class AppStrings {
   String get thisWasMe => _t('thisWasMe');
 
   // ---- Login ----
-  String get continueWithDemo => _t('continueWithDemo');
   String get emailField => _t('emailField');
   String get passwordField => _t('passwordField');
   String get loginTitle => _t('loginTitle');
   String get loginSubtitle => _t('loginSubtitle');
-  String get loginDisplayName => _t('loginDisplayName');
-  String get loginDisplayNameHint => _t('loginDisplayNameHint');
   String get loginEmailHint => _t('loginEmailHint');
   String get loginFooter => _t('loginFooter');
+  String loginDemoHint(String email, String password) =>
+      _t('loginDemoHint')
+          .replaceAll('{email}', email)
+          .replaceAll('{password}', password);
 
   // ---- UMA chat ----
   String get umaSuggestionPay => _t('umaSuggestionPay');
@@ -572,6 +573,48 @@ class AppStrings {
   String loginFirebaseError(String code) =>
       _t('loginFirebaseError').replaceAll('{code}', code);
   String get loginFirebaseReadyFooter => _t('loginFirebaseReadyFooter');
+  String get loginCreateAccount => _t('loginCreateAccount');
+
+  // ---- Signup screen ----
+  String get signupTitle => _t('signupTitle');
+  String get signupSubtitleFirebase => _t('signupSubtitleFirebase');
+  String get signupSubtitleLocal => _t('signupSubtitleLocal');
+  String get signupFieldFullName => _t('signupFieldFullName');
+  String get signupFieldEmail => _t('signupFieldEmail');
+  String get signupFieldPassword => _t('signupFieldPassword');
+  String get signupFieldConfirmPassword => _t('signupFieldConfirmPassword');
+  String get signupErrorNameRequired => _t('signupErrorNameRequired');
+  String get signupErrorInvalidEmail => _t('signupErrorInvalidEmail');
+  String get signupErrorShortPassword => _t('signupErrorShortPassword');
+  String get signupErrorPasswordMismatch => _t('signupErrorPasswordMismatch');
+  String get signupErrorAcceptTerms => _t('signupErrorAcceptTerms');
+  String signupFailedTemplate(String code) =>
+      _t('signupFailedTemplate').replaceAll('{code}', code);
+  String get signupTerms => _t('signupTerms');
+  String get signupStrengthWeak => _t('signupStrengthWeak');
+  String get signupStrengthMedium => _t('signupStrengthMedium');
+  String get signupStrengthStrong => _t('signupStrengthStrong');
+  String get signupCtaCreate => _t('signupCtaCreate');
+  String get signupCtaContinueLocal => _t('signupCtaContinueLocal');
+  String get signupAlreadyHaveAccount => _t('signupAlreadyHaveAccount');
+  String get signupSignIn => _t('signupSignIn');
+
+  // ---- Sample / demo account ----
+  String get demoSampleLoaded => _t('demoSampleLoaded');
+  String get demoBankPrimary => _t('demoBankPrimary');
+  String get demoBankSavings => _t('demoBankSavings');
+  String get demoBillCreditCard => _t('demoBillCreditCard');
+  String get demoBillElectric => _t('demoBillElectric');
+  String get demoBillInternet => _t('demoBillInternet');
+  String get demoTxnSalary => _t('demoTxnSalary');
+  String get demoTxnGrocery => _t('demoTxnGrocery');
+  String get demoTxnFuel => _t('demoTxnFuel');
+  String get demoTxnRestaurant => _t('demoTxnRestaurant');
+  String get demoTxnPharmacy => _t('demoTxnPharmacy');
+  String get demoTxnRent => _t('demoTxnRent');
+  String get demoTxnTransfer => _t('demoTxnTransfer');
+  String get demoTxnFamilyIncoming => _t('demoTxnFamilyIncoming');
+  String get demoTxnAtm => _t('demoTxnAtm');
 
   // ---- Recovered Subscriptions & Wealth ----
   String subscriptionsAttentionCount(int n) =>
@@ -664,10 +707,8 @@ class AppStrings {
   String get fieldDescription => _t('fieldDescription');
   String get subsKnownVendorLabel => _t('subsKnownVendorLabel');
   String get categoryFuel => _t('categoryFuel');
-  String get someKey => _t('someKey');
   String get proactiveEmptyTitle => _t('proactiveEmptyTitle');
   String get scanFallbackWarning => _t('scanFallbackWarning');
-  String get dart => _t('dart');
 
   String get statementFallbackAction => _t('statementFallbackAction');
   String get aiSuggestionLabel => _t('aiSuggestionLabel');
