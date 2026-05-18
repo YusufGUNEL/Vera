@@ -247,6 +247,18 @@ const Map<String, String> _enStrings = {
     'loginFooter':
         'If Firebase is not configured, sign-in will fail. Check your .env.',
     'loginDemoHint': 'Quick try with the demo account: email "{email}", password "{password}".',
+    'umaVoiceStart': 'Ask by voice',
+    'umaVoiceStop': 'Stop listening',
+    'umaVoiceListening': 'Listening...',
+    'umaVoicePermissionDenied':
+        'Microphone permission required. Enable it for Vera in system settings.',
+    'umaVoiceUnavailable':
+        'Speech recognition is not available on this device.',
+    'umaToolGoalCreated': 'Done. Created a {target} TL goal for you.',
+    'umaToolBillAdded':
+        'Added the {name} bill, due in {days} days.',
+    'umaToolExpenseAdded':
+        'Logged {name} ({amount} TL) as an expense.',
     'umaSuggestionPay': 'Pay my credit card',
     'umaSuggestionSubs': 'Show my subscriptions',
     'umaSuggestionAnalyze': 'Analyze my spending',

@@ -54,7 +54,7 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 90 saniyelik sahne senaryosu |
 | [docs/SETUP.md](docs/SETUP.md) | Geliştirici ortamı ve build rehberi |
 | [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) | Firebase bağlantı durumu, Storage kurulum adımları |
-| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Sürüm geçmişi |
+| [docs/HACKATHON_NOTLARI.md](docs/HACKATHON_NOTLARI.md) | Hackathon'26 kapsama analizi ve önem sırasına göre yapılacaklar |
 | [docs/YAPILACAKLAR.md](docs/YAPILACAKLAR.md) | Demo öncesi yapılacaklar — adım adım rehber (arkadaşa atılabilir) |
 
 ## Stack

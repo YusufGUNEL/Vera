@@ -377,6 +377,20 @@ class AppStrings {
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
   String get umaStatusOnline => _t('umaStatusOnline');
+  String get umaVoiceStart => _t('umaVoiceStart');
+  String get umaVoiceStop => _t('umaVoiceStop');
+  String get umaVoiceListening => _t('umaVoiceListening');
+  String get umaVoicePermissionDenied => _t('umaVoicePermissionDenied');
+  String get umaVoiceUnavailable => _t('umaVoiceUnavailable');
+  String umaToolGoalCreated(String target) =>
+      _t('umaToolGoalCreated').replaceAll('{target}', target);
+  String umaToolBillAdded(String name, int days) => _t('umaToolBillAdded')
+      .replaceAll('{name}', name)
+      .replaceAll('{days}', '$days');
+  String umaToolExpenseAdded(String name, String amount) =>
+      _t('umaToolExpenseAdded')
+          .replaceAll('{name}', name)
+          .replaceAll('{amount}', amount);
   String get umaSuggestionBuyGold => _t('umaSuggestionBuyGold');
   String get umaSuggestionMoveSavings => _t('umaSuggestionMoveSavings');
   String get umaActionPolicy => _t('umaActionPolicy');

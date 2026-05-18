@@ -157,6 +157,18 @@ const Map<String, String> _ruStrings = {
     'passwordField': 'Пароль',
     'loginDemoHint':
         'Быстрый вход в демо-аккаунт: e-mail «{email}», пароль «{password}».',
+    'umaVoiceStart': 'Спросить голосом',
+    'umaVoiceStop': 'Остановить запись',
+    'umaVoiceListening': 'Слушаю...',
+    'umaVoicePermissionDenied':
+        'Нужен доступ к микрофону. Разрешите для Vera в настройках устройства.',
+    'umaVoiceUnavailable':
+        'Распознавание речи недоступно на этом устройстве.',
+    'umaToolGoalCreated': 'Готово. Создана цель на {target} TL.',
+    'umaToolBillAdded':
+        'Добавлен счёт {name}, к оплате через {days} дн.',
+    'umaToolExpenseAdded':
+        'Расход {name} ({amount} TL) записан.',
     'umaSuggestionPay': 'Оплатить мою карту',
     'umaSuggestionSubs': 'Показать подписки',
     'umaSuggestionAnalyze': 'Анализировать траты',

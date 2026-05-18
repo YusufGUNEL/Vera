@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../../../core/services/voice_input_service.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_audit_event.dart';
@@ -169,6 +170,11 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
               controller: _inputController,
               onSubmit: _send,
               busy: state.thinking,
+              onVoiceResult: (recognized) {
+                final trimmed = recognized.trim();
+                if (trimmed.isEmpty) return;
+                _send(trimmed);
+              },
             ),
           ],
         ),
@@ -532,20 +538,54 @@ class _SuggestionStrip extends StatelessWidget {
   }
 }
 
-class _Input extends StatelessWidget {
+class _Input extends ConsumerWidget {
   const _Input({
     required this.controller,
     required this.onSubmit,
     required this.busy,
+    required this.onVoiceResult,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onSubmit;
   final bool busy;
+  final ValueChanged<String> onVoiceResult;
+
+  void _toggleVoice(BuildContext context, WidgetRef ref, VoiceState voice) {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+
+    if (voice.status == VoiceStatus.listening) {
+      ref.read(voiceInputControllerProvider.notifier).stop();
+      return;
+    }
+    if (voice.status == VoiceStatus.unavailable) {
+      messenger?.showSnackBar(
+        SnackBar(content: Text(l10n.umaVoiceUnavailable)),
+      );
+      return;
+    }
+    if (voice.status == VoiceStatus.permissionDenied) {
+      messenger?.showSnackBar(
+        SnackBar(content: Text(l10n.umaVoicePermissionDenied)),
+      );
+      return;
+    }
+    ref.read(voiceInputControllerProvider.notifier).start(
+          onFinalResult: onVoiceResult,
+        );
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final l10n = context.l10n;
+    final voice = ref.watch(voiceInputControllerProvider);
+    final listening = voice.status == VoiceStatus.listening;
+    final hintText = listening
+        ? l10n.umaVoiceListening
+        : (busy ? l10n.umaThinking : l10n.umaAskHint);
+
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.only(bottom: 8),
@@ -563,20 +603,41 @@ class _Input extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 6),
+              Tooltip(
+                message:
+                    listening ? l10n.umaVoiceStop : l10n.umaVoiceStart,
+                child: GestureDetector(
+                  onTap: busy ? null : () => _toggleVoice(context, ref, voice),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: listening
+                          ? t.red.withValues(alpha: 0.14)
+                          : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      listening ? Icons.stop_circle_outlined : Icons.mic_none,
+                      size: 20,
+                      color: listening ? t.red : t.uma,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
               Expanded(
                 child: TextField(
                   controller: controller,
-                  enabled: !busy,
+                  enabled: !busy && !listening,
                   textInputAction: TextInputAction.send,
                   onSubmitted: onSubmit,
                   style: TextStyle(fontSize: 15, color: t.ink),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
-                    hintText: busy
-                        ? context.l10n.umaThinking
-                        : context.l10n.umaAskHint,
+                    hintText: hintText,
                     hintStyle: TextStyle(color: t.muted, fontSize: 15),
                   ),
                 ),

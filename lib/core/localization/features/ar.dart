@@ -156,6 +156,18 @@ const Map<String, String> _arStrings = {
     'passwordField': 'كلمة المرور',
     'loginDemoHint':
         'تجربة سريعة بالحساب التجريبي: البريد "{email}"، كلمة المرور "{password}".',
+    'umaVoiceStart': 'اسأل بصوتك',
+    'umaVoiceStop': 'إيقاف الاستماع',
+    'umaVoiceListening': 'أستمع إليك...',
+    'umaVoicePermissionDenied':
+        'إذن الميكروفون مطلوب. فعّله لتطبيق Vera من إعدادات النظام.',
+    'umaVoiceUnavailable':
+        'التعرف على الصوت غير متاح على هذا الجهاز.',
+    'umaToolGoalCreated': 'تم. أنشأت هدفاً بقيمة {target} ليرة.',
+    'umaToolBillAdded':
+        'أضفت فاتورة {name}، استحقاقها بعد {days} يوماً.',
+    'umaToolExpenseAdded':
+        'سجّلت {name} ({amount} ليرة) كمصروف.',
     'umaSuggestionPay': 'ادفع بطاقتي الائتمانية',
     'umaSuggestionSubs': 'عرض اشتراكاتي',
     'umaSuggestionAnalyze': 'حلّل مصروفاتي',

@@ -247,6 +247,18 @@ const Map<String, String> _trStrings = {
     'loginFooter':
         'Firebase yapılandırılmadıysa giriş başarısız olur. .env\'i kontrol et.',
     'loginDemoHint': 'Hızlı deneme için demo hesabı: e-posta "{email}", şifre "{password}".',
+    'umaVoiceStart': 'Sesle sor',
+    'umaVoiceStop': 'Dinlemeyi durdur',
+    'umaVoiceListening': 'Dinliyorum...',
+    'umaVoicePermissionDenied':
+        'Mikrofon izni gerekli. Cihaz ayarlarından Vera için mikrofonu aç.',
+    'umaVoiceUnavailable':
+        'Bu cihazda ses tanıma kullanılabilir değil.',
+    'umaToolGoalCreated': 'Tamam, {target} TL\'lik hedefi oluşturdum.',
+    'umaToolBillAdded':
+        '{name} faturasını {days} gün sonrası için ekledim.',
+    'umaToolExpenseAdded':
+        '{name} ({amount} TL) işlemini kaydettim.',
     'umaSuggestionPay': 'Kredi kartımı öde',
     'umaSuggestionSubs': 'Aboneliklerimi göster',
     'umaSuggestionAnalyze': 'Harcamalarımı analiz et',

@@ -18,6 +18,7 @@ import '../domain/uma_message.dart';
 import 'firebase_uma_audit_store.dart';
 import 'firebase_uma_feedback_store.dart';
 import 'intent_router.dart';
+import 'uma_tools.dart';
 
 class UmaRepository {
   UmaRepository(
@@ -152,12 +153,48 @@ class UmaRepository {
     }
 
     try {
-      final reply = await _gemini.generateText(await buildPrompt(userText));
+      // Agent mode: Gemini can choose to call one of Uma's tools (create
+      // goal, add bill, log expense) instead of just replying with text.
+      // If a tool fires, prefer its localized confirmation as the reply so
+      // the user sees concrete acknowledgement, not just the model's prose.
+      final lastOutcome = <UmaToolOutcome>[];
+      final result = await _gemini.runAgent(
+        prompt: await buildPrompt(userText),
+        tools: umaTools,
+        onCall: (name, args) async {
+          final res = await executeUmaTool(
+            name: name,
+            args: args,
+            ref: _ref,
+            l10n: l10n,
+          );
+          lastOutcome.add(res.outcome);
+          return res.response;
+        },
+      );
+
+      final success = lastOutcome.firstWhere(
+        (o) => o.success,
+        orElse: () => const UmaToolOutcome(
+          toolName: '',
+          success: false,
+          confirmation: '',
+        ),
+      );
+      final replyText = success.success && success.confirmation.isNotEmpty
+          ? success.confirmation
+          : (result.text.trim().isEmpty
+              ? l10n.umaReplyFallback
+              : result.text.trim());
+
       await _analytics.logUmaIntent(
-        intent: intent.type.name,
+        intent: success.success ? success.toolName : intent.type.name,
         resolvedByGemini: true,
       );
-      return _reply(intent: intent.type.name, text: reply.trim());
+      return _reply(
+        intent: success.success ? success.toolName : intent.type.name,
+        text: replyText,
+      );
     } catch (_) {
       return _reply(intent: intent.type.name, text: l10n.umaReplyFallback);
     }
@@ -236,8 +273,17 @@ user wrote in. Use TL (Turkish Lira) when amounts are relevant.
 Ground every answer in USER_CONTEXT below. If the answer truly is not
 derivable from that context, say so politely and ask what to import / add.
 Never invent specific transaction history or prices the user hasn't entered.
-Never claim Vera will move money. If the user wants an action, say you will
-open the right bank app and that they'll confirm there.
+Never claim Vera will move money. If the user wants Vera to move money,
+explain that you will open the right bank app and they will confirm there.
+
+You also have local TOOLS for in-app changes (these do NOT touch any bank):
+- create_savings_goal: when the user asks to set a savings goal
+- add_upcoming_bill: when the user asks to remember/track a payment due soon
+- add_expense: when the user describes an expense they just made and asks
+  Uma to log it
+
+Use a tool only when the user clearly asks for that action. Ask one short
+clarifying question if a required argument is missing instead of guessing.
 
 USER_CONTEXT:
 $userContext

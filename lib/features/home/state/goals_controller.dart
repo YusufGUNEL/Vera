@@ -19,6 +19,22 @@ class GoalsController extends StateNotifier<FinancialGoal> {
     await _store.save(state);
   }
 
+  /// Replaces the current goal entirely. Used by Uma's function-calling tool
+  /// when the user asks to create a savings goal from scratch.
+  Future<void> setGoal({
+    required double target,
+    double saved = 0,
+    double monthlyContribution = 0,
+  }) async {
+    final next = FinancialGoal(
+      target: target,
+      saved: saved,
+      monthlyContribution: monthlyContribution,
+    );
+    await _store.save(next);
+    state = next;
+  }
+
   Future<void> reset() async {
     await _store.clear();
     state = FinancialGoal.empty;

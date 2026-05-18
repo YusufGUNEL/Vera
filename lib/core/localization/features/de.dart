@@ -157,6 +157,18 @@ const Map<String, String> _deStrings = {
     'passwordField': 'Passwort',
     'loginDemoHint':
         'Schnelltest mit dem Demo-Konto: E-Mail „{email}", Passwort „{password}".',
+    'umaVoiceStart': 'Per Sprache fragen',
+    'umaVoiceStop': 'Aufnahme stoppen',
+    'umaVoiceListening': 'Ich höre zu...',
+    'umaVoicePermissionDenied':
+        'Mikrofonberechtigung nötig. In den Systemeinstellungen für Vera erlauben.',
+    'umaVoiceUnavailable':
+        'Spracherkennung ist auf diesem Gerät nicht verfügbar.',
+    'umaToolGoalCreated': 'Erledigt. Ein Ziel über {target} TL wurde erstellt.',
+    'umaToolBillAdded':
+        'Rechnung {name} hinzugefügt, fällig in {days} Tagen.',
+    'umaToolExpenseAdded':
+        'Ausgabe {name} ({amount} TL) erfasst.',
     'umaSuggestionPay': 'Kreditkarte bezahlen',
     'umaSuggestionSubs': 'Abos anzeigen',
     'umaSuggestionAnalyze': 'Ausgaben analysieren',
