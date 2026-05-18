@@ -84,6 +84,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final firebase = ref.read(firebaseBootstrapProvider);
+
+    if (!firebase.ready) {
+      messenger?.showSnackBar(
+        SnackBar(content: Text(l10n.googleSignInUnavailable)),
+      );
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+
+    try {
+      await ref.read(authControllerProvider.notifier).signInWithGoogle();
+    } on FirebaseAuthException catch (error) {
+      final message = error.message?.trim();
+      setState(() {
+        _error = message == null || message.isEmpty
+            ? l10n.loginFirebaseError(error.code)
+            : message;
+      });
+    } catch (error) {
+      setState(() => _error = '$error');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -134,8 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 6),
                   Text(
                     l10n.loginSubtitle,
-                    style:
-                        TextStyle(fontSize: 14, color: t.muted, height: 1.5),
+                    style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
                   ),
                   const SizedBox(height: 24),
                   _Field(
@@ -173,6 +205,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           : Text(l10n.loginContinueEmail),
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _busy ? null : _signInWithGoogle,
+                      icon: Icon(Icons.g_mobiledata_rounded,
+                          color: t.brand, size: 22),
+                      label: Text(l10n.continueWithGoogle),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: t.brand,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: t.line),
+                      ),
+                    ),
+                  ),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -193,8 +240,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     decoration: BoxDecoration(
                       color: t.uma.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
-                      border:
-                          Border.all(color: t.uma.withValues(alpha: 0.18)),
+                      border: Border.all(color: t.uma.withValues(alpha: 0.18)),
                     ),
                     child: Row(
                       children: [
@@ -218,8 +264,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       Expanded(child: Divider(color: t.line, thickness: 1)),
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           l10n.dividerOr,
                           style: TextStyle(
@@ -238,9 +283,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton.icon(
-                      onPressed: _busy
-                          ? null
-                          : () => context.go(Routes.signup),
+                      onPressed: _busy ? null : () => context.go(Routes.signup),
                       icon: Icon(
                         Icons.person_add_alt_1_outlined,
                         size: 18,

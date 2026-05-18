@@ -76,7 +76,8 @@ class AuthController extends StateNotifier<AuthSession> {
     await _analytics.logLogin(method: 'firebase_email');
     await _analytics.setUserId(session.userId);
     if (!kDebugMode) {
-      await FirebaseCrashlytics.instance.setUserIdentifier(session.userId ?? '');
+      await FirebaseCrashlytics.instance
+          .setUserIdentifier(session.userId ?? '');
     }
     state = session;
   }
@@ -99,13 +100,40 @@ class AuthController extends StateNotifier<AuthSession> {
     await _analytics.logSignUp(method: 'firebase_email');
     await _analytics.setUserId(session.userId);
     if (!kDebugMode) {
-      await FirebaseCrashlytics.instance.setUserIdentifier(session.userId ?? '');
+      await FirebaseCrashlytics.instance
+          .setUserIdentifier(session.userId ?? '');
     }
     state = session;
   }
 
+  Future<bool> signInWithGoogle() async {
+    final session = await _firebaseAuthService.signInWithGoogle();
+    if (session == null) return false;
+    await _storage.writeSession(session);
+    await _firebaseProfileService.saveProfileShell(
+      displayName: session.displayName ?? session.email ?? 'Vera User',
+      email: session.email ?? '',
+    );
+    await _analytics.logLogin(method: 'google');
+    await _analytics.setUserId(session.userId);
+    if (!kDebugMode) {
+      await FirebaseCrashlytics.instance
+          .setUserIdentifier(session.userId ?? '');
+    }
+    state = session;
+    return true;
+  }
+
   Future<void> signOut() async {
     await _firebaseAuthService.signOut();
+    await _storage.clearSession();
+    await _clearLocalCaches();
+    await _ref.read(onboardingControllerProvider.notifier).reset();
+    state = const AuthSession(status: AuthStatus.signedOut);
+  }
+
+  Future<void> deleteAccount() async {
+    await _firebaseAuthService.deleteAccount();
     await _storage.clearSession();
     await _clearLocalCaches();
     await _ref.read(onboardingControllerProvider.notifier).reset();
@@ -123,11 +151,22 @@ class AuthController extends StateNotifier<AuthSession> {
       'home.upcoming.bills',
       'home.goal.emergency',
       'home.category.budgets',
+      'home.networth.history',
       'security.feed.cache',
       'subscriptions.cache',
       'uma.history',
       'uma.audit',
+      'uma.audit.events',
       'uma.feedback',
+      'uma.feedback.entries',
+      'profile.notifications',
+      'profile.face_id',
+      'profile.fraud_alerts',
+      'profile.ai_tone',
+      'profile.daily_briefing',
+      'profile.data_sync_mode',
+      'profile.auto_approve_limit',
+      'onboarding.completed',
     ];
     for (final k in keys) {
       await prefs.remove(k);

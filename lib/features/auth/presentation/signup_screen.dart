@@ -112,6 +112,36 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    final l10n = context.l10n;
+    final firebase = ref.read(firebaseBootstrapProvider);
+
+    if (!firebase.ready) {
+      setState(() => _error = l10n.googleSignInUnavailable);
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+
+    try {
+      await ref.read(authControllerProvider.notifier).signInWithGoogle();
+    } on FirebaseAuthException catch (error) {
+      final message = error.message?.trim();
+      setState(() {
+        _error = message == null || message.isEmpty
+            ? l10n.signupFailedTemplate(error.code)
+            : message;
+      });
+    } catch (error) {
+      setState(() => _error = '$error');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   double _strength(String password) {
     if (password.isEmpty) return 0;
     var score = 0.0;
@@ -303,8 +333,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: t.brand,
                     foregroundColor: t.brandFG,
-                    disabledBackgroundColor:
-                        t.brand.withValues(alpha: 0.5),
+                    disabledBackgroundColor: t.brand.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -329,6 +358,33 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             letterSpacing: -0.2,
                           ),
                         ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: _busy ? null : _signInWithGoogle,
+                  icon: Icon(
+                    Icons.g_mobiledata_rounded,
+                    size: 24,
+                    color: t.brand,
+                  ),
+                  label: Text(
+                    l10n.continueWithGoogle,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: t.brand,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: t.line),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 18),

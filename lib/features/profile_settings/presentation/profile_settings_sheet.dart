@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../core/localization/app_locale.dart';
 import '../../../core/localization/app_strings.dart';
@@ -220,8 +221,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     icon: Icons.email_outlined,
                     label: l10n.accountTileEmail,
                     value: auth.email ?? 'demo@vera.app',
-                    onTap: () =>
-                        _openInfo(context, _emailInfo(l10n, auth)),
+                    onTap: () => _openInfo(context, _emailInfo(l10n, auth)),
                   ),
                   _AccountTile(
                     icon: Icons.lock_outline,
@@ -236,8 +236,8 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     icon: Icons.storage_outlined,
                     label: l10n.accountTileStorage,
                     value: _syncModeLabel(context, profile.dataSyncMode),
-                    onTap: () =>
-                        _openInfo(context, _storageInfo(context, l10n, profile)),
+                    onTap: () => _openInfo(
+                        context, _storageInfo(context, l10n, profile)),
                   ),
                   _AccountTile(
                     icon: Icons.help_outline,
@@ -273,6 +273,19 @@ class ProfileSettingsSheet extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(l10n.signOut),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () =>
+                          _confirmDeleteAccount(context, ref, auth),
+                      style: TextButton.styleFrom(
+                        foregroundColor: t.red,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text(l10n.deleteAccount),
                     ),
                   ),
                 ],
@@ -343,6 +356,87 @@ class ProfileSettingsSheet extends ConsumerWidget {
     );
   }
 
+  Future<void> _confirmDeleteAccount(
+    BuildContext context,
+    WidgetRef ref,
+    AuthSession auth,
+  ) async {
+    final l10n = context.l10n;
+    final t = context.tokens;
+    final isDemo =
+        auth.userId == 'demo-user' || auth.authMethod == 'demo vault';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.deleteAccountTitle),
+        content:
+            Text(isDemo ? l10n.deleteAccountDemoBody : l10n.deleteAccountBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.deleteAccountCancel),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: t.red),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.deleteAccountConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 14),
+              Expanded(child: Text(l10n.deleteAccountProcessing)),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      await ref.read(authControllerProvider.notifier).deleteAccount();
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+        SnackBar(content: Text(l10n.deleteAccountDone)),
+      );
+      Navigator.of(context).pop();
+    } on FirebaseAuthException catch (error) {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        final message = error.code == 'requires-recent-login'
+            ? l10n.deleteAccountRecentLogin
+            : (error.message?.trim().isNotEmpty ?? false)
+                ? error.message!.trim()
+                : l10n.deleteAccountError;
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text(l10n.deleteAccountError)),
+        );
+      }
+    }
+  }
+
   AccountInfoSheet _personalInfo(AppStrings l10n, AuthSession auth) {
     return AccountInfoSheet(
       title: l10n.accountTilePersonal,
@@ -388,9 +482,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
         ),
         AccountInfoSection(
           label: l10n.infoFaceId,
-          body: profile.faceIdEnabled
-              ? l10n.infoFaceIdOn
-              : l10n.infoFaceIdOff,
+          body: profile.faceIdEnabled ? l10n.infoFaceIdOn : l10n.infoFaceIdOff,
         ),
         AccountInfoSection(
           label: l10n.infoFraudAlerts,
@@ -524,8 +616,8 @@ class _ProfileCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    context.l10n.profileAiToneBadge(
-                        _aiToneLabel(aiTone).toUpperCase()),
+                    context.l10n
+                        .profileAiToneBadge(_aiToneLabel(aiTone).toUpperCase()),
                     style: TextStyle(
                       color: t.uma,
                       fontSize: 10,
@@ -1008,8 +1100,9 @@ class _SegmentedSelector<T> extends StatelessWidget {
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          color:
-                              option.$1 == selected ? t.card : Colors.transparent,
+                          color: option.$1 == selected
+                              ? t.card
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(9),
                           boxShadow: option.$1 == selected
                               ? [

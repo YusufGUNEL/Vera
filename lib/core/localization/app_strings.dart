@@ -48,11 +48,9 @@ class AppStrings {
   String get refresh => _t('refresh');
   String get syncingDots => _t('syncingDots');
   String get firstSyncPending => _t('firstSyncPending');
-  String updatedAt(String time) =>
-      _t('updatedAt').replaceAll('{time}', time);
+  String updatedAt(String time) => _t('updatedAt').replaceAll('{time}', time);
   String get firstScanPending => _t('firstScanPending');
-  String lastScanAt(String time) =>
-      _t('lastScanAt').replaceAll('{time}', time);
+  String lastScanAt(String time) => _t('lastScanAt').replaceAll('{time}', time);
   String get recentTransactions => _t('recentTransactions');
   String itemsCount(int n) => _t('itemsCount').replaceAll('{n}', '$n');
   String get itemsVisible => _t('itemsVisible');
@@ -65,8 +63,7 @@ class AppStrings {
   String get addBankColor => _t('addBankColor');
   String get addBankSave => _t('addBankSave');
   String get addBankNameRequired => _t('addBankNameRequired');
-  String bankAdded(String name) =>
-      _t('bankAdded').replaceAll('{name}', name);
+  String bankAdded(String name) => _t('bankAdded').replaceAll('{name}', name);
   String get umaInsight => _t('umaInsight');
   String get spent => _t('spent');
   String get incoming => _t('incoming');
@@ -76,8 +73,7 @@ class AppStrings {
   String get creditStatIncome => _t('creditStatIncome');
   String get creditStatDti => _t('creditStatDti');
   String get creditStatTerm => _t('creditStatTerm');
-  String creditTermMo(int n) =>
-      _t('creditTermMo').replaceAll('{n}', '$n');
+  String creditTermMo(int n) => _t('creditTermMo').replaceAll('{n}', '$n');
   String creditTermMonths(int n) =>
       _t('creditTermMonths').replaceAll('{n}', '$n');
   String get creditRunSimulation => _t('creditRunSimulation');
@@ -216,6 +212,7 @@ class AppStrings {
   String get vibeBold => _t('vibeBold');
   String get language => _t('language');
   String get signOut => _t('signOut');
+  String get deleteAccount => _t('deleteAccount');
   String get umaTone => _t('umaTone');
   String get toneConcise => _t('toneConcise');
   String get toneCoach => _t('toneCoach');
@@ -297,10 +294,11 @@ class AppStrings {
   String get loginSubtitle => _t('loginSubtitle');
   String get loginEmailHint => _t('loginEmailHint');
   String get loginFooter => _t('loginFooter');
-  String loginDemoHint(String email, String password) =>
-      _t('loginDemoHint')
-          .replaceAll('{email}', email)
-          .replaceAll('{password}', password);
+  String get continueWithGoogle => _t('continueWithGoogle');
+  String get googleSignInUnavailable => _t('googleSignInUnavailable');
+  String loginDemoHint(String email, String password) => _t('loginDemoHint')
+      .replaceAll('{email}', email)
+      .replaceAll('{password}', password);
 
   // ---- UMA chat ----
   String get umaSuggestionPay => _t('umaSuggestionPay');
@@ -321,6 +319,18 @@ class AppStrings {
   String get accountTileSecurity => _t('accountTileSecurity');
   String get accountTileStorage => _t('accountTileStorage');
   String get accountTileHelp => _t('accountTileHelp');
+  String get deleteAccountTile => _t('deleteAccountTile');
+  String get deleteAccountTileValue => _t('deleteAccountTileValue');
+  String get deleteAccountDemoTileValue => _t('deleteAccountDemoTileValue');
+  String get deleteAccountTitle => _t('deleteAccountTitle');
+  String get deleteAccountBody => _t('deleteAccountBody');
+  String get deleteAccountDemoBody => _t('deleteAccountDemoBody');
+  String get deleteAccountConfirm => _t('deleteAccountConfirm');
+  String get deleteAccountCancel => _t('deleteAccountCancel');
+  String get deleteAccountProcessing => _t('deleteAccountProcessing');
+  String get deleteAccountDone => _t('deleteAccountDone');
+  String get deleteAccountError => _t('deleteAccountError');
+  String get deleteAccountRecentLogin => _t('deleteAccountRecentLogin');
   String get infoDisplayName => _t('infoDisplayName');
   String get infoMember => _t('infoMember');
   String get infoMemberDescription => _t('infoMemberDescription');
@@ -358,9 +368,10 @@ class AppStrings {
       _t('umaReplyPayCard').replaceAll('{bank}', bank);
   String umaReplyMoveSavings(int pct) =>
       _t('umaReplyMoveSavings').replaceAll('{pct}', '$pct');
-  String umaReplySubscriptions(int n, String total) => _t('umaReplySubscriptions')
-      .replaceAll('{n}', '$n')
-      .replaceAll('{total}', total);
+  String umaReplySubscriptions(int n, String total) =>
+      _t('umaReplySubscriptions')
+          .replaceAll('{n}', '$n')
+          .replaceAll('{total}', total);
   String umaReplySubscriptionsEmpty() => _t('umaReplySubscriptionsEmpty');
   String umaReplyAnalyze(String top, String topAmount, String spending) =>
       _t('umaReplyAnalyze')
@@ -440,8 +451,7 @@ class AppStrings {
   String get goalEditSaved => _t('goalEditSaved');
   String get goalEditSave => _t('goalEditSave');
   String get goalEditFooter => _t('goalEditFooter');
-  String goalEtaMonths(int n) =>
-      _t('goalEtaMonths').replaceAll('{n}', '$n');
+  String goalEtaMonths(int n) => _t('goalEtaMonths').replaceAll('{n}', '$n');
   String get goalEtaReached => _t('goalEtaReached');
 
   // ---- Bank actions / delete ----
@@ -480,8 +490,7 @@ class AppStrings {
 
   // ---- Notification center ----
   String get notifTitle => _t('notifTitle');
-  String notifSubtitle(int n) =>
-      _t('notifSubtitle').replaceAll('{n}', '$n');
+  String notifSubtitle(int n) => _t('notifSubtitle').replaceAll('{n}', '$n');
   String get notifEmpty => _t('notifEmpty');
   String get notifBlockedDefault => _t('notifBlockedDefault');
   String notifPriceIncreaseTitle(String name) =>
@@ -503,10 +512,9 @@ class AppStrings {
   String get proactiveBadge => _t('proactiveBadge');
   String proactiveBillTitle(String name) =>
       _t('proactiveBillTitle').replaceAll('{name}', name);
-  String proactiveBillBody(String amount, int days) =>
-      _t('proactiveBillBody')
-          .replaceAll('{amount}', amount)
-          .replaceAll('{days}', '$days');
+  String proactiveBillBody(String amount, int days) => _t('proactiveBillBody')
+      .replaceAll('{amount}', amount)
+      .replaceAll('{days}', '$days');
   String get proactiveBillCta => _t('proactiveBillCta');
   String proactiveBillPrompt(String name) =>
       _t('proactiveBillPrompt').replaceAll('{name}', name);
@@ -634,32 +642,33 @@ class AppStrings {
   // ---- Recovered Subscriptions & Wealth ----
   String subscriptionsAttentionCount(int n) =>
       _t('subscriptionsAttentionCount').replaceAll('{n}', '$n');
-      
+
   String get subsAlertPriceMetric => _t('subsAlertPriceMetric');
   String get subsAlertUnusedTitle => _t('subsAlertUnusedTitle');
   String get subsAlertUnusedMessageNone => _t('subsAlertUnusedMessageNone');
-  
+
   String subsAlertUnusedMessageSome(int n) =>
       _t('subsAlertUnusedMessageSome').replaceAll('{n}', '$n');
-      
+
   String get subsAlertUnusedMetric => _t('subsAlertUnusedMetric');
   String get subsInsightEmpty => _t('subsInsightEmpty');
   String get subsInsightHealthy => _t('subsInsightHealthy');
-  
+
   String subsInsightNeedsAttention(int n, String amount) =>
       _t('subsInsightNeedsAttention')
           .replaceAll('{n}', '$n')
           .replaceAll('{amount}', amount);
-          
+
   String get noSubscriptionsDetectedTitle => _t('noSubscriptionsDetectedTitle');
-  String get noSubscriptionsForFilterTitle => _t('noSubscriptionsForFilterTitle');
+  String get noSubscriptionsForFilterTitle =>
+      _t('noSubscriptionsForFilterTitle');
   String get noSubscriptionsDetectedBody => _t('noSubscriptionsDetectedBody');
   String get noSubscriptionsForFilterBody => _t('noSubscriptionsForFilterBody');
   String get subsStatusActive => _t('subsStatusActive');
   String get subsStatusPriceUp => _t('subsStatusPriceUp');
   String get subsStatusUnused => _t('subsStatusUnused');
   String get subsStatusRenewsSoon => _t('subsStatusRenewsSoon');
-  
+
   String get categoryEntertainment => _t('categoryEntertainment');
   String get categoryMusic => _t('categoryMusic');
   String get categoryVideo => _t('categoryVideo');
@@ -667,7 +676,7 @@ class AppStrings {
   String get categoryDeveloper => _t('categoryDeveloper');
   String get categoryAi => _t('categoryAi');
   String get categorySubscription => _t('categorySubscription');
-  
+
   String get removeHolding => _t('removeHolding');
   String get addHoldingTitle => _t('addHoldingTitle');
   String get addHoldingSubtitle => _t('addHoldingSubtitle');
@@ -678,7 +687,7 @@ class AppStrings {
   String get wealthActionReversed => _t('wealthActionReversed');
   String get wealthApprovalAuto => _t('wealthApprovalAuto');
   String get wealthApprovalHybrid => _t('wealthApprovalHybrid');
-  
+
   String get fieldLabelOptional => _t('fieldLabelOptional');
   String get addHoldingHint => _t('addHoldingHint');
   String get holdingValueLabel => _t('holdingValueLabel');
@@ -696,7 +705,8 @@ class AppStrings {
   String get addManualTxnNameHint => _t('addManualTxnNameHint');
   String get noTransactionsBody => _t('noTransactionsBody');
   String get umaInsightNoData => _t('umaInsightNoData');
-  String subsSeenInRecentTransactions(int n) => _t('subsSeenInRecentTransactions').replaceAll('{n}', '$n');
+  String subsSeenInRecentTransactions(int n) =>
+      _t('subsSeenInRecentTransactions').replaceAll('{n}', '$n');
   String get statementFallbackWarning => _t('statementFallbackWarning');
   String get actionDelete => _t('actionDelete');
   String get proactiveHealthyCta => _t('proactiveHealthyCta');
@@ -716,9 +726,11 @@ class AppStrings {
   String get goalCalculate => _t('goalCalculate');
   String get proactiveEmptyBody => _t('proactiveEmptyBody');
   String get homeFirstStepsBody => _t('homeFirstStepsBody');
-  String goalMonthsOption(int n) => _t('goalMonthsOption').replaceAll('{n}', '$n');
+  String goalMonthsOption(int n) =>
+      _t('goalMonthsOption').replaceAll('{n}', '$n');
   String get subsAlertSavingsTitle => _t('subsAlertSavingsTitle');
-  String goalPresetEmergency(String amount) => _t('goalPresetEmergency').replaceAll('{amount}', amount);
+  String goalPresetEmergency(String amount) =>
+      _t('goalPresetEmergency').replaceAll('{amount}', amount);
   String get fieldDescription => _t('fieldDescription');
   String get subsKnownVendorLabel => _t('subsKnownVendorLabel');
   String get categoryFuel => _t('categoryFuel');
@@ -727,9 +739,11 @@ class AppStrings {
 
   String get statementFallbackAction => _t('statementFallbackAction');
   String get aiSuggestionLabel => _t('aiSuggestionLabel');
-  String get subsAlertSavingsMessageActive => _t('subsAlertSavingsMessageActive');
+  String get subsAlertSavingsMessageActive =>
+      _t('subsAlertSavingsMessageActive');
   String get billKindOther => _t('billKindOther');
-  String goalPresetCar(String amount) => _t('goalPresetCar').replaceAll('{amount}', amount);
+  String goalPresetCar(String amount) =>
+      _t('goalPresetCar').replaceAll('{amount}', amount);
   String get subsAlertPriceTitle => _t('subsAlertPriceTitle');
   String get noTransactionsTitle => _t('noTransactionsTitle');
   String get fieldDate => _t('fieldDate');
@@ -749,7 +763,8 @@ class AppStrings {
   String get editBillTitle => _t('editBillTitle');
   String get billKindInternet => _t('billKindInternet');
   String get addBillTitle => _t('addBillTitle');
-  String goalPresetVacation(String amount) => _t('goalPresetVacation').replaceAll('{amount}', amount);
+  String goalPresetVacation(String amount) =>
+      _t('goalPresetVacation').replaceAll('{amount}', amount);
   String get onbBlankCanvasTitle => _t('onbBlankCanvasTitle');
   String get dueDateLabel => _t('dueDateLabel');
   String get onbPalettePreviewTitle => _t('onbPalettePreviewTitle');
@@ -764,7 +779,9 @@ class AppStrings {
   String get homeFirstStepsTitle => _t('homeFirstStepsTitle');
   String get goalEmptyCta => _t('goalEmptyCta');
   String get connectedAccountsEmptyTitle => _t('connectedAccountsEmptyTitle');
-  String goalAdviceSummary(String amount, int months) => _t('goalAdviceSummary').replaceAll('{amount}', amount).replaceAll('{months}', '$months');
+  String goalAdviceSummary(String amount, int months) => _t('goalAdviceSummary')
+      .replaceAll('{amount}', amount)
+      .replaceAll('{months}', '$months');
   String get umaInsightDeepenCta => _t('umaInsightDeepenCta');
   String get addBillCta => _t('addBillCta');
   String get subsAlertPriceMessageSome => _t('subsAlertPriceMessageSome');
@@ -779,8 +796,13 @@ class AppStrings {
   String get acceptSuggestion => _t('acceptSuggestion');
   String get homeFirstStepsHint => _t('homeFirstStepsHint');
   String get subsAlertSavingsMessageEmpty => _t('subsAlertSavingsMessageEmpty');
-  String umaInsightTopCategory(String category, String amount, int share, String total) => _t('umaInsightTopCategory').replaceAll('{category}', category).replaceAll('{amount}', amount).replaceAll('{share}', '$share').replaceAll('{total}', total);
-
+  String umaInsightTopCategory(
+          String category, String amount, int share, String total) =>
+      _t('umaInsightTopCategory')
+          .replaceAll('{category}', category)
+          .replaceAll('{amount}', amount)
+          .replaceAll('{share}', '$share')
+          .replaceAll('{total}', total);
 }
 
 // ---- Translations (6 locales) ----
@@ -792,7 +814,6 @@ const Map<AppLocale, Map<String, String>> _strings = {
   AppLocale.ru: _ruStrings,
   AppLocale.zh: _zhStrings,
 };
-
 
 /// InheritedWidget for ergonomic `context.l10n.someKey` access.
 class StringsProvider extends InheritedWidget {

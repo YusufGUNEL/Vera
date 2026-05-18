@@ -92,6 +92,20 @@ flutter build web --release
 # Çıktı: build/web/  -> herhangi bir static host'a koy
 ```
 
+> Bu repo dinamik `IconData` kullandığı için production web build'i şu komutla
+> alınmalı:
+>
+> ```bash
+> flutter build web --release --no-tree-shake-icons
+> ```
+>
+> Vercel ile en hızlı yol:
+>
+> ```bash
+> flutter build web --release --no-tree-shake-icons
+> vercel --prod build/web
+> ```
+
 ### App bundle (Play Store)
 
 ```bash
