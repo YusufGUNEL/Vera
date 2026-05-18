@@ -124,7 +124,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   String _strengthLabel(double value, AppStrings l10n) {
-    if (value == 0) return ' ';
     if (value < 0.4) return l10n.signupStrengthWeak;
     if (value < 0.7) return l10n.signupStrengthMedium;
     return l10n.signupStrengthStrong;
@@ -135,7 +134,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final t = context.tokens;
     final l10n = context.l10n;
     final firebase = ref.watch(firebaseBootstrapProvider);
-    final strength = _strength(_passwordController.text);
+    final password = _passwordController.text;
+    final strength = _strength(password);
     final strengthColor = strength < 0.4
         ? t.red
         : strength < 0.7
@@ -147,9 +147,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       appBar: AppBar(
         backgroundColor: t.bg,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: Icon(Icons.arrow_back, color: t.ink),
+          tooltip: l10n.signupSignIn,
         ),
       ),
       body: SafeArea(
@@ -159,6 +161,25 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Brand glyph — mirrors the login screen for continuity.
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.4, -0.4),
+                    colors: [t.umaLight, t.uma],
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 18),
               Text(
                 l10n.signupTitle,
                 style: TextStyle(
@@ -175,12 +196,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     : l10n.signupSubtitleLocal,
                 style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 26),
+
+              // ── Form fields ──────────────────────────────────────────
               AuthField(
                 label: l10n.signupFieldFullName,
                 controller: _nameController,
                 prefixIcon: Icons.person_outline,
                 autofillHints: const [AutofillHints.name],
+                textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 14),
               AuthField(
@@ -189,6 +213,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: Icons.mail_outline,
                 autofillHints: const [AutofillHints.email],
+                textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 14),
               AuthField(
@@ -197,6 +222,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
                 autofillHints: const [AutofillHints.newPassword],
+                textInputAction: TextInputAction.next,
                 suffix: IconButton(
                   onPressed: () => setState(() => _obscure = !_obscure),
                   icon: Icon(
@@ -208,30 +234,42 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: strength,
-                        minHeight: 4,
-                        backgroundColor: t.bgSoft,
-                        valueColor: AlwaysStoppedAnimation(strengthColor),
+              // Strength meter — only when the user has typed something.
+              AnimatedSize(
+                duration: const Duration(milliseconds: 160),
+                curve: Curves.easeOut,
+                alignment: Alignment.topCenter,
+                child: password.isEmpty
+                    ? const SizedBox(width: double.infinity, height: 0)
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(999),
+                                child: LinearProgressIndicator(
+                                  value: strength,
+                                  minHeight: 5,
+                                  backgroundColor: t.bgSoft,
+                                  valueColor:
+                                      AlwaysStoppedAnimation(strengthColor),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              _strengthLabel(strength, l10n),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: strengthColor,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    _strengthLabel(strength, l10n),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: strengthColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
               ),
               const SizedBox(height: 14),
               AuthField(
@@ -239,77 +277,34 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 controller: _confirmController,
                 obscure: _obscure,
                 prefixIcon: Icons.lock_outline,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _busy ? null : _signUp(),
               ),
-              const SizedBox(height: 14),
-              GestureDetector(
-                onTap: () => setState(() => _accepted = !_accepted),
-                behavior: HitTestBehavior.opaque,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 22,
-                      height: 22,
-                      margin: const EdgeInsets.only(top: 1),
-                      decoration: BoxDecoration(
-                        color: _accepted ? t.brand : Colors.transparent,
-                        border: Border.all(
-                          color: _accepted ? t.brand : t.line,
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: _accepted
-                          ? Icon(Icons.check, color: t.brandFG, size: 16)
-                          : null,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l10n.signupTerms,
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          color: t.ink2,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 18),
+
+              // ── Terms ────────────────────────────────────────────────
+              _TermsRow(
+                accepted: _accepted,
+                text: l10n.signupTerms,
+                onToggle: () => setState(() => _accepted = !_accepted),
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: t.red.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: t.red.withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.error_outline, size: 16, color: t.red),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: TextStyle(fontSize: 12, color: t.red),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _ErrorBanner(message: _error!),
               ],
-              const SizedBox(height: 18),
+              const SizedBox(height: 22),
+
+              // ── Primary CTA ──────────────────────────────────────────
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _busy ? null : _signUp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: t.brand,
                     foregroundColor: t.brandFG,
+                    disabledBackgroundColor:
+                        t.brand.withValues(alpha: 0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -317,10 +312,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   child: _busy
                       ? SizedBox(
-                          width: 18,
-                          height: 18,
+                          width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: 2.2,
                             color: t.brandFG,
                           ),
                         )
@@ -329,39 +324,139 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               ? l10n.signupCtaCreate
                               : l10n.signupCtaContinueLocal,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 15.5,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: -0.2,
                           ),
                         ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
+
+              // ── "Already have an account? Sign in" ───────────────────
               Center(
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text(
-                      l10n.signupAlreadyHaveAccount,
-                      style: TextStyle(fontSize: 13.5, color: t.muted),
+                child: TextButton(
+                  onPressed: () => context.pop(),
+                  style: TextButton.styleFrom(
+                    foregroundColor: t.brand,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
                     ),
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      behavior: HitTestBehavior.opaque,
-                      child: Text(
-                        l10n.signupSignIn,
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: t.brand,
-                        ),
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: t.muted,
+                        height: 1.4,
                       ),
+                      children: [
+                        TextSpan(text: l10n.signupAlreadyHaveAccount),
+                        TextSpan(
+                          text: l10n.signupSignIn,
+                          style: TextStyle(
+                            color: t.brand,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TermsRow extends StatelessWidget {
+  const _TermsRow({
+    required this.accepted,
+    required this.text,
+    required this.onToggle,
+  });
+
+  final bool accepted;
+  final String text;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return InkWell(
+      onTap: onToggle,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              width: 22,
+              height: 22,
+              margin: const EdgeInsets.only(top: 1),
+              decoration: BoxDecoration(
+                color: accepted ? t.brand : Colors.transparent,
+                border: Border.all(
+                  color: accepted ? t.brand : t.line,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(7),
+              ),
+              alignment: Alignment.center,
+              child: accepted
+                  ? Icon(Icons.check, color: t.brandFG, size: 15)
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: t.ink2,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorBanner extends StatelessWidget {
+  const _ErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: t.red.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: t.red.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, size: 16, color: t.red),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 12, color: t.red, height: 1.4),
+            ),
+          ),
+        ],
       ),
     );
   }

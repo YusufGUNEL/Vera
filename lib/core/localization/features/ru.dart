@@ -389,6 +389,7 @@ const Map<String, String> _ruStrings = {
     'loginFirebaseReadyFooter':
         'Firebase auth подключён. Демо-режим остаётся доступным для hackathon-сценариев.',
     'loginCreateAccount': 'Создать аккаунт',
+    'dividerOr': 'или',
     'signupTitle': 'Создайте аккаунт',
     'signupSubtitleFirebase':
         'Ваш профиль Vera будет синхронизироваться через Firebase.',

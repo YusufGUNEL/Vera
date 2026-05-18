@@ -569,6 +569,7 @@ const Map<String, String> _trStrings = {
     'loginFirebaseReadyFooter':
         'Firebase auth bağlı. Demo modu hackathon akışları için açık.',
     'loginCreateAccount': 'Hesap oluştur',
+    'dividerOr': 'veya',
     'signupTitle': 'Hesabını oluştur',
     'signupSubtitleFirebase':
         'Vera kimliğin ve profilin Firebase üzerinden senkronlanacak.',

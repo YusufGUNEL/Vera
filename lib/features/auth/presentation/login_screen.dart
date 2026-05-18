@@ -213,20 +213,62 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: t.line, thickness: 1)),
+                      Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          l10n.dividerOr,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: t.muted,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: t.line, thickness: 1)),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton.icon(
+                      onPressed: _busy
+                          ? null
+                          : () => context.go(Routes.signup),
+                      icon: Icon(
+                        Icons.person_add_alt_1_outlined,
+                        size: 18,
+                        color: t.brand,
+                      ),
+                      label: Text(
+                        l10n.loginCreateAccount,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: t.brand,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: t.brand, width: 1.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   Text(
                     firebase.ready
                         ? l10n.loginFirebaseReadyFooter
                         : l10n.loginFooter,
                     style:
                         TextStyle(fontSize: 11.5, color: t.muted, height: 1.45),
-                  ),
-                  const SizedBox(height: 8),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => context.go(Routes.signup),
-                      child: Text(l10n.loginCreateAccount),
-                    ),
                   ),
                   const SizedBox(height: 12),
                 ],

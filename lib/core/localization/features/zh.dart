@@ -376,6 +376,7 @@ const Map<String, String> _zhStrings = {
     'loginFirebaseReadyFooter':
         'Firebase auth 已连接。Demo 模式仍可用于 hackathon 流程。',
     'loginCreateAccount': '创建账户',
+    'dividerOr': '或',
     'signupTitle': '创建你的账户',
     'signupSubtitleFirebase': '你的 Vera 身份和资料将通过 Firebase 同步。',
     'signupSubtitleLocal': 'Firebase 尚未配置。此流程将在本地演示模式中继续。',

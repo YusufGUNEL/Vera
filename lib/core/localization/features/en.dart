@@ -586,6 +586,7 @@ const Map<String, String> _enStrings = {
     'loginFirebaseReadyFooter':
         'Firebase auth is connected. Demo mode is still available for hackathon flows.',
     'loginCreateAccount': 'Create account',
+    'dividerOr': 'or',
     'signupTitle': 'Create your account',
     'signupSubtitleFirebase':
         'Your Vera identity and profile will sync through Firebase.',

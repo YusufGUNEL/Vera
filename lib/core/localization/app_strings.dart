@@ -588,6 +588,7 @@ class AppStrings {
       _t('loginFirebaseError').replaceAll('{code}', code);
   String get loginFirebaseReadyFooter => _t('loginFirebaseReadyFooter');
   String get loginCreateAccount => _t('loginCreateAccount');
+  String get dividerOr => _t('dividerOr');
 
   // ---- Signup screen ----
   String get signupTitle => _t('signupTitle');

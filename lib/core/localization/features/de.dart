@@ -389,6 +389,7 @@ const Map<String, String> _deStrings = {
     'loginFirebaseReadyFooter':
         'Firebase-Auth verbunden. Demo-Modus bleibt für Hackathon-Flows verfügbar.',
     'loginCreateAccount': 'Konto erstellen',
+    'dividerOr': 'oder',
     'signupTitle': 'Konto erstellen',
     'signupSubtitleFirebase':
         'Deine Vera-Identität und dein Profil werden über Firebase synchronisiert.',

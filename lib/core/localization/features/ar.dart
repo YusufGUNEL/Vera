@@ -386,6 +386,7 @@ const Map<String, String> _arStrings = {
     'loginFirebaseReadyFooter':
         'Firebase auth متصل. الوضع التجريبي لا يزال متاحاً لتدفقات الـ hackathon.',
     'loginCreateAccount': 'إنشاء حساب',
+    'dividerOr': 'أو',
     'signupTitle': 'أنشئ حسابك',
     'signupSubtitleFirebase':
         'ستتم مزامنة هوية Vera وملفك الشخصي عبر Firebase.',
