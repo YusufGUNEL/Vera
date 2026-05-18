@@ -12,10 +12,6 @@ const Map<String, String> _arStrings = {
   'liveFeed': 'مباشر',
   'syncing': 'مزامنة',
   'thisMonth': 'هذا الشهر',
-  'actionSend': 'إرسال',
-  'actionRequest': 'طلب',
-  'actionTopUp': 'شحن',
-  'actionPay': 'دفع',
   'connectedAccounts': 'الحسابات المتصلة',
   'refresh': 'تحديث',
   'syncingDots': 'جارٍ المزامنة...',
@@ -56,7 +52,7 @@ const Map<String, String> _arStrings = {
   'incoming': 'وارد',
   'creditTitle': 'الائتمان',
   'creditSubtitle': 'اقتراض مبني على دخلك الفعلي.',
-  'creditScoreLabel': 'درجة الائتمان',
+  'creditSummaryCardSubtitle': 'احسب القسط الشهري ونسبة الدين',
   'openCredit': 'فتح الائتمان',
   'wealthTitle': 'الثروة',
   'wealthSubtitle': 'أموالك تعمل باستقلالية.',
@@ -79,8 +75,6 @@ const Map<String, String> _arStrings = {
   'filterAttention': 'تحتاج انتباه',
   'filterUnused': 'غير مستخدمة',
   'filterPriceChanges': 'تغير السعر',
-  'freezePlan': 'تجميد الخطة',
-  'reviewPlan': 'مراجعة الخطة',
   'askUma': 'اسأل UMA',
   'securityTitle': 'الأمان',
   'securitySubtitle': 'طبقة حمايتك المباشرة.',
@@ -146,11 +140,6 @@ const Map<String, String> _arStrings = {
   'statementFallbackWarning':
       'مفتاح Gemini API غير موجود أو تعذر تحليل كشف الحساب. يُرجى إدخال المعاملات يدويًا.',
   'statementFallbackAction': 'تعذر على الذكاء القراءة — إدخال يدوي',
-  'openBankApp': 'فتح {bank}',
-  'umaForwardNote':
-      'تكتمل العملية داخل تطبيق بنكك. تتابع Vera النتيجة عبر الرسائل أو الكشف.',
-  'forwardedToBank': 'أُرسل إلى {bank} · Vera تراقب',
-  'keep': 'إبقاء',
   'thisMonthsAiPlan': 'خطة الذكاء الاصطناعي لهذا الشهر',
   'aiPlanFooter': 'اقتراح Uma — طبّقه عبر بنكك، وVera تحتفظ بالسجل.',
   'applyAtBank': 'تطبيق عبر بنكي',
@@ -178,15 +167,12 @@ const Map<String, String> _arStrings = {
   'umaToolGoalCreated': 'تم. أنشأت هدفاً بقيمة {target} ليرة.',
   'umaToolBillAdded': 'أضفت فاتورة {name}، استحقاقها بعد {days} يوماً.',
   'umaToolExpenseAdded': 'سجّلت {name} ({amount} ليرة) كمصروف.',
-  'umaSuggestionPay': 'ادفع بطاقتي الائتمانية',
   'umaSuggestionSubs': 'عرض اشتراكاتي',
   'umaSuggestionAnalyze': 'حلّل مصروفاتي',
   'voiceCommandTooltip': 'أمر صوتي',
-  'requireConfirmation': 'اطلب موافقتي',
-  'requireConfirmationDesc': 'أظهر بطاقة تأكيد قبل أي إجراء',
-  'orderFrom': 'من',
-  'orderTo': 'إلى',
-  'orderAmount': 'المبلغ',
+  'umaAuditTrailTitle': 'سجل التدقيق',
+  'umaAuditTrailEmpty': 'لا توجد إجراءات Uma موقّعة بعد.',
+  'umaAuditTrailCount': 'تم تسجيل {n} إجراءً موقّعاً على هذا الجهاز.',
   'accountTilePersonal': 'المعلومات الشخصية',
   'accountTileEmail': 'البريد الإلكتروني',
   'accountTileSecurity': 'الأمان وPIN',
@@ -213,6 +199,23 @@ const Map<String, String> _arStrings = {
   'infoLocalData': 'البيانات المحلية',
   'infoLocalDataDescription':
       'فواتير OCR والبنوك المُضافة تُحفظ في SharedPreferences. "تصدير البيانات" ضمن خطط P1.',
+  'infoCloudSync': 'مزامنة السحابة',
+  'infoCloudSyncActive':
+      'مزامنة السحابة مفعّلة. يمكن مزامنة الإيصالات والكشوف والبنوك وإعدادات الملف الشخصي والمعاملات إلى مساحة Vera الخاصة بك.',
+  'infoCloudSyncInactive':
+      'مزامنة السحابة غير مفعّلة في هذه الجلسة؛ تعمل Vera حالياً محلياً فقط.',
+  'fraudAlertTitle': 'Vera • تم حظر معاملة مشبوهة',
+  'googleSignInConfigMissing':
+      'فشل تسجيل الدخول عبر Google. ربما لم يُسجَّل بصمة SHA-1 للتطبيق في Firebase Console. يجب على المسؤول تحديث إعدادات Firebase.',
+  'fraudReasonOutlier':
+      'هذا المصروف يفوق وسيطك الأخير {median} ل.ت بـ{multiplier}×. وجدت Vera الفارق مثيراً للانتباه.',
+  'fraudNameRoundTransfer': 'تحويل مدوّر · {amount} ل.ت',
+  'fraudReasonRoundTransfer':
+      'تم رصد مبلغ مدوّر تماماً يفوق 10,000 ل.ت. غالباً تحويل لمستلم؛ أكّد إن كان منك.',
+  'fraudNameBurst': '{merchant} · {count}× اليوم نفسه',
+  'fraudLocationBurstTotal': 'الإجمالي {total} ل.ت',
+  'fraudReasonBurst':
+      'نفس التاجر سجّل {count} عملية اليوم. هل كانت محاولة بطاقة متكررة أم تسوّق فعلي؟',
   'helpFaqQ1': 'هل تتصل Vera بمصرفي؟',
   'helpFaqA1':
       'لا. Vera لا تحمل ترخيص AISP/PSP. أنت تجلب البيانات: كشوف PDF، صور إيصالات، لقطات شاشة، أو إدخال يدوي. Vera تجمعها بالذكاء الاصطناعي وتمرر الإجراءات إلى تطبيق مصرفك.',
@@ -227,11 +230,6 @@ const Map<String, String> _arStrings = {
   'umaThinking': 'Uma تفكر...',
   'umaAskHint': 'اسأل Uma...',
   'umaStatusOnline': 'مساعد ذكاء · متصل',
-  'umaSuggestionBuyGold': 'اشترِ 10 جرام ذهب',
-  'umaSuggestionMoveSavings': 'حوّل 2500 ليرة إلى الادخار',
-  'umaActionPolicy': 'سياسة الإجراء',
-  'umaActionPolicyDesc':
-      'Vera لا تحرّك الأموال بنفسها؛ كل إجراء يفتح تطبيق بنكك لتأكيدك.',
   'onbStep1Title': 'مرحبًا بك في Vera',
   'onbStep1Subtitle':
       'اختر لغتك أولًا. يمكنك تغييرها لاحقًا في الإعدادات في أي وقت.',
@@ -419,9 +417,10 @@ const Map<String, String> _arStrings = {
   'loginCreateAccount': 'إنشاء حساب',
   'dividerOr': 'أو',
   'signupTitle': 'أنشئ حسابك',
-  'signupSubtitleFirebase': 'ستتم مزامنة هوية Vera وملفك الشخصي عبر Firebase.',
+  'signupSubtitleFirebase':
+      'أنشئ حسابك — ستتم مزامنة ملفك الشخصي وبياناتك في Vera بأمان.',
   'signupSubtitleLocal':
-      'لم يتم إعداد Firebase بعد. سيستمر هذا التدفق في وضع العرض التجريبي المحلي.',
+      'لم يتم إعداد الخادم. سيستمر هذا التدفق في وضع العرض التجريبي على هذا الجهاز.',
   'signupFieldFullName': 'الاسم الكامل',
   'signupFieldEmail': 'البريد الإلكتروني',
   'signupFieldPassword': 'كلمة المرور',
@@ -436,8 +435,8 @@ const Map<String, String> _arStrings = {
   'signupStrengthWeak': 'ضعيفة',
   'signupStrengthMedium': 'متوسطة',
   'signupStrengthStrong': 'قوية',
-  'signupCtaCreate': 'إنشاء حساب Firebase',
-  'signupCtaContinueLocal': 'المتابعة محلياً',
+  'signupCtaCreate': 'تسجيل',
+  'signupCtaContinueLocal': 'المتابعة كعرض تجريبي',
   'signupAlreadyHaveAccount': 'هل لديك حساب بالفعل؟ ',
   'signupSignIn': 'تسجيل الدخول',
   'demoSampleLoaded': 'تم تحميل بيانات الحساب التجريبي.',
@@ -475,4 +474,179 @@ const Map<String, String> _arStrings = {
   'continueWithGoogle': 'المتابعة باستخدام Google',
   'googleSignInUnavailable':
       'يتطلب تسجيل الدخول عبر Google إعداد Firebase لهذا الإصدار.',
+  'bankActionsTitle': 'خيارات البنك',
+  'bankActionsCancel': 'إلغاء',
+  'bankActionsDelete': 'حذف البنك',
+  'bankActionsConfirmTitle': 'حذف هذا البنك؟',
+  'bankActionsConfirmBody':
+      'سيتم إزالة {name} ولن يُحتسب في الرصيد الإجمالي بعد الآن.',
+  'bankDeleted': 'تم حذف {name}',
+  'bankActionsFeedNote':
+      'هذا البنك يأتي ضمن بيانات العرض ولا يمكن حذفه. يمكنك إزالة البنوك التي أضفتها بنفسك.',
+  'billDetailPrompt':
+      'فاتورة {name} بقيمة {amount}، متبقي {days} يوماً. ما الذي يجب فعله؟',
+  'categoryBudgetLabel': 'إنفاق هذا الشهر',
+  'categoryBudgetTopHint': 'الأعلى في {category} · {pct}%',
+  'categoryLimitEditTitle': 'حد الفئة',
+  'categoryLimitEditSubtitle':
+      'حدد ميزانية شهرية لـ{category}. تعرض Vera المتبقي عند كل مصروف.',
+  'categoryLimitField': 'الحد الشهري (TL)',
+  'categoryLimitSave': 'حفظ',
+  'categoryLimitClear': 'إزالة الحد',
+  'categoryNoLimit': 'بلا حد',
+  'categoryOver': 'تجاوزت بـ{amount}',
+  'categoryRemaining': 'متبقي {amount}',
+  'creditFieldDebt': 'الالتزامات الشهرية الحالية',
+  'creditFieldIncome': 'الدخل الشهري',
+  'creditFieldLoanAmount': 'مبلغ القرض',
+  'creditFieldTerm': 'المدة',
+  'creditLoanSimulation': 'محاكي القرض',
+  'creditLoanSimulationSubtitle':
+      'اضبط القيم — يتم احتساب القسط الشهري وعبء الدين فوراً.',
+  'creditScoreDisclaimer':
+      'هذه الصفحة لا تحسب درجة ائتمانية. للحصول على درجة حقيقية، راجع بنكك أو مكتب الائتمان. هنا ترى فقط تقديراً تقريبياً للقسط ونسبة الدين بناءً على القيم التي أدخلتها.',
+  'creditTermMonths': '{n} شهراً',
+  'creditResultMonthlyPayment': 'القسط الشهري التقديري',
+  'creditResultTotalCost': 'إجمالي السداد',
+  'creditResultPaymentLoad': 'القسط / الدخل',
+  'creditResultDtiAfter': 'نسبة الدين بعد القرض',
+  'creditResultGuidance':
+      'تفضل البنوك عادةً نسبة دين/دخل تحت 35%. تجاوز 40% يضيّق العروض. للتخطيط فقط.',
+  'demoResetTile': 'إعادة ضبط بيانات العرض',
+  'demoResetTileValue': 'مسح الواردات والإضافات',
+  'demoResetTitle': 'إعادة ضبط بيانات العرض؟',
+  'demoResetBody':
+      'تعود المعاملات المستوردة والبنوك المضافة وتقدّم الأهداف إلى حالة البداية.',
+  'demoResetCancel': 'إلغاء',
+  'demoResetConfirm': 'إعادة الضبط',
+  'demoResetDone': 'تمت العودة إلى حالة العرض',
+  'exportTile': 'تصدير بياناتي',
+  'exportTileValue': 'JSON · على الجهاز فقط',
+  'exportTitle': 'بيانات Vera الخاصة بك',
+  'exportSubtitle':
+      'المعاملات المستوردة والبنوك التي أضفتها وأهدافك والاشتراكات المكتشفة. انسخها دون مغادرة الجهاز.',
+  'exportCopy': 'نسخ JSON',
+  'exportCopied': 'تم النسخ إلى الحافظة',
+  'firstScanPending': 'بانتظار أول فحص',
+  'firstSyncPending': 'بانتظار أول مزامنة',
+  'goalEditTitle': 'تعديل هدفك',
+  'goalEditTarget': 'المبلغ المستهدف (TL)',
+  'goalEditSaved': 'المُدّخر حتى الآن (TL)',
+  'goalEditFooter':
+      'Vera تتابع الرصيد؛ وUma تتفقد كل شهر بفكرة جديدة.',
+  'goalEditSave': 'حفظ',
+  'goalEmergencyFund': 'صندوق الطوارئ',
+  'goalEtaMonths': 'باقي {n} شهر',
+  'goalEtaReached': 'وصلت إليه 🎯',
+  'goalProgress': 'وصلت {pct}%',
+  'goalRemaining': 'باقي {amount}',
+  'goalsSectionTitle': 'أهدافك',
+  'lastScanAt': 'آخر فحص {time}',
+  'loginTitle': 'تسجيل الدخول إلى Vera',
+  'loginSubtitle':
+      'سجّل الدخول بحسابك؛ تفضيلات الملف الشخصي وإجراءات الذكاء تبقى محلية حتى تسجّل الخروج.',
+  'loginEmailHint': 'you@vera.app',
+  'loginFooter':
+      'إذا لم يكن Firebase مهيّأً، سيفشل تسجيل الدخول. راجع ملف .env.',
+  'notifTitle': 'الإشعارات',
+  'notifSubtitle': '{n} إشارات تراقبها Uma',
+  'notifEmpty': 'كل شيء هادئ. Uma لا تزال تراقب بهدوء.',
+  'notifBillTitle': 'فاتورة {name} تقترب',
+  'notifBillBody': 'القيمة {amount}. ادفع عبر Uma أو بنكك.',
+  'notifPriceIncreaseTitle': '{name} رفعت السعر',
+  'notifPriceIncreaseBody':
+      'شهرياً +{delta} · الآن {price}. يمكنك تجميدها من قسم الخطط.',
+  'notifUnusedTitle': '{name} غير مستخدمة',
+  'notifUnusedBody':
+      'آخر استخدام: {last}. وضعتها Vera كتسرّب صامت.',
+  'notifBlockedDefault':
+      'وضعت Vera هذه المعاملة كحالة شاذة.',
+  'profileAiToneBadge': 'نبرة الذكاء / {tone}',
+  'profileAutoApprove': 'حد الموافقة التلقائية',
+  'profileAutoApproveOff': 'إيقاف',
+  'profileConnectedTitle': '{n} مؤسسات مربوطة',
+  'profileConnectedSubtitle':
+      'الأرصدة المباشرة تتحدث عبر سياسة المزامنة وذاكرة الخلاصة.',
+  'profileConnectedAccount': 'حساب {last4}',
+  'profileDailyBriefing': 'إيجاز الذكاء اليومي',
+  'profileDailyBriefingSub':
+      'ابدأ يومك بصحة الحساب والأنشطة المريبة ونصائح الادخار',
+  'profileFaceId': 'إعادة قفل بـFace ID',
+  'profileFaceIdSub':
+      'طلب التحقق الحيوي قبل الإجراءات الحساسة',
+  'profileFraudHigh': 'تنبيهات احتيال عالية الحساسية',
+  'profileFraudHighSub':
+      'تتيح Vera وضع علامة على أنماط جهاز ودفع غير معتادة في وقت أبكر',
+  'profileLiveSync': 'مزامنة مباشرة',
+  'profileLiveSyncLive': 'مباشر',
+  'profileLiveSyncBalanced': 'متوازن',
+  'profileLiveSyncSaver': 'موفر',
+  'profileSmartNotif': 'إشعارات ذكية',
+  'profileSmartNotifSub':
+      'تنبيهات للاحتيال والتجديدات وتغيرات الموافقة',
+  'profileVaultTitle': 'خزينة جلسة محمية',
+  'profileVaultSubtitle':
+      'الهوية محفوظة بشكل منفصل عن التفضيلات المحلية.',
+  'profileVaultSignIn': 'تسجيل الدخول',
+  'profileVaultProtectedSince': 'محمي منذ',
+  'profileVaultThisDevice': 'هذا الجهاز',
+  'profileVaultApproval': 'حاجز الموافقة',
+  'profileVaultManualOnly': 'يدوي فقط',
+  'profileVaultSyncMode': 'وضع المزامنة',
+  'profileVaultSyncLive': 'مزامنة مباشرة',
+  'profileVaultSyncBalanced': 'مزامنة متوازنة',
+  'profileVaultSyncSaver': 'مزامنة موفّرة',
+  'securityAccountSection': 'أمان الحساب',
+  'securityActiveBody': 'يتابع رادار الاحتيال {n} تنبيهات نشطة.',
+  'securityClearBody':
+      'لا توجد تنبيهات احتيال غير محلولة في آخر فحص.',
+  'securityPillBlocked': 'حُجبت بواسطة الذكاء',
+  'securityPillApproved': 'وافقت أنت',
+  'securityPillKept': 'بقيت محظورة',
+  'securityDecisionKept':
+      'أبقيت هذا الحدث محظوراً. سيستمر رادار الاحتيال في معاملة الأنماط المشابهة كخطر مرتفع.',
+  'securityDecisionApproved':
+      'وسمت هذا الحدث بأنه آمن. سيستخدم رادار الاحتيال هذا الانطباع لتقليل الإنذارات المشابهة الخاطئة.',
+  'securityStatBlockedLabel': 'محجوب',
+  'securityStatBlockedSub': 'نشط',
+  'securityStatReviewedLabel': 'مُراجَع',
+  'securityStatReviewedSub': 'هذا الأسبوع',
+  'securityStatDevicesLabel': 'الأجهزة',
+  'securityStatDevicesSub': 'موثوقة',
+  'securityViewReport': 'فتح تقرير UMA',
+  'subsRenewalLabel': 'التجديد',
+  'subsActivityLabel': 'النشاط',
+  'txnDetailWhen': 'الوقت',
+  'txnDetailCategory': 'الفئة',
+  'txnDetailDirection': 'الاتجاه',
+  'txnDetailIncoming': 'وارد',
+  'txnDetailOutgoing': 'صادر',
+  'txnDetailAskPrompt':
+      'ألقِ نظرة على معاملة {name} — هل {amount} طبيعي؟',
+  'umaAuditTrailSubtitle':
+      'سجل محلي موقّع لردود Uma على هذا الجهاز.',
+  'umaAuditTrailEmptyState':
+      'لا توجد إجراءات موقّعة بعد. تحدّث مع Uma وسيظهر سجل الثقة هنا.',
+  'umaAuditNoteAttached': 'ملاحظة مرفقة',
+  'umaAuditActionReplyGenerated': 'تم إنشاء الرد',
+  'umaGreeting':
+      'مرحباً {name}. قرأت الكشوف التي استوردتها. يمكنني تحليل إنفاقك، وإظهار الاشتراكات غير المستخدمة، ومساعدتك على وضع أهداف ادخار. لا أحرّك أموالاً — عند الحاجة لإجراء، أوجهك إلى تطبيق بنكك.',
+  'umaPromptAnalyze': 'حلّل إنفاقي لهذا الشهر.',
+  'umaReplyAnalyze':
+      'أعلى إنفاقك هذا الشهر في {top} بقيمة {topAmount}. إجمالي الخروج {spending}. يمكننا ضبط حدود لكل فئة إن أردت.',
+  'umaReplyAnalyzeEmpty':
+      'لا توجد معاملات للتحليل بعد. امسح إيصالاً أو استورد كشفاً وسنفصّل الإنفاق معاً.',
+  'umaReplyExplainWealth':
+      'تتابع Vera محفظتك عبر الحسابات التي استوردتها. الأسهم تبدو موزّعة بزيادة طفيفة هذا الشهر؛ اقتراحي رفع الذهب أو السيولة في زيارتك القادمة للبنك.',
+  'umaReplyLoan':
+      'بناءً على الدخل والدين في كشوفك، تبدو مؤهلاً لقروض شخصية متوسطة. افتح محاكاة الائتمان لنضبط المبلغ والمدة بأمان.',
+  'umaReplySecurity':
+      'وضعت علامة على ذلك التحويل لأن المستلم ظهر مرة واحدة قبلاً ولأن موقع الجهاز لم يطابق نمطك المعتاد. Vera لا تحظر لدى بنكك — تنبهك، والقرار يكون بينكما.',
+  'umaReplySubscriptions':
+      'لديك {n} خطط تستحق المراجعة. إجمالي اشتراكاتك الشهري نحو {total}.',
+  'umaReplySubscriptionsEmpty':
+      'لا أرى اشتراكات نشطة بعد. استورد كشفاً وستكتشف Vera الرسوم المتكررة.',
+  'umaReplyFallback':
+      'يمكنني المساعدة. لو رغبت، أعطيك تقييماً مالياً سريعاً أو أحضّر خطوة آمنة تالية.',
+  'updatedAt': 'تم التحديث {time}',
 };

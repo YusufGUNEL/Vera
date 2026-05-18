@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/app_tokens.dart';
-import '../../../credit/state/credit_controller.dart';
 
 class CreditSummaryCard extends ConsumerWidget {
   const CreditSummaryCard({super.key});
@@ -14,7 +13,6 @@ class CreditSummaryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final l10n = context.l10n;
-    final decision = ref.watch(creditControllerProvider).decision;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -33,17 +31,17 @@ class CreditSummaryCard extends ConsumerWidget {
             child: Row(
               children: [
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: t.brandSoft.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   alignment: Alignment.center,
                   child: Icon(
-                    Icons.credit_card_rounded,
+                    Icons.calculate_outlined,
                     color: t.brand,
-                    size: 26,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -52,43 +50,22 @@ class CreditSummaryCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.creditScoreLabel,
+                        l10n.creditLoanSimulation,
                         style: TextStyle(
-                          color: t.muted,
-                          fontSize: 10,
-                          letterSpacing: 0.5,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: t.ink,
+                          letterSpacing: -0.2,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '${decision.score}',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              color: t.ink,
-                              letterSpacing: -0.4,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            decision.bandLabel,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.muted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
                       Text(
-                        l10n.creditTitle,
-                        style: TextStyle(fontSize: 12, color: t.ink2),
+                        l10n.creditSummaryCardSubtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: t.muted,
+                          height: 1.35,
+                        ),
                       ),
                     ],
                   ),

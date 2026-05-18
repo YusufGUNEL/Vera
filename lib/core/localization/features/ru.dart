@@ -12,10 +12,6 @@ const Map<String, String> _ruStrings = {
   'liveFeed': 'ОНЛАЙН',
   'syncing': 'СИНХРО',
   'thisMonth': 'в этом месяце',
-  'actionSend': 'Отправить',
-  'actionRequest': 'Запросить',
-  'actionTopUp': 'Пополнить',
-  'actionPay': 'Оплатить',
   'connectedAccounts': 'Подключённые счета',
   'refresh': 'Обновить',
   'syncingDots': 'Синхронизация...',
@@ -57,7 +53,7 @@ const Map<String, String> _ruStrings = {
   'incoming': 'Доход',
   'creditTitle': 'Кредит',
   'creditSubtitle': 'Кредит на основе реального дохода.',
-  'creditScoreLabel': 'КРЕДИТНЫЙ РЕЙТИНГ',
+  'creditSummaryCardSubtitle': 'Расчёт месячного платежа и долговой нагрузки',
   'openCredit': 'Открыть кредит',
   'wealthTitle': 'Капитал',
   'wealthSubtitle': 'Ваши деньги работают сами.',
@@ -80,8 +76,6 @@ const Map<String, String> _ruStrings = {
   'filterAttention': 'Нужно внимание',
   'filterUnused': 'Неиспользуемые',
   'filterPriceChanges': 'Изменение цены',
-  'freezePlan': 'Заморозить план',
-  'reviewPlan': 'Проверить план',
   'askUma': 'Спросить UMA',
   'securityTitle': 'Защита',
   'securitySubtitle': 'Активный уровень защиты.',
@@ -147,11 +141,6 @@ const Map<String, String> _ruStrings = {
   'statementFallbackWarning':
       'Ключ Gemini API отсутствует или выписку не удалось разобрать. Пожалуйста, введите операции вручную.',
   'statementFallbackAction': 'ИИ не сработал — ввести вручную',
-  'openBankApp': 'Открыть {bank}',
-  'umaForwardNote':
-      'Действие завершается в банковском приложении. Vera отслеживает результат по SMS или выписке.',
-  'forwardedToBank': 'Передано в {bank} · Vera следит',
-  'keep': 'Отмена',
   'thisMonthsAiPlan': 'План ИИ на этот месяц',
   'aiPlanFooter': 'Совет Uma — выполните в своём банке; Vera ведёт учёт.',
   'applyAtBank': 'Сделать в банке',
@@ -179,16 +168,12 @@ const Map<String, String> _ruStrings = {
   'umaToolGoalCreated': 'Готово. Создана цель на {target} TL.',
   'umaToolBillAdded': 'Добавлен счёт {name}, к оплате через {days} дн.',
   'umaToolExpenseAdded': 'Расход {name} ({amount} TL) записан.',
-  'umaSuggestionPay': 'Оплатить мою карту',
   'umaSuggestionSubs': 'Показать подписки',
   'umaSuggestionAnalyze': 'Анализировать траты',
   'voiceCommandTooltip': 'Голосовая команда',
-  'requireConfirmation': 'Требовать подтверждение',
-  'requireConfirmationDesc':
-      'Показывать карточку подтверждения перед действием',
-  'orderFrom': 'От',
-  'orderTo': 'Кому',
-  'orderAmount': 'Сумма',
+  'umaAuditTrailTitle': 'Журнал аудита',
+  'umaAuditTrailEmpty': 'Пока нет подписанных действий Uma.',
+  'umaAuditTrailCount': 'На этом устройстве записано {n} подписанных действий.',
   'accountTilePersonal': 'Личные данные',
   'accountTileEmail': 'E-mail',
   'accountTileSecurity': 'Безопасность и PIN',
@@ -216,6 +201,23 @@ const Map<String, String> _ruStrings = {
   'infoLocalData': 'Локальные данные',
   'infoLocalDataDescription':
       'OCR-чеки и добавленные банки хранятся в SharedPreferences. "Экспорт данных" — в P1-бэклоге.',
+  'infoCloudSync': 'Облачная синхронизация',
+  'infoCloudSyncActive':
+      'Облачная синхронизация активна. Импортированные чеки, выписки, банки, настройки профиля и операции могут синхронизироваться в ваше пространство Vera.',
+  'infoCloudSyncInactive':
+      'Облачная синхронизация в этой сессии не активна; Vera работает только локально.',
+  'fraudAlertTitle': 'Vera • Подозрительная операция заблокирована',
+  'googleSignInConfigMissing':
+      'Не удалось войти через Google. Возможно, отпечаток SHA-1 приложения не зарегистрирован в Firebase Console. Администратор должен обновить настройки Firebase.',
+  'fraudReasonOutlier':
+      'Эта трата в {multiplier}× выше вашей недавней медианы в {median} TL. Vera посчитала скачок заметным.',
+  'fraudNameRoundTransfer': 'Круглый перевод · {amount} TL',
+  'fraudReasonRoundTransfer':
+      'Обнаружена круглая сумма свыше 10 000 TL. Часто это легитимный перевод получателю — подтвердите, если это были вы.',
+  'fraudNameBurst': '{merchant} · {count}× за день',
+  'fraudLocationBurstTotal': 'Всего {total} TL',
+  'fraudReasonBurst':
+      'Сегодня тот же продавец списал {count} раз. Повтор карты или реальный шопинг?',
   'helpFaqQ1': 'Vera подключается к моему банку?',
   'helpFaqA1':
       'Нет. У Vera нет лицензии AISP/PSP. Данные приносите вы: PDF-выписки, фото чеков, скриншоты или ручной ввод. Vera объединяет их с помощью ИИ и направляет действия в ваше банковское приложение.',
@@ -230,11 +232,6 @@ const Map<String, String> _ruStrings = {
   'umaThinking': 'Uma думает...',
   'umaAskHint': 'Спросите Uma...',
   'umaStatusOnline': 'ИИ-ассистент · онлайн',
-  'umaSuggestionBuyGold': 'Купить 10 г золота',
-  'umaSuggestionMoveSavings': 'Перевести 2500 TL в сбережения',
-  'umaActionPolicy': 'ПОЛИТИКА ДЕЙСТВИЙ',
-  'umaActionPolicyDesc':
-      'Vera не двигает деньги сама; каждое действие открывает банковское приложение для вашего подтверждения.',
   'onbStep1Title': 'Добро пожаловать в Vera',
   'onbStep1Subtitle':
       'Сначала выберите язык. Позже его всегда можно поменять в настройках.',
@@ -425,9 +422,9 @@ const Map<String, String> _ruStrings = {
   'dividerOr': 'или',
   'signupTitle': 'Создайте аккаунт',
   'signupSubtitleFirebase':
-      'Ваш профиль Vera будет синхронизироваться через Firebase.',
+      'Создайте аккаунт — ваш профиль Vera и данные будут безопасно синхронизироваться.',
   'signupSubtitleLocal':
-      'Firebase ещё не настроен. Поток продолжится в локальном демо-режиме.',
+      'Сервер не настроен. Поток продолжится в локальном демо-режиме на этом устройстве.',
   'signupFieldFullName': 'Полное имя',
   'signupFieldEmail': 'Email',
   'signupFieldPassword': 'Пароль',
@@ -442,8 +439,8 @@ const Map<String, String> _ruStrings = {
   'signupStrengthWeak': 'Слабый',
   'signupStrengthMedium': 'Средний',
   'signupStrengthStrong': 'Сильный',
-  'signupCtaCreate': 'Создать Firebase-аккаунт',
-  'signupCtaContinueLocal': 'Продолжить локально',
+  'signupCtaCreate': 'Зарегистрироваться',
+  'signupCtaContinueLocal': 'Продолжить как демо',
   'signupAlreadyHaveAccount': 'Уже есть аккаунт? ',
   'signupSignIn': 'Войти',
   'demoSampleLoaded': 'Данные демо-аккаунта загружены.',
@@ -481,4 +478,179 @@ const Map<String, String> _ruStrings = {
   'continueWithGoogle': 'Продолжить через Google',
   'googleSignInUnavailable':
       'Для входа через Google в этой сборке должен быть настроен Firebase.',
+  'bankActionsTitle': 'Опции банка',
+  'bankActionsCancel': 'Отмена',
+  'bankActionsDelete': 'Удалить банк',
+  'bankActionsConfirmTitle': 'Удалить этот банк?',
+  'bankActionsConfirmBody':
+      '{name} будет удалён и перестанет учитываться в общем балансе.',
+  'bankDeleted': '{name} удалён',
+  'bankActionsFeedNote':
+      'Этот банк поставляется с демо-данными и не может быть удалён. Свои добавленные можно убрать.',
+  'billDetailPrompt':
+      'Счёт {name} на {amount}, осталось {days} дн. Что делать?',
+  'categoryBudgetLabel': 'ТРАТЫ В ЭТОМ МЕСЯЦЕ',
+  'categoryBudgetTopHint': 'Больше всего на {category} · {pct}%',
+  'categoryLimitEditTitle': 'Лимит категории',
+  'categoryLimitEditSubtitle':
+      'Установите месячный бюджет для {category}. Vera покажет остаток при каждой трате.',
+  'categoryLimitField': 'Месячный лимит (TL)',
+  'categoryLimitSave': 'Сохранить',
+  'categoryLimitClear': 'Снять лимит',
+  'categoryNoLimit': 'без лимита',
+  'categoryOver': 'превышение на {amount}',
+  'categoryRemaining': 'осталось {amount}',
+  'creditFieldDebt': 'Текущие месячные платежи',
+  'creditFieldIncome': 'Месячный доход',
+  'creditFieldLoanAmount': 'Сумма кредита',
+  'creditFieldTerm': 'Срок',
+  'creditLoanSimulation': 'Кредитный калькулятор',
+  'creditLoanSimulationSubtitle':
+      'Настройте значения — платёж и долговая нагрузка считаются мгновенно.',
+  'creditScoreDisclaimer':
+      'На этой странице кредитный рейтинг не рассчитывается. Реальный рейтинг получите в банке или бюро кредитных историй. Здесь только примерный платёж и долговая нагрузка по введённым вами данным.',
+  'creditTermMonths': '{n} месяцев',
+  'creditResultMonthlyPayment': 'ОЦЕНОЧНЫЙ МЕСЯЧНЫЙ ПЛАТЁЖ',
+  'creditResultTotalCost': 'Итого к выплате',
+  'creditResultPaymentLoad': 'Платёж / доход',
+  'creditResultDtiAfter': 'Новая долговая нагрузка',
+  'creditResultGuidance':
+      'Банки обычно предпочитают долг/доход ниже 35%. Выше 40% сужает предложения. Только для планирования.',
+  'demoResetTile': 'Сбросить демо-данные',
+  'demoResetTileValue': 'Очистить импорт и добавления',
+  'demoResetTitle': 'Сбросить демо-данные?',
+  'demoResetBody':
+      'Импортированные операции, добавленные банки и прогресс цели вернутся в начальное состояние.',
+  'demoResetCancel': 'Отмена',
+  'demoResetConfirm': 'Сбросить',
+  'demoResetDone': 'Возвращено в демо-состояние',
+  'exportTile': 'Экспорт моих данных',
+  'exportTileValue': 'JSON · только устройство',
+  'exportTitle': 'Ваши данные Vera',
+  'exportSubtitle':
+      'Импортированные операции, добавленные банки, ваша цель и обнаруженные подписки. Копирование без выхода с устройства.',
+  'exportCopy': 'Копировать JSON',
+  'exportCopied': 'Скопировано в буфер',
+  'firstScanPending': 'Ожидание первого сканирования',
+  'firstSyncPending': 'Ожидание первой синхронизации',
+  'goalEditTitle': 'Редактировать цель',
+  'goalEditTarget': 'Целевая сумма (TL)',
+  'goalEditSaved': 'Накоплено (TL)',
+  'goalEditFooter':
+      'Vera следит за балансом; Uma каждый месяц подкидывает новую идею.',
+  'goalEditSave': 'Сохранить',
+  'goalEmergencyFund': 'Резервный фонд',
+  'goalEtaMonths': 'Осталось {n} мес.',
+  'goalEtaReached': 'Цель достигнута 🎯',
+  'goalProgress': '{pct}% пройдено',
+  'goalRemaining': 'осталось {amount}',
+  'goalsSectionTitle': 'Ваши цели',
+  'lastScanAt': 'Последнее сканирование {time}',
+  'loginTitle': 'Войти в Vera',
+  'loginSubtitle':
+      'Войдите со своим аккаунтом; предпочтения профиля и действия ИИ хранятся локально до выхода.',
+  'loginEmailHint': 'you@vera.app',
+  'loginFooter':
+      'Если Firebase не настроен, вход не сработает. Проверьте .env.',
+  'notifTitle': 'Уведомления',
+  'notifSubtitle': '{n} сигналов под наблюдением Uma',
+  'notifEmpty': 'Всё тихо. Uma продолжает спокойно наблюдать.',
+  'notifBillTitle': 'Счёт {name} приближается',
+  'notifBillBody': 'Сумма {amount}. Оплатите через Uma или банк.',
+  'notifPriceIncreaseTitle': '{name} подняла цену',
+  'notifPriceIncreaseBody':
+      'Ежемесячно +{delta} · теперь {price}. Можно заморозить в разделе планов.',
+  'notifUnusedTitle': '{name} не используется',
+  'notifUnusedBody':
+      'Последний раз: {last}. Vera отметила как тихую утечку.',
+  'notifBlockedDefault':
+      'Vera пометила эту операцию как аномалию.',
+  'profileAiToneBadge': 'ТОН ИИ / {tone}',
+  'profileAutoApprove': 'Лимит автоодобрения',
+  'profileAutoApproveOff': 'Выкл.',
+  'profileConnectedTitle': '{n} подключённых учреждений',
+  'profileConnectedSubtitle':
+      'Балансы в реальном времени обновляются через текущую политику синхронизации и кэш ленты.',
+  'profileConnectedAccount': 'Счёт {last4}',
+  'profileDailyBriefing': 'Ежедневный ИИ-брифинг',
+  'profileDailyBriefingSub':
+      'Начинайте день с состояния счёта, подозрительной активности и подсказок по сбережениям',
+  'profileFaceId': 'Повторная Face ID',
+  'profileFaceIdSub':
+      'Требовать биометрию перед чувствительными действиями',
+  'profileFraudHigh': 'Чувствительные оповещения о мошенничестве',
+  'profileFraudHighSub':
+      'Vera помечает необычные шаблоны устройств и платежей раньше',
+  'profileLiveSync': 'Live-синхронизация',
+  'profileLiveSyncLive': 'Live',
+  'profileLiveSyncBalanced': 'Сбалансированный',
+  'profileLiveSyncSaver': 'Экономия',
+  'profileSmartNotif': 'Умные уведомления',
+  'profileSmartNotifSub':
+      'Оповещения о мошенничестве, продлениях и изменениях одобрения',
+  'profileVaultTitle': 'Защищённый сейф сессии',
+  'profileVaultSubtitle':
+      'Идентичность хранится отдельно от локальных настроек.',
+  'profileVaultSignIn': 'Вход',
+  'profileVaultProtectedSince': 'Защита с',
+  'profileVaultThisDevice': 'Это устройство',
+  'profileVaultApproval': 'Гарант одобрения',
+  'profileVaultManualOnly': 'Только вручную',
+  'profileVaultSyncMode': 'Режим синхронизации',
+  'profileVaultSyncLive': 'Live-синхронизация',
+  'profileVaultSyncBalanced': 'Сбалансированная синхронизация',
+  'profileVaultSyncSaver': 'Экономная синхронизация',
+  'securityAccountSection': 'БЕЗОПАСНОСТЬ АККАУНТА',
+  'securityActiveBody': 'Fraud Radar отслеживает {n} активных предупреждений.',
+  'securityClearBody':
+      'В последнем сканировании нет нерешённых предупреждений.',
+  'securityPillBlocked': 'ЗАБЛОКИРОВАНО ИИ',
+  'securityPillApproved': 'ВЫ ОДОБРИЛИ',
+  'securityPillKept': 'ОСТАВЛЕНО В БЛОКЕ',
+  'securityDecisionKept':
+      'Вы оставили это событие заблокированным. Fraud Radar продолжит считать похожие шаблоны высоко-рисковыми.',
+  'securityDecisionApproved':
+      'Вы отметили это событие безопасным. Fraud Radar использует обратную связь, чтобы сокращать похожие ложные срабатывания.',
+  'securityStatBlockedLabel': 'БЛОК',
+  'securityStatBlockedSub': 'активно',
+  'securityStatReviewedLabel': 'ПРОВЕРЕНО',
+  'securityStatReviewedSub': 'за неделю',
+  'securityStatDevicesLabel': 'УСТРОЙСТВА',
+  'securityStatDevicesSub': 'доверенные',
+  'securityViewReport': 'ОТКРЫТЬ ОТЧЁТ UMA',
+  'subsRenewalLabel': 'Продление',
+  'subsActivityLabel': 'Активность',
+  'txnDetailWhen': 'Когда',
+  'txnDetailCategory': 'Категория',
+  'txnDetailDirection': 'Направление',
+  'txnDetailIncoming': 'Входящая',
+  'txnDetailOutgoing': 'Исходящая',
+  'txnDetailAskPrompt':
+      'Посмотри на операцию {name} — {amount} это нормально?',
+  'umaAuditTrailSubtitle':
+      'Подписанный локальный журнал ответов Uma на этом устройстве.',
+  'umaAuditTrailEmptyState':
+      'Пока нет подписанных действий. Обратитесь к Uma и журнал доверия появится здесь.',
+  'umaAuditNoteAttached': 'Заметка прикреплена',
+  'umaAuditActionReplyGenerated': 'Ответ сгенерирован',
+  'umaGreeting':
+      'Привет, {name}. Я прочла импортированные выписки. Могу проанализировать траты, найти неиспользуемые подписки и помочь поставить цели сбережений. Я не двигаю деньги — если нужно действие, направлю в ваше банковское приложение.',
+  'umaPromptAnalyze': 'Проанализируй мои траты в этом месяце.',
+  'umaReplyAnalyze':
+      'Больше всего в этом месяце вы тратите на {top} — {topAmount}. Всего отток {spending}. Если хотите, поставим лимиты по категориям.',
+  'umaReplyAnalyzeEmpty':
+      'Пока нет операций для анализа. Отсканируйте чек или импортируйте выписку — разберём траты вместе.',
+  'umaReplyExplainWealth':
+      'Vera следит за портфелем по импортированным счетам. Акции выглядят чуть перевешенными в этом месяце; предложу добавить золото или наличные при следующем входе в банк.',
+  'umaReplyLoan':
+      'Судя по доходу и долгам из ваших выписок, вы подходите под средние личные кредиты. Откройте кредитную симуляцию — вместе подберём сумму и срок.',
+  'umaReplySecurity':
+      'Я отметила этот перевод, потому что получатель появлялся раз ранее, а геолокация устройства не совпала с обычной. Vera не блокирует в банке — она предупреждает, решение за вами.',
+  'umaReplySubscriptions':
+      'У вас {n} планов, заслуживающих проверки. Месячный итог подписок около {total}.',
+  'umaReplySubscriptionsEmpty':
+      'Пока не вижу активных подписок. Импортируйте выписку — Vera найдёт повторяющиеся списания.',
+  'umaReplyFallback':
+      'Помогу с этим. Если хотите, дам короткую финансовую сводку или подготовлю безопасный следующий шаг.',
+  'updatedAt': 'Обновлено {time}',
 };

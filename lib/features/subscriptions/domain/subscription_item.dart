@@ -15,7 +15,6 @@ class SubscriptionItem {
     required this.status,
     required this.recommendation,
     required this.icon,
-    this.canFreeze = false,
   });
 
   final String id;
@@ -29,7 +28,6 @@ class SubscriptionItem {
   final SubscriptionStatus status;
   final String recommendation;
   final IconData icon;
-  final bool canFreeze;
 
   double get priceDelta => monthlyPrice - previousPrice;
 
@@ -48,7 +46,6 @@ class SubscriptionItem {
       'iconCodePoint': icon.codePoint,
       'iconFontFamily': icon.fontFamily,
       'iconFontPackage': icon.fontPackage,
-      'canFreeze': canFreeze,
     };
   }
 
@@ -72,7 +69,6 @@ class SubscriptionItem {
         fontFamily: map['iconFontFamily'] as String? ?? Icons.star.fontFamily,
         fontPackage: map['iconFontPackage'] as String?,
       ),
-      canFreeze: map['canFreeze'] as bool? ?? false,
     );
   }
 }

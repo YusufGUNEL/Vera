@@ -12,10 +12,6 @@ const Map<String, String> _deStrings = {
   'liveFeed': 'LIVE',
   'syncing': 'SYNCHRO',
   'thisMonth': 'diesen Monat',
-  'actionSend': 'Senden',
-  'actionRequest': 'Anfordern',
-  'actionTopUp': 'Aufladen',
-  'actionPay': 'Zahlen',
   'connectedAccounts': 'Verbundene Konten',
   'refresh': 'Aktualisieren',
   'syncingDots': 'Synchronisieren...',
@@ -57,7 +53,7 @@ const Map<String, String> _deStrings = {
   'incoming': 'Eingang',
   'creditTitle': 'Kredit',
   'creditSubtitle': 'Kreditaufnahme nach echtem Einkommen.',
-  'creditScoreLabel': 'KREDITPUNKTE',
+  'creditSummaryCardSubtitle': 'Monatsrate und Schuldenquote berechnen',
   'openCredit': 'Kredit öffnen',
   'wealthTitle': 'Vermögen',
   'wealthSubtitle': 'Ihr Geld arbeitet autonom.',
@@ -80,8 +76,6 @@ const Map<String, String> _deStrings = {
   'filterAttention': 'Achtung nötig',
   'filterUnused': 'Ungenutzt',
   'filterPriceChanges': 'Preisänderung',
-  'freezePlan': 'Plan einfrieren',
-  'reviewPlan': 'Plan prüfen',
   'askUma': 'Uma fragen',
   'securityTitle': 'Sicherheit',
   'securitySubtitle': 'Ihre Live-Schutzschicht.',
@@ -147,11 +141,6 @@ const Map<String, String> _deStrings = {
   'statementFallbackWarning':
       'Der Gemini-API-Schlüssel fehlt oder der Auszug konnte nicht gelesen werden. Bitte die Buchungen manuell eingeben.',
   'statementFallbackAction': 'KI fehlgeschlagen — manuell eingeben',
-  'openBankApp': '{bank} öffnen',
-  'umaForwardNote':
-      'Die Aktion wird in deiner Bank-App abgeschlossen. Vera verfolgt das Ergebnis per SMS oder Auszug.',
-  'forwardedToBank': 'An {bank} weitergeleitet · Vera beobachtet',
-  'keep': 'Abbrechen',
   'thisMonthsAiPlan': 'KI-Plan für diesen Monat',
   'aiPlanFooter':
       'Uma-Vorschlag — in deiner Bank umsetzen; Vera führt das Protokoll.',
@@ -181,15 +170,12 @@ const Map<String, String> _deStrings = {
   'umaToolGoalCreated': 'Erledigt. Ein Ziel über {target} TL wurde erstellt.',
   'umaToolBillAdded': 'Rechnung {name} hinzugefügt, fällig in {days} Tagen.',
   'umaToolExpenseAdded': 'Ausgabe {name} ({amount} TL) erfasst.',
-  'umaSuggestionPay': 'Kreditkarte bezahlen',
   'umaSuggestionSubs': 'Abos anzeigen',
   'umaSuggestionAnalyze': 'Ausgaben analysieren',
   'voiceCommandTooltip': 'Sprachbefehl',
-  'requireConfirmation': 'Bestätigung verlangen',
-  'requireConfirmationDesc': 'Vor jeder Aktion eine Bestätigungskarte zeigen',
-  'orderFrom': 'Von',
-  'orderTo': 'An',
-  'orderAmount': 'Betrag',
+  'umaAuditTrailTitle': 'Audit-Protokoll',
+  'umaAuditTrailEmpty': 'Noch keine signierten Uma-Aktionen.',
+  'umaAuditTrailCount': '{n} signierte Aktionen auf diesem Gerät.',
   'accountTilePersonal': 'Persönliche Daten',
   'accountTileEmail': 'E-Mail',
   'accountTileSecurity': 'Sicherheit & PIN',
@@ -217,6 +203,23 @@ const Map<String, String> _deStrings = {
   'infoLocalData': 'Lokale Daten',
   'infoLocalDataDescription':
       'OCR-Belege und hinzugefügte Banken liegen in SharedPreferences. "Daten exportieren" ist im P1-Backlog.',
+  'infoCloudSync': 'Cloud-Sync',
+  'infoCloudSyncActive':
+      'Cloud-Sync ist aktiv. Importierte Belege, Auszüge, Banken, Profileinstellungen und Transaktionen können in deinen Vera-Bereich synchronisiert werden.',
+  'infoCloudSyncInactive':
+      'Cloud-Sync ist in dieser Sitzung nicht aktiv; Vera läuft derzeit im lokalen Modus.',
+  'fraudAlertTitle': 'Vera • Verdächtige Buchung blockiert',
+  'googleSignInConfigMissing':
+      'Google-Anmeldung fehlgeschlagen. Der SHA-1-Fingerabdruck der App ist möglicherweise nicht in der Firebase Console hinterlegt. Der Admin muss die Firebase-Einstellungen aktualisieren.',
+  'fraudReasonOutlier':
+      'Diese Ausgabe liegt {multiplier}× über deinem aktuellen Median von {median} TL. Vera findet den Sprung auffällig.',
+  'fraudNameRoundTransfer': 'Runde Überweisung · {amount} TL',
+  'fraudReasonRoundTransfer':
+      'Ein perfekt runder Betrag über 10.000 TL wurde erkannt. Häufig eine legitime Empfänger-Überweisung — bestätige, ob du es warst.',
+  'fraudNameBurst': '{merchant} · {count}× am selben Tag',
+  'fraudLocationBurstTotal': 'Gesamt {total} TL',
+  'fraudReasonBurst':
+      'Derselbe Händler hat heute {count}-mal abgebucht. Kartenwiederholung oder echter Einkaufsbummel?',
   'helpFaqQ1': 'Verbindet Vera sich mit meiner Bank?',
   'helpFaqA1':
       'Nein. Vera hat keine AISP/PSP-Lizenz. Du bringst die Daten: PDF-Auszüge, Belegfotos, Screenshots oder manuelle Einträge. Vera fügt sie mit KI zusammen und leitet reale Aktionen an deine Bank-App weiter.',
@@ -231,11 +234,6 @@ const Map<String, String> _deStrings = {
   'umaThinking': 'Uma denkt nach...',
   'umaAskHint': 'Frag Uma...',
   'umaStatusOnline': 'KI-Assistent · online',
-  'umaSuggestionBuyGold': '10g Gold kaufen',
-  'umaSuggestionMoveSavings': '2500 TL ins Sparen',
-  'umaActionPolicy': 'AKTIONSREGEL',
-  'umaActionPolicyDesc':
-      'Vera bewegt nie selbst Geld; jede Aktion öffnet deine Bank-App zur Bestätigung.',
   'onbStep1Title': 'Willkommen bei Vera',
   'onbStep1Subtitle':
       'Wähle zuerst deine Sprache. Du kannst sie jederzeit in den Einstellungen ändern.',
@@ -432,9 +430,9 @@ const Map<String, String> _deStrings = {
   'dividerOr': 'oder',
   'signupTitle': 'Konto erstellen',
   'signupSubtitleFirebase':
-      'Deine Vera-Identität und dein Profil werden über Firebase synchronisiert.',
+      'Erstelle dein Konto — dein Vera-Profil und deine Daten werden sicher synchronisiert.',
   'signupSubtitleLocal':
-      'Firebase ist noch nicht eingerichtet. Dieser Flow läuft im lokalen Demo-Modus weiter.',
+      'Keine Server-Konfiguration. Dieser Flow läuft im lokalen Demo-Modus weiter.',
   'signupFieldFullName': 'Vollständiger Name',
   'signupFieldEmail': 'E-Mail',
   'signupFieldPassword': 'Passwort',
@@ -452,8 +450,8 @@ const Map<String, String> _deStrings = {
   'signupStrengthWeak': 'Schwach',
   'signupStrengthMedium': 'Mittel',
   'signupStrengthStrong': 'Stark',
-  'signupCtaCreate': 'Firebase-Konto erstellen',
-  'signupCtaContinueLocal': 'Lokal fortfahren',
+  'signupCtaCreate': 'Registrieren',
+  'signupCtaContinueLocal': 'Als Demo fortfahren',
   'signupAlreadyHaveAccount': 'Hast du schon ein Konto? ',
   'signupSignIn': 'Anmelden',
   'demoSampleLoaded': 'Beispieldaten geladen.',
@@ -491,4 +489,179 @@ const Map<String, String> _deStrings = {
   'continueWithGoogle': 'Mit Google fortfahren',
   'googleSignInUnavailable':
       'Google-Anmeldung erfordert eine Firebase-Konfiguration fÃ¼r diesen Build.',
+  'bankActionsTitle': 'Bank-Optionen',
+  'bankActionsCancel': 'Abbrechen',
+  'bankActionsDelete': 'Bank löschen',
+  'bankActionsConfirmTitle': 'Diese Bank löschen?',
+  'bankActionsConfirmBody':
+      '{name} wird entfernt und zählt nicht mehr zum Gesamtsaldo.',
+  'bankDeleted': '{name} gelöscht',
+  'bankActionsFeedNote':
+      'Diese Bank gehört zu den Demo-Daten und kann nicht gelöscht werden. Selbst hinzugefügte kannst du entfernen.',
+  'billDetailPrompt':
+      'Meine {name}-Rechnung beträgt {amount}, fällig in {days} Tagen. Was soll ich tun?',
+  'categoryBudgetLabel': 'AUSGABEN DIESEN MONAT',
+  'categoryBudgetTopHint': 'Am meisten für {category} · {pct}%',
+  'categoryLimitEditTitle': 'Kategorielimit',
+  'categoryLimitEditSubtitle':
+      'Setze ein Monatsbudget für {category}. Vera zeigt bei jeder Ausgabe den Rest.',
+  'categoryLimitField': 'Monatslimit (TL)',
+  'categoryLimitSave': 'Speichern',
+  'categoryLimitClear': 'Limit entfernen',
+  'categoryNoLimit': 'kein Limit',
+  'categoryOver': '{amount} drüber',
+  'categoryRemaining': 'noch {amount}',
+  'creditFieldDebt': 'Bestehende Monatsraten',
+  'creditFieldIncome': 'Monatliches Einkommen',
+  'creditFieldLoanAmount': 'Kreditbetrag',
+  'creditFieldTerm': 'Laufzeit',
+  'creditTermMonths': '{n} Monate',
+  'creditScoreDisclaimer':
+      'Diese Seite berechnet keinen Bonitäts-Score. Echte Scores findest du bei deiner Bank oder einer Auskunftei. Hier siehst du nur eine geschätzte Monatsrate und Schuldenquote aus deinen Eingaben.',
+  'creditLoanSimulation': 'Kredit-Simulator',
+  'creditLoanSimulationSubtitle':
+      'Passe die Werte an — Monatsrate und Schuldenlast werden live berechnet.',
+  'creditResultMonthlyPayment': 'GESCHÄTZTE MONATSRATE',
+  'creditResultTotalCost': 'Gesamtrückzahlung',
+  'creditResultPaymentLoad': 'Rate / Einkommen',
+  'creditResultDtiAfter': 'Neue Schuldenquote',
+  'creditResultGuidance':
+      'Banken wünschen meist eine Schuldenquote unter 35%. Über 40% schränkt Angebote stark ein. Nur für Planungszwecke.',
+  'demoResetTile': 'Demo-Daten zurücksetzen',
+  'demoResetTileValue': 'Importe und Eintragungen löschen',
+  'demoResetTitle': 'Demo-Daten zurücksetzen?',
+  'demoResetBody':
+      'Importierte Transaktionen, von dir hinzugefügte Banken und Zielfortschritt kehren zum Startzustand zurück.',
+  'demoResetCancel': 'Abbrechen',
+  'demoResetConfirm': 'Zurücksetzen',
+  'demoResetDone': 'Zurück im Demo-Zustand',
+  'exportTile': 'Meine Daten exportieren',
+  'exportTileValue': 'JSON · nur auf dem Gerät',
+  'exportTitle': 'Deine Vera-Daten',
+  'exportSubtitle':
+      'Importierte Transaktionen, hinzugefügte Banken, dein Ziel und die erkannten Abos. Kopieren, ohne das Gerät zu verlassen.',
+  'exportCopy': 'JSON kopieren',
+  'exportCopied': 'In die Zwischenablage kopiert',
+  'firstScanPending': 'Warte auf ersten Scan',
+  'firstSyncPending': 'Warte auf ersten Sync',
+  'goalEditTitle': 'Ziel bearbeiten',
+  'goalEditTarget': 'Zielbetrag (TL)',
+  'goalEditSaved': 'Bislang gespart (TL)',
+  'goalEditFooter':
+      'Vera verfolgt den Saldo; Uma meldet sich monatlich mit einem neuen Impuls.',
+  'goalEditSave': 'Speichern',
+  'goalEmergencyFund': 'Notgroschen',
+  'goalEtaMonths': 'Noch {n} Monate',
+  'goalEtaReached': 'Geschafft 🎯',
+  'goalProgress': '{pct}% erreicht',
+  'goalRemaining': 'noch {amount}',
+  'goalsSectionTitle': 'Deine Ziele',
+  'lastScanAt': 'Letzter Scan {time}',
+  'loginTitle': 'Bei Vera anmelden',
+  'loginSubtitle':
+      'Melde dich mit deinem Konto an; Profilpräferenzen und KI-Aktionen bleiben lokal, bis du dich abmeldest.',
+  'loginEmailHint': 'du@vera.app',
+  'loginFooter':
+      'Wenn Firebase nicht konfiguriert ist, schlägt die Anmeldung fehl. Prüfe deine .env-Datei.',
+  'notifTitle': 'Benachrichtigungen',
+  'notifSubtitle': '{n} Signale, die Uma beobachtet',
+  'notifEmpty': 'Alles ruhig. Uma wacht weiter im Hintergrund.',
+  'notifBillTitle': '{name}-Rechnung steht an',
+  'notifBillBody': 'Betrag {amount}. Begleiche über Uma oder deine Bank.',
+  'notifPriceIncreaseTitle': '{name} hat den Preis erhöht',
+  'notifPriceIncreaseBody':
+      'Monatlich +{delta} · jetzt {price}. Du kannst es in Plänen einfrieren.',
+  'notifUnusedTitle': '{name} wird nicht genutzt',
+  'notifUnusedBody':
+      'Zuletzt: {last}. Vera markiert es als unbemerktes Leck.',
+  'notifBlockedDefault':
+      'Vera hat diese Transaktion als Anomalie eingestuft.',
+  'profileAiToneBadge': 'KI-TON / {tone}',
+  'profileAutoApprove': 'Auto-Freigabe-Limit',
+  'profileAutoApproveOff': 'Aus',
+  'profileConnectedTitle': '{n} verbundene Institute',
+  'profileConnectedSubtitle':
+      'Live-Salden werden über die aktuelle Sync-Richtlinie und den Feed-Cache aktualisiert.',
+  'profileConnectedAccount': 'Konto {last4}',
+  'profileDailyBriefing': 'Tägliches KI-Briefing',
+  'profileDailyBriefingSub':
+      'Starte den Tag mit Konto-Gesundheit, verdächtigen Aktivitäten und Spartipps',
+  'profileFaceId': 'Face-ID-Sperre',
+  'profileFaceIdSub':
+      'Biometrische Entsperrung vor sensiblen Aktionen erforderlich',
+  'profileFraudHigh': 'Empfindliche Betrugswarnungen',
+  'profileFraudHighSub':
+      'Vera markiert ungewöhnliche Geräte- und Zahlungsmuster früher',
+  'profileLiveSync': 'Live-Datenabgleich',
+  'profileLiveSyncLive': 'Live',
+  'profileLiveSyncBalanced': 'Ausgewogen',
+  'profileLiveSyncSaver': 'Sparmodus',
+  'profileSmartNotif': 'Smarte Benachrichtigungen',
+  'profileSmartNotifSub':
+      'Warnungen bei Betrug, Verlängerungen und Freigabeänderungen',
+  'profileVaultTitle': 'Geschützter Sitzungs-Tresor',
+  'profileVaultSubtitle':
+      'Identität wird separat von lokalen Präferenzen gespeichert.',
+  'profileVaultSignIn': 'Anmeldung',
+  'profileVaultProtectedSince': 'Geschützt seit',
+  'profileVaultThisDevice': 'Dieses Gerät',
+  'profileVaultApproval': 'Freigabe-Schutz',
+  'profileVaultManualOnly': 'Nur manuell',
+  'profileVaultSyncMode': 'Sync-Modus',
+  'profileVaultSyncLive': 'Live-Sync',
+  'profileVaultSyncBalanced': 'Ausgewogener Sync',
+  'profileVaultSyncSaver': 'Energiesparender Sync',
+  'securityAccountSection': 'KONTOSICHERHEIT',
+  'securityActiveBody': 'Fraud Radar verfolgt {n} aktive Warnungen.',
+  'securityClearBody':
+      'Keine offenen Betrugswarnungen im letzten Scan.',
+  'securityPillBlocked': 'KI-BLOCKIERT',
+  'securityPillApproved': 'VON DIR FREIGEGEBEN',
+  'securityPillKept': 'BLOCKIERT GELASSEN',
+  'securityDecisionKept':
+      'Du hast dieses Ereignis blockiert gelassen. Fraud Radar behandelt ähnliche Muster weiterhin als Hochrisiko.',
+  'securityDecisionApproved':
+      'Du hast dieses Ereignis als sicher markiert. Fraud Radar nutzt dieses Feedback, um ähnliche Fehlalarme zu reduzieren.',
+  'securityStatBlockedLabel': 'BLOCKIERT',
+  'securityStatBlockedSub': 'aktiv',
+  'securityStatReviewedLabel': 'GEPRÜFT',
+  'securityStatReviewedSub': 'diese Woche',
+  'securityStatDevicesLabel': 'GERÄTE',
+  'securityStatDevicesSub': 'vertraut',
+  'securityViewReport': 'UMA-BERICHT ÖFFNEN',
+  'subsRenewalLabel': 'Verlängerung',
+  'subsActivityLabel': 'Aktivität',
+  'txnDetailWhen': 'Wann',
+  'txnDetailCategory': 'Kategorie',
+  'txnDetailDirection': 'Richtung',
+  'txnDetailIncoming': 'Eingehend',
+  'txnDetailOutgoing': 'Ausgehend',
+  'txnDetailAskPrompt':
+      'Schau dir die {name}-Buchung an — ist {amount} normal?',
+  'umaAuditTrailSubtitle':
+      'Eine signierte lokale Aufzeichnung von Umas Antworten auf diesem Gerät.',
+  'umaAuditTrailEmptyState':
+      'Noch keine signierten Aktionen. Sprich mit Uma, und das Vertrauensprotokoll erscheint hier.',
+  'umaAuditNoteAttached': 'Notiz angehängt',
+  'umaAuditActionReplyGenerated': 'Antwort erzeugt',
+  'umaGreeting':
+      'Hallo {name}. Ich habe deine importierten Auszüge gelesen. Ich kann deine Ausgaben analysieren, ungenutzte Abos aufdecken und beim Setzen von Sparzielen helfen. Ich bewege kein Geld — wenn eine Aktion nötig ist, leite ich dich an deine Bank-App weiter.',
+  'umaPromptAnalyze': 'Analysiere meine Ausgaben in diesem Monat.',
+  'umaReplyAnalyze':
+      'Diesen Monat gibst du am meisten für {top} mit {topAmount} aus. Gesamtabfluss {spending}. Wenn du willst, setzen wir Limits pro Kategorie.',
+  'umaReplyAnalyzeEmpty':
+      'Noch keine Transaktionen zum Auswerten. Scanne einen Beleg oder importiere einen Auszug, dann brechen wir die Ausgaben gemeinsam herunter.',
+  'umaReplyExplainWealth':
+      'Vera verfolgt dein Portfolio über die importierten Konten. Aktien wirken diesen Monat leicht überallokiert; mein Vorschlag: Gold oder Bargeld beim nächsten Bankbesuch aufstocken.',
+  'umaReplyLoan':
+      'Basierend auf Einkommen und Schulden aus deinen Auszügen siehst du für mittlere Privatkredite stark aus. Öffne die Kreditsimulation, dann passen wir Betrag und Laufzeit gemeinsam an.',
+  'umaReplySecurity':
+      'Diesen Transfer habe ich markiert, weil der Empfänger nur einmal zuvor auftauchte und der Gerätestandort nicht zu deinem üblichen Muster passte. Vera blockiert nicht bei deiner Bank — sie warnt, die Entscheidung trefft ihr gemeinsam.',
+  'umaReplySubscriptions':
+      'Du hast {n} prüfenswerte Pläne. Deine monatliche Abo-Summe liegt bei etwa {total}.',
+  'umaReplySubscriptionsEmpty':
+      'Ich sehe noch keine aktiven Abos. Importiere einen Auszug, dann erkennt Vera wiederkehrende Buchungen.',
+  'umaReplyFallback':
+      'Dabei kann ich helfen. Auf Wunsch gebe ich dir eine kurze Finanz-Einschätzung oder bereite einen sicheren nächsten Schritt vor.',
+  'updatedAt': 'Aktualisiert {time}',
 };

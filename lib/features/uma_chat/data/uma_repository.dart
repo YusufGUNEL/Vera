@@ -44,69 +44,6 @@ class UmaRepository {
     final l10n = _strings;
 
     switch (intent.type) {
-      case UmaIntentType.buyGold:
-        final banks = _ref.read(homeControllerProvider).banks;
-        final primary = banks.isEmpty ? 'Garanti BBVA' : banks.first.name;
-        final last4 = banks.isEmpty ? '****' : banks.first.last4;
-        return _reply(
-          intent: intent.type.name,
-          text: l10n.umaReplyBuyGold(primary),
-          card: OrderCard(
-            type: UmaActionType.buyGold,
-            title: l10n.orderTitleBuyGold,
-            from: '${l10n.connectedAccounts} / $primary $last4',
-            to: '$primary Gold',
-            amount: 29840,
-            bankApp: primary,
-            detailLabel: l10n.orderTitleGoldRate,
-            detailValue: 'TL 2.984/g',
-          ),
-        );
-      case UmaIntentType.payCreditCard:
-        final banks = _ref.read(homeControllerProvider).banks;
-        final bank =
-            banks.length > 1 ? banks[1] : (banks.isNotEmpty ? banks.first : null);
-        final bankName = bank?.name ?? 'Akbank';
-        return _reply(
-          intent: intent.type.name,
-          text: l10n.umaReplyPayCard(bankName),
-          card: OrderCard(
-            type: UmaActionType.payCreditCard,
-            title: l10n.orderTitlePayCard,
-            from:
-                '${l10n.connectedAccounts} / $bankName ${bank?.last4 ?? '****'}',
-            to: bankName,
-            amount: 12450,
-            bankApp: bankName,
-            detailLabel: l10n.orderTitleDue,
-            detailValue: l10n.orderTitleDueToday,
-          ),
-        );
-      case UmaIntentType.moveToSavings:
-        final goal = _ref.read(goalsControllerProvider);
-        const moveAmount = 2500.0;
-        final after = goal.target <= 0
-            ? 0
-            : (((goal.saved + moveAmount) / goal.target) * 100)
-                .clamp(0, 100)
-                .round();
-        final banks = _ref.read(homeControllerProvider).banks;
-        final source = banks.isEmpty ? 'Yapi Kredi' : banks.first.name;
-        final last4 = banks.isEmpty ? '****' : banks.first.last4;
-        return _reply(
-          intent: intent.type.name,
-          text: l10n.umaReplyMoveSavings(after),
-          card: OrderCard(
-            type: UmaActionType.moveToSavings,
-            title: l10n.goalEmergencyFund,
-            from: '$source $last4',
-            to: l10n.goalEmergencyFund,
-            amount: moveAmount,
-            bankApp: source,
-            detailLabel: l10n.goalsSectionTitle,
-            detailValue: '$after%',
-          ),
-        );
       case UmaIntentType.showSubscriptions:
         final subs = _ref.read(subscriptionsControllerProvider);
         if (subs.items.isEmpty) {
@@ -365,14 +302,12 @@ Uma:''';
 
   UmaMessage _reply({
     required String text,
-    OrderCard? card,
     String? intent,
   }) {
     final message = UmaMessage(
       id: _messageId(),
       role: UmaRole.uma,
       text: text,
-      card: card,
       createdAt: DateTime.now(),
       intent: intent,
     );
@@ -381,10 +316,6 @@ Uma:''';
       action: UmaAuditAction.replyGenerated,
       summary: text,
       intent: intent,
-      metadata: {
-        'hasCard': card != null,
-        if (card != null) 'bankApp': card.bankApp,
-      },
     );
     return message;
   }

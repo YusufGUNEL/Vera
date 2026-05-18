@@ -1,13 +1,60 @@
 # Yapılacaklar — Vera Demo Hazırlığı
 
-> **Durum (2026-05-18):** Demo öncesi kritik adımların hepsi tamamlandı.
-> Sahte/mock veri sızıntısı yok (örnek hesap hariç — orası bilinçli);
-> hardcoded locale sızıntıları temizlendi; ölü kod (`comingSoon`,
-> `someKey`, `dart`, yanıltıcı yorumlar) kaldırıldı; signup ekranı 6
-> dile çevrildi; Android release config Play Store yüklemeye hazır.
+> **Durum (2026-05-19):** Telefonda elle test edildikten sonra çıkan
+> bulgular düzeltildi: sahte para işlemi butonları kaldırıldı (NetWorth
+> quick actions, Uma intent OrderCard'ları), sahte kredi puanı/gauge
+> ekranı yerine gerçek aylık-ödeme kalkülatörü kondu, Uma feedback bar
+> kaldırıldı, audit log + güvenlik heuristic mesajları + bulut sync
+> bilgisi l10n'a alındı, signup invisible-text/back-button/wording
+> düzeltildi, ana sayfadan UmaInsightStrip kaldırıldı. 6 dilin tamamı
+> 546 anahtarla parity'de.
 >
-> Aşağıda kalan **opsiyonel** iyileştirmeler var — demo için kritik değil,
-> vakit kalırsa P1 → P2 → P3 sırasıyla yap.
+> **Yarın yapılacak tek kritik iş: aşağıdaki "Hemen önce" bölümü
+> (Google Sign-In SHA-1).** Geri kalanlar opsiyonel iyileştirme.
+
+## Hemen önce yap (yarın başlarken — kritik)
+
+### Google Sign-In çalışmıyor: Firebase Console'a SHA-1 ekle
+
+`PlatformException(sign_in_failed, ...)` — `google-services.json`'da
+`oauth_client: []` boş, yani Firebase Console'da Android uygulamasına
+SHA-1 fingerprint kayıtlı değil. Kodla çözülmez.
+
+1. https://console.firebase.google.com/project/vera-ai-finance/settings/general
+2. **Your apps** → Android (`com.vera.vera`) → **Add fingerprint**
+3. Bu debug SHA-1'i yapıştır → **Save**:
+   ```
+   9C:22:FD:B8:47:10:A1:87:39:6E:67:AD:58:77:E3:36:B6:85:14:7D
+   ```
+   (Play App Signing açıksa SHA-256 da gerekecek:
+   `25:4C:41:C6:E5:8D:DC:E2:C7:8D:C7:94:F5:7A:29:E8:7A:CA:B4:B9:36:83:74:23:6F:4B:40:A0:59:35:20:78`)
+4. Aynı sayfadan **`google-services.json`**'u yeniden indir →
+   `android/app/google-services.json` üzerine yaz.
+5. `flutter build apk --release --no-tree-shake-icons` → telefona kur.
+6. Test: Login veya signup ekranında "Google ile devam et" → Google
+   hesap seçici açılmalı, ardından home'a düşmelisin. Eğer hâlâ
+   `sign_in_failed` görüyorsan UI artık "Firebase Console'a SHA-1
+   eklenmemiş olabilir" diye uyarıyor (l10n.googleSignInConfigMissing).
+
+### Telefonda smoke test (yeni APK kurulduktan sonra)
+
+- [ ] Signup ekranı: input box'lardaki yazılar görünüyor mu? (defansif
+      `Theme.of(...).textTheme.bodyLarge` ile düzelttik, ama gerçek
+      cihaz doğrulaması yapılmadı.)
+- [ ] Signup ekranı: sol üst geri butonu login'e dönüyor mu?
+      (`context.push` + `canPop` fallback).
+- [ ] Signup ekranı: birincil buton metni "Kayıt ol" (eskisi "Firebase
+      hesabı oluştur"du).
+- [ ] Kredi sayfası: geri butonu var, sahte 850 puanlık gauge yok,
+      sadece slider-tabanlı kalkülatör + disclaimer.
+- [ ] Uma sohbet: mesajların altında "Yardımcı oldu / Geliştirilmeli /
+      Not ekle" satırı YOK.
+- [ ] Uma sohbet → ⚙ → audit log: başlık + alt metin + boş-durum metni
+      seçili dilde (TR'de Türkçe, EN'de İngilizce vs.).
+- [ ] Net Worth kartı: "Gönder / İste / Yükle / Öde" quick action
+      butonları YOK.
+- [ ] Ana sayfa: "UMA İÇGÖRÜ" stripi YOK.
+- [ ] Subscriptions: ödeme/freeze chip'leri YOK (sadece bilgi).
 
 ## Play Store yüklemesi için tek yapılması gereken
 
@@ -65,8 +112,8 @@ kayıtlı gerçek hesap gerekir.
 ### P2 — Ürün hissi (post-demo)
 
 - [ ] `GoalEditSheet` için daha güçlü ilk öneri akışı.
-- [ ] `UmaInsightStrip` ve `ProactiveInsightCard` için küçük animasyon /
-      stagger geçişleri.
+- [ ] `ProactiveInsightCard` için küçük animasyon / stagger geçişleri.
+      (`UmaInsightStrip` kaldırıldı.)
 - [ ] Connected accounts / subscriptions / wealth empty-state kartları
       arasında görsel dil birliğini artır.
 - [ ] Goal kartında "örnek hedefler" / "hızlı preset" akışı (ev, araç,
@@ -86,11 +133,20 @@ kayıtlı gerçek hesap gerekir.
       (`home_screen.dart` artık layout + karar yapıyor).
 - [ ] Repo genelinde UTF-8 encoding hijyen taraması.
 - [ ] Kullanılmayan string key taraması.
+- [ ] Uma feedback storage altyapısı (UI kaldırıldı) — `firebase_uma_feedback_store.dart`,
+      `uma_feedback_store.dart`, `uma_feedback.dart`, repository'deki
+      `saveFeedback/loadFeedback` ölü kalıyor. Eski veriler için
+      okuma korunuyor, yazılım yok. Tamamen silmek için ayrı bir
+      sprint gerekir (Firestore koleksiyonu da temizlenmeli).
+- [ ] Kredi simülatöründeki faiz çarpanı (`1.16 + months/100`) gerçek
+      TR banka oranlarıyla doğrulanmadı — disclaimer veriyoruz ama
+      ileride bir referans rakam (TCMB ortalama) bağlanabilir.
 - [ ] Unit test ekle:
-      - `FraudHeuristic.analyze()`
+      - `FraudHeuristic.analyze()` (l10n parametresi de testlenmeli)
       - `AiCategorizer.heuristic()`
       - `GoalAdvisor` (deterministik output testi)
       - `RecurringTransactionParser.detectSubscriptions()`
+      - `CreditRuleEngine.evaluate()` (monthlyPayment / paymentLoad / dti)
 
 ### P3 — iOS / billing (büyük iş, ayrı sprint)
 
@@ -106,10 +162,12 @@ kayıtlı gerçek hesap gerekir.
 
 | İş | Neden |
 | --- | --- |
+| Firebase Console — SHA-1 fingerprint ekle | Google Sign-In çalışması için (yukarıdaki "Hemen önce" bölümü) |
 | Firebase Console / Cloud Billing | Kredi kartı/hesap senin |
 | iOS sertifikası | Apple Developer hesabı senin |
 | Play Store / TestFlight upload | Hesaplar senin |
 | Gemini API key rotate (demo sonrası) | Google hesabına giriş |
+| Telefonda yeni APK ile elle smoke test | Cihaz senin |
 
 ### Gemini key rotate (5 dk — DEMO SONRASI)
 

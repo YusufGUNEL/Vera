@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/localization/app_strings.dart';
+import '../../../core/routing/routes.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../state/auth_controller.dart';
 import 'widgets/auth_field.dart';
@@ -135,6 +137,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             ? l10n.signupFailedTemplate(error.code)
             : message;
       });
+    } on PlatformException catch (error) {
+      setState(() {
+        _error = error.code == 'sign_in_failed'
+            ? l10n.googleSignInConfigMissing
+            : (error.message?.trim().isNotEmpty == true
+                ? error.message!
+                : l10n.signupFailedTemplate(error.code));
+      });
     } catch (error) {
       setState(() => _error = '$error');
     } finally {
@@ -179,7 +189,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          onPressed: () => context.pop(),
+          onPressed: () => context.canPop()
+              ? context.pop()
+              : context.go(Routes.login),
           icon: Icon(Icons.arrow_back, color: t.ink),
           tooltip: l10n.signupSignIn,
         ),
@@ -392,7 +404,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               // ── "Already have an account? Sign in" ───────────────────
               Center(
                 child: TextButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () => context.canPop()
+              ? context.pop()
+              : context.go(Routes.login),
                   style: TextButton.styleFrom(
                     foregroundColor: t.brand,
                     padding: const EdgeInsets.symmetric(

@@ -150,7 +150,6 @@ class RecurringTransactionParser {
           status: SubscriptionStatus.unused,
           recommendation: l10n.subsRecommendationDetected,
           icon: catalog?.icon ?? Icons.subscriptions_outlined,
-          canFreeze: true,
         ),
       );
     });

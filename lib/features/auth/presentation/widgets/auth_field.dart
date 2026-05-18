@@ -49,10 +49,15 @@ class AuthField extends StatelessWidget {
           autofillHints: autofillHints,
           textInputAction: textInputAction,
           onSubmitted: onSubmitted,
-          style: TextStyle(fontSize: 15, color: t.ink),
+          cursorColor: t.uma,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(fontSize: 15, color: t.ink),
           decoration: InputDecoration(
             filled: true,
             fillColor: t.card,
+            hintStyle: TextStyle(color: t.muted),
             prefixIcon: prefixIcon != null
                 ? Icon(prefixIcon, size: 19, color: t.muted)
                 : null,

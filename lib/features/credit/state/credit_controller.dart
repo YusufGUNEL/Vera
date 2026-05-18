@@ -7,19 +7,19 @@ import '../domain/loan_application.dart';
 class CreditState {
   const CreditState({
     required this.application,
-    required this.decision,
+    required this.calculation,
   });
 
   final LoanApplication application;
-  final CreditDecision decision;
+  final CreditCalculation calculation;
 
   CreditState copyWith({
     LoanApplication? application,
-    CreditDecision? decision,
+    CreditCalculation? calculation,
   }) {
     return CreditState(
       application: application ?? this.application,
-      decision: decision ?? this.decision,
+      calculation: calculation ?? this.calculation,
     );
   }
 }
@@ -28,22 +28,17 @@ class CreditController extends StateNotifier<CreditState> {
   CreditController(this._repository)
       : super(
           CreditState(
-            application: const LoanApplication(
-              amount: 0,
-              months: 12,
-              monthlyIncome: 0,
-              monthlyDebt: 0,
-            ),
-            decision: _repository.evaluate(
-              const LoanApplication(
-                amount: 0,
-                months: 12,
-                monthlyIncome: 0,
-                monthlyDebt: 0,
-              ),
-            ),
+            application: _initial,
+            calculation: _repository.evaluate(_initial),
           ),
         );
+
+  static const LoanApplication _initial = LoanApplication(
+    amount: 50000,
+    months: 24,
+    monthlyIncome: 35000,
+    monthlyDebt: 0,
+  );
 
   final CreditRepository _repository;
 
@@ -66,7 +61,7 @@ class CreditController extends StateNotifier<CreditState> {
   void _update(LoanApplication application) {
     state = state.copyWith(
       application: application,
-      decision: _repository.evaluate(application),
+      calculation: _repository.evaluate(application),
     );
   }
 }

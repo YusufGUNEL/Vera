@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -88,6 +89,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _error = message == null || message.isEmpty
             ? l10n.loginFirebaseError(error.code)
             : message;
+      });
+    } on PlatformException catch (error) {
+      setState(() {
+        _error = error.code == 'sign_in_failed'
+            ? l10n.googleSignInConfigMissing
+            : (error.message?.trim().isNotEmpty == true
+                ? error.message!
+                : l10n.loginFirebaseError(error.code));
       });
     } catch (error) {
       setState(() => _error = '$error');
@@ -236,7 +245,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton.icon(
-                      onPressed: _busy ? null : () => context.go(Routes.signup),
+                      onPressed: _busy ? null : () => context.push(Routes.signup),
                       icon: Icon(
                         Icons.person_add_alt_1_outlined,
                         size: 18,
@@ -303,6 +312,11 @@ class _Field extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscure,
+          cursorColor: t.uma,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: t.ink),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: t.muted),

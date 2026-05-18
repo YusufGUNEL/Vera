@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
+import '../../../core/localization/locale_controller.dart';
 import '../../../core/services/notification_service.dart';
 import '../../home/data/transaction.dart';
 import '../../home/state/home_controller.dart';
@@ -161,7 +163,8 @@ class SecurityController extends StateNotifier<SecurityState> {
   }
 
   void _runHeuristic(List<Txn> txns) {
-    _heuristicFeed = _heuristic.analyze(txns);
+    final strings = AppStrings(_ref.read(localeControllerProvider));
+    _heuristicFeed = _heuristic.analyze(txns, strings);
     if (!mounted) return;
     final merged = _mergedChecks();
     state = state.copyWith(
@@ -182,13 +185,14 @@ class SecurityController extends StateNotifier<SecurityState> {
 
   Future<void> _fireNotificationsForNewBlocks(
       List<SecurityCheck> checks) async {
+    final strings = AppStrings(_ref.read(localeControllerProvider));
     for (final check in checks) {
       if (!check.blocked) continue;
       if (_notifiedIds.contains(check.id)) continue;
       _notifiedIds.add(check.id);
       try {
         await _notifications.showFraudAlert(
-          title: 'Vera • Şüpheli işlem engellendi',
+          title: strings.fraudAlertTitle,
           body: '${check.name} · ${check.location}',
           payload: '/security',
         );

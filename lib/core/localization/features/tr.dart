@@ -12,10 +12,6 @@ const Map<String, String> _trStrings = {
   'liveFeed': 'CANLI',
   'syncing': 'EŞİTLENİYOR',
   'thisMonth': 'bu ay',
-  'actionSend': 'Gönder',
-  'actionRequest': 'İste',
-  'actionTopUp': 'Yükle',
-  'actionPay': 'Öde',
   'connectedAccounts': 'Bağlı hesaplar',
   'refresh': 'Yenile',
   'syncingDots': 'Eşitleniyor...',
@@ -59,25 +55,22 @@ const Map<String, String> _trStrings = {
   'umaInsightDeepenCta': 'Uma ile derinleştir',
   'spent': 'Harcanan',
   'incoming': 'Gelen',
-  'creditHealthScore': 'Kredi sağlık skoru',
-  'creditStatIncome': 'GELİR',
-  'creditStatDti': 'BORÇ/GELİR',
-  'creditStatTerm': 'VADE',
-  'creditTermMo': '{n} ay',
   'creditTermMonths': '{n} ay',
-  'creditRunSimulation': 'Kredi simülasyonunu çalıştır',
-  'creditCurrentDecision': 'Geçerli karar',
-  'creditPersonalLoan': 'Kişisel kredi · {amount}',
-  'creditMonthsApr': '{n} ay · %{apr} APR',
-  'creditUmaInsight': 'UMA İÇGÖRÜ',
-  'creditEligibleProducts': 'Uygun ürünler',
-  'creditLoanSimulation': 'Kredi simülasyonu',
+  'creditScoreDisclaimer':
+      'Bu sayfa kredi puanı hesaplamaz. Gerçek kredi notu için bankan veya Findeks/KKB gibi kuruluşların hizmetini kullan. Burada yalnızca girdiğin değerlerle yaklaşık aylık ödeme ve borç oranı hesaplanır.',
+  'creditLoanSimulation': 'Kredi simülatörü',
   'creditLoanSimulationSubtitle':
-      'İstediğin değerleri ayarla, Vera kararı anlık günceller.',
+      'Değerleri ayarla — aylık ödeme ve borç yükü canlı hesaplanır.',
   'creditFieldLoanAmount': 'Kredi tutarı',
   'creditFieldTerm': 'Vade',
   'creditFieldIncome': 'Aylık gelir',
-  'creditFieldDebt': 'Aylık borç',
+  'creditFieldDebt': 'Mevcut aylık borç',
+  'creditResultMonthlyPayment': 'TAHMİNİ AYLIK ÖDEME',
+  'creditResultTotalCost': 'Toplam geri ödeme',
+  'creditResultPaymentLoad': 'Taksit / gelir',
+  'creditResultDtiAfter': 'Yeni borç / gelir oranı',
+  'creditResultGuidance':
+      'Bankalar genellikle borç/gelir oranını %35\'in altında tutmanı bekler. %40 üstü teklifleri zorlaştırır. Yalnızca planlama amaçlıdır.',
   'subsRenewalLabel': 'Yenileme',
   'subsActivityLabel': 'Aktivite',
   'profileDailyBriefing': 'Günlük AI özeti',
@@ -114,17 +107,9 @@ const Map<String, String> _trStrings = {
   'profileConnectedSubtitle':
       'Canlı bakiyeler mevcut senkron politikası ve feed cache üzerinden tazelenir.',
   'profileConnectedAccount': 'Hesap {last4}',
-  'orderTitleBuyGold': '10g altın alımı',
-  'orderTitlePayCard': 'Kredi kartı ekstresini öde',
-  'orderTitleGoldRate': 'Fiyat',
-  'orderTitleDue': 'Vade',
-  'orderTitleDueToday': 'Bugün',
-  'orderPillReady': 'HAZIR',
-  'orderPillSent': 'BANKADA',
-  'orderPillDismissed': 'İPTAL',
   'creditTitle': 'Kredi',
   'creditSubtitle': 'Gerçek gelirine göre borçlanma.',
-  'creditScoreLabel': 'KREDİ PUANI',
+  'creditSummaryCardSubtitle': 'Aylık ödemeyi ve borç oranını hesapla',
   'openCredit': 'Krediyi aç',
   'wealthTitle': 'Servet',
   'wealthSubtitle': 'Paranız otonom çalışıyor.',
@@ -147,8 +132,6 @@ const Map<String, String> _trStrings = {
   'filterAttention': 'Dikkat gerek',
   'filterUnused': 'Kullanılmıyor',
   'filterPriceChanges': 'Fiyat değişimi',
-  'freezePlan': 'Planı dondur',
-  'reviewPlan': 'Planı incele',
   'askUma': "UMA'ya sor",
   'securityTitle': 'Güvenlik',
   'securitySubtitle': 'Hesabınızın canlı koruma katmanı.',
@@ -231,11 +214,6 @@ const Map<String, String> _trStrings = {
   'statementFallbackWarning':
       'Gemini API key yok veya ekstre çözümlenemedi. Lütfen işlemleri manuel gir.',
   'statementFallbackAction': 'AI çalışmadı — manuel gir',
-  'openBankApp': '{bank} uygulamasını aç',
-  'umaForwardNote':
-      'İşlem bankanda tamamlanır. Vera SMS veya ekstreyle sonucu yakalar.',
-  'forwardedToBank': "{bank}'a yönlendirildi · Vera takip ediyor",
-  'keep': 'Vazgeç',
   'thisMonthsAiPlan': 'Bu ayın AI önerisi',
   'aiPlanFooter': "Uma'nın önerisi — bankanda uygula, Vera kaydını tutar.",
   'applyAtBank': 'Bankamda uygula',
@@ -269,16 +247,12 @@ const Map<String, String> _trStrings = {
   'umaToolGoalCreated': 'Tamam, {target} TL\'lik hedefi oluşturdum.',
   'umaToolBillAdded': '{name} faturasını {days} gün sonrası için ekledim.',
   'umaToolExpenseAdded': '{name} ({amount} TL) işlemini kaydettim.',
-  'umaSuggestionPay': 'Kredi kartımı öde',
   'umaSuggestionSubs': 'Aboneliklerimi göster',
   'umaSuggestionAnalyze': 'Harcamalarımı analiz et',
   'voiceCommandTooltip': 'Sesli komut',
-  'requireConfirmation': 'Onayımı iste',
-  'requireConfirmationDesc':
-      'Eyleme geçmeden önce her zaman bir onay kartı göster',
-  'orderFrom': 'Kimden',
-  'orderTo': 'Kime',
-  'orderAmount': 'Tutar',
+  'umaAuditTrailTitle': 'Denetim kaydı',
+  'umaAuditTrailEmpty': 'Henüz imzalı Uma aksiyonu yok.',
+  'umaAuditTrailCount': 'Bu cihazda {n} imzalı aksiyon kayıtlı.',
   'accountTilePersonal': 'Kişisel bilgiler',
   'accountTileEmail': 'E-posta',
   'accountTileSecurity': 'Güvenlik & PIN',
@@ -306,6 +280,23 @@ const Map<String, String> _trStrings = {
   'infoLocalData': 'Yerel veri',
   'infoLocalDataDescription':
       'OCR fişleri ve banka eklemeleri SharedPreferences\'ta tutuluyor. "Verileri dışa aktar" P1 backlog\'unda.',
+  'infoCloudSync': 'Bulut senkronu',
+  'infoCloudSyncActive':
+      'Sunucu bağlı. İçe aktardığın fişler, ekstreler, banka eklemeleri, profil ayarları ve işlemler buluta senkronlanabilir.',
+  'infoCloudSyncInactive':
+      'Bu oturumda sunucu bağlı değil; Vera şu an yalnızca cihaz üzerinde çalışıyor.',
+  'fraudAlertTitle': 'Vera • Şüpheli işlem engellendi',
+  'googleSignInConfigMissing':
+      "Google ile giriş yapılamadı. Firebase Console'a uygulamanın SHA-1 sertifikası henüz eklenmemiş olabilir. Yönetici Firebase ayarlarını güncellemeli.",
+  'fraudReasonOutlier':
+      "Bu işlem, son işlemlerinin medyanı olan {median} TL'nin {multiplier}× üzerinde. Vera bu sıçramayı dikkat çekici buldu.",
+  'fraudNameRoundTransfer': 'Yuvarlak transfer · {amount} TL',
+  'fraudReasonRoundTransfer':
+      '10.000 TL üzerinde, tam yuvarlak bir tutar tespit edildi. Genelde alıcı transferi böyle olur; sen onayladıysan sorun yok.',
+  'fraudNameBurst': '{merchant} · {count}× aynı gün',
+  'fraudLocationBurstTotal': 'Toplam {total} TL',
+  'fraudReasonBurst':
+      'Aynı gün içinde aynı satıcıdan {count} işlem yapılmış. Bu kart tekrar denemesi mi yoksa gerçek alışveriş mi, hatırla.',
   'helpFaqQ1': 'Vera bankama bağlanır mı?',
   'helpFaqA1':
       'Hayır. Vera AISP/PSP lisansı taşımıyor. Veriyi sen getiriyorsun: PDF ekstre, fiş fotoğrafı, ekran görüntüsü ya da manuel giriş. Vera AI ile birleştirip yorumluyor ve doğru bankaya yönlendiriyor.',
@@ -318,13 +309,7 @@ const Map<String, String> _trStrings = {
   'helpContact': 'İletişim',
   'demoUser': 'Demo kullanıcı',
   'umaGreeting':
-      'Merhaba {name}. İçe aktardığın işlemleri okudum. Kart faturası ödeyebilir, transfer hazırlayabilir veya altın fiyatına bakabiliriz. Para hareketi hep senin bankanda olur; ben hazırlığı yapar, sonucu takip ederim.',
-  'umaReplyBuyGold':
-      '{bank} üzerinden 10 gram altın alım planını hazırladım. Uygulamayı açıp onayla; SMS\'ten sonucu takip ederim.',
-  'umaReplyPayCard':
-      '{bank} ekstresi ödemeye hazır. Uygulamayı doğrudan ödeme ekranında açacağım.',
-  'umaReplyMoveSavings':
-      'Acil durum fonu planın hazır. Bankanı aç ve transferi orada onayla. Bu transferden sonra hedefe %{pct} ulaşıyorsun.',
+      'Merhaba {name}. İçe aktardığın işlemleri okudum. Harcamalarını analiz edebilir, kullanılmayan abonelikleri tespit edebilir, birikim hedeflerine yardım edebilirim. Para hareketi yapmam — aksiyon gerekirse seni bankanın uygulamasına yönlendiririm.',
   'umaReplySubscriptions':
       'Bakmaya değer {n} planın var. Aylık abonelik toplamın {total} civarında.',
   'umaReplySubscriptionsEmpty':
@@ -344,11 +329,6 @@ const Map<String, String> _trStrings = {
   'umaThinking': 'Uma düşünüyor...',
   'umaAskHint': "Uma'ya sor...",
   'umaStatusOnline': 'AI asistan · çevrimiçi',
-  'umaSuggestionBuyGold': '10g altın al',
-  'umaSuggestionMoveSavings': "2500 TL'yi birikime aktar",
-  'umaActionPolicy': 'EYLEM POLİTİKASI',
-  'umaActionPolicyDesc':
-      'Vera para hareketini bankanda yapar; sen her zaman onay verirsin.',
   'categoryBudgetLabel': 'BU AYKİ HARCAMALAR',
   'categoryOther': 'Diğer',
   'receiptDefaultName': 'Fiş',
@@ -382,10 +362,6 @@ const Map<String, String> _trStrings = {
   'bankDeleted': '{name} silindi',
   'bankActionsFeedNote':
       'Bu banka demo verisinde geliyor — silinemez. Kendi eklediklerini silebilirsin.',
-  'umaPromptSend': 'Bir arkadaşa para göndermek istiyorum.',
-  'umaPromptRequest': 'Bir arkadaştan para iste.',
-  'umaPromptTopUp': 'Hesabıma yükleme yapmak istiyorum.',
-  'umaPromptPay': 'Kredi kartı faturamı ödemek istiyorum.',
   'umaPromptAnalyze': 'Bu ay harcamalarımı analiz et.',
   'txnDetailWhen': 'Zaman',
   'txnDetailCategory': 'Kategori',
@@ -611,9 +587,9 @@ const Map<String, String> _trStrings = {
   'dividerOr': 'veya',
   'signupTitle': 'Hesabını oluştur',
   'signupSubtitleFirebase':
-      'Vera kimliğin ve profilin Firebase üzerinden senkronlanacak.',
+      'Hesabını oluştur — Vera profilin ve verilerin güvenle senkronlanır.',
   'signupSubtitleLocal':
-      'Firebase henüz yapılandırılmadı. Bu akış yerel demo modunda devam edecek.',
+      'Sunucu yapılandırması yok. Bu cihazda demo modunda devam edeceksin.',
   'signupFieldFullName': 'Ad Soyad',
   'signupFieldEmail': 'E-posta',
   'signupFieldPassword': 'Şifre',
@@ -629,8 +605,8 @@ const Map<String, String> _trStrings = {
   'signupStrengthWeak': 'Zayıf',
   'signupStrengthMedium': 'Orta',
   'signupStrengthStrong': 'Güçlü',
-  'signupCtaCreate': 'Firebase hesabı oluştur',
-  'signupCtaContinueLocal': 'Yerel olarak devam et',
+  'signupCtaCreate': 'Kayıt ol',
+  'signupCtaContinueLocal': 'Demo olarak devam et',
   'signupAlreadyHaveAccount': 'Zaten hesabın var mı? ',
   'signupSignIn': 'Giriş yap',
   'demoSampleLoaded': 'Örnek hesap verileri yüklendi.',
@@ -668,4 +644,10 @@ const Map<String, String> _trStrings = {
   'continueWithGoogle': 'Google ile devam et',
   'googleSignInUnavailable':
       'Google ile giris icin bu buildde Firebase yapilandirilmis olmali.',
+  'umaAuditTrailSubtitle':
+      "Uma'nın yanıtlarının cihazına imzalanmış yerel kaydı.",
+  'umaAuditTrailEmptyState':
+      "Henüz imzalı bir aksiyon yok. Uma ile bir şeyler konuştuğunda burada görünür.",
+  'umaAuditNoteAttached': 'Not eklendi',
+  'umaAuditActionReplyGenerated': 'Yanıt üretildi',
 };

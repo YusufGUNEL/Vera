@@ -398,24 +398,6 @@ class _SubscriptionTile extends StatelessWidget {
                     height: 1.45,
                   ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _ActionChip(
-                      label: item.canFreeze
-                          ? context.l10n.freezePlan
-                          : context.l10n.reviewPlan,
-                      foreground: t.brand,
-                      background: t.brandSoft.withValues(alpha: 0.16),
-                    ),
-                    const SizedBox(width: 8),
-                    _ActionChip(
-                      label: context.l10n.askUma,
-                      foreground: t.uma,
-                      background: t.umaSoft,
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -467,37 +449,6 @@ class _MetaItem extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ActionChip extends StatelessWidget {
-  const _ActionChip({
-    required this.label,
-    required this.foreground,
-    required this.background,
-  });
-
-  final String label;
-  final Color foreground;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          color: foreground,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 }

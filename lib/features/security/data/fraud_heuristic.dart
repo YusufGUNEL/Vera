@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../home/data/transaction.dart';
 import 'security_check.dart';
 
@@ -17,7 +18,7 @@ import 'security_check.dart';
 class FraudHeuristic {
   const FraudHeuristic();
 
-  List<SecurityCheck> analyze(List<Txn> txns) {
+  List<SecurityCheck> analyze(List<Txn> txns, AppStrings l10n) {
     if (txns.isEmpty) return const [];
 
     final expenses = txns.where((t) => !t.isCredit).toList();
@@ -40,8 +41,10 @@ class FraudHeuristic {
             location: t.category,
             when: t.when,
             blocked: t.amount.abs() > median * 6,
-            reason:
-                'Bu işlem, son işlemlerinin medyanı olan ${median.toStringAsFixed(0)} TL\'nin ${(t.amount.abs() / median).toStringAsFixed(1)}× üzerinde. Vera bu sıçramayı dikkat çekici buldu.',
+            reason: l10n.fraudReasonOutlier(
+              median.toStringAsFixed(0),
+              (t.amount.abs() / median).toStringAsFixed(1),
+            ),
           ));
         }
       }
@@ -55,12 +58,11 @@ class FraudHeuristic {
         if (seen.add(id)) {
           findings.add(SecurityCheck(
             id: id.hashCode,
-            name: 'Yuvarlak transfer · ${v.toStringAsFixed(0)} TL',
+            name: l10n.fraudNameRoundTransfer(v.toStringAsFixed(0)),
             location: t.name,
             when: t.when,
             blocked: false,
-            reason:
-                '10.000 TL üzerinde, tam yuvarlak bir tutar tespit edildi. Genelde alıcı transferi böyle olur; sen onayladıysan sorun yok.',
+            reason: l10n.fraudReasonRoundTransfer,
           ));
         }
       }
@@ -81,13 +83,11 @@ class FraudHeuristic {
               entry.value.fold<double>(0, (s, t) => s + t.amount.abs());
           findings.add(SecurityCheck(
             id: id.hashCode,
-            name:
-                '${sample.name} · ${entry.value.length}× aynı gün',
-            location: 'Toplam ${total.toStringAsFixed(0)} TL',
+            name: l10n.fraudNameBurst(sample.name, entry.value.length),
+            location: l10n.fraudLocationBurstTotal(total.toStringAsFixed(0)),
             when: sample.when,
             blocked: false,
-            reason:
-                'Aynı gün içinde aynı satıcıdan ${entry.value.length} işlem yapılmış. Bu kart tekrar denemesi mi yoksa gerçek alışveriş mi, hatırla.',
+            reason: l10n.fraudReasonBurst(entry.value.length),
           ));
         }
       }

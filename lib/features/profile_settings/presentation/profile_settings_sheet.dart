@@ -510,10 +510,10 @@ class ProfileSettingsSheet extends ConsumerWidget {
           body: l10n.infoLocalDataDescription,
         ),
         AccountInfoSection(
-          label: 'Cloud sync',
+          label: l10n.infoCloudSync,
           body: firebase.ready
-              ? 'Firebase is active. Imported receipts, statements, banks, profile settings, and imported transactions can sync to the vera-ai-finance project.'
-              : 'Firebase is not active on this session yet, so Vera is currently running in local-first mode.',
+              ? l10n.infoCloudSyncActive
+              : l10n.infoCloudSyncInactive,
         ),
       ],
     );

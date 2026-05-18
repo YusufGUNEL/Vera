@@ -1,51 +1,25 @@
-import 'offer_option.dart';
-import 'risk_factor.dart';
-
-enum CreditDecisionStatus { approved, review, declined }
-
-class CreditDecision {
-  const CreditDecision({
-    required this.status,
-    required this.score,
-    required this.apr,
-    required this.summary,
-    required this.insight,
-    required this.riskFactors,
-    required this.offers,
-    required this.recommendedAmount,
-    required this.recommendedMonths,
-    required this.decisionTimeSeconds,
+/// Result of the in-app loan affordability calculator.
+///
+/// Pure math: monthly payment is an approximation, debt-to-income and the
+/// payment load are derived from user inputs. No bureau score, no fake APR,
+/// no "approval" verdict — that data only exists at real lenders.
+class CreditCalculation {
+  const CreditCalculation({
+    required this.monthlyPayment,
+    required this.totalCost,
+    required this.debtToIncome,
+    required this.paymentLoad,
   });
 
-  final CreditDecisionStatus status;
-  final int score;
-  final double apr;
-  final String summary;
-  final String insight;
-  final List<RiskFactor> riskFactors;
-  final List<OfferOption> offers;
-  final double recommendedAmount;
-  final int recommendedMonths;
-  final int decisionTimeSeconds;
+  /// Approximate monthly installment (TL).
+  final double monthlyPayment;
 
-  /// Internal band code; UI maps it to a localized label via AppStrings.
-  String get bandCode {
-    if (score >= 760) return 'excellent';
-    if (score >= 690) return 'strong';
-    if (score >= 620) return 'fair';
-    return 'watch';
-  }
+  /// Total amount paid over the loan term (TL).
+  final double totalCost;
 
-  String get bandLabel {
-    switch (bandCode) {
-      case 'excellent':
-        return 'EXCELLENT';
-      case 'strong':
-        return 'STRONG';
-      case 'fair':
-        return 'FAIR';
-      default:
-        return 'WATCH';
-    }
-  }
+  /// Current debt obligations divided by monthly income (0..1).
+  final double debtToIncome;
+
+  /// Estimated installment divided by monthly income (0..1).
+  final double paymentLoad;
 }

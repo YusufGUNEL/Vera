@@ -9,7 +9,7 @@ class CreditRepository {
 
   final CreditRuleEngine _engine;
 
-  CreditDecision evaluate(LoanApplication application) {
+  CreditCalculation evaluate(LoanApplication application) {
     return _engine.evaluate(application);
   }
 }

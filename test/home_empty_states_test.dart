@@ -15,7 +15,6 @@ import 'package:vera/features/home/presentation/widgets/proactive_insight_card.d
 import 'package:vera/features/home/presentation/widgets/connected_banks.dart';
 import 'package:vera/features/home/presentation/widgets/goal_card.dart';
 import 'package:vera/features/home/presentation/widgets/home_first_steps_card.dart';
-import 'package:vera/features/home/presentation/widgets/uma_insight_strip.dart';
 import 'package:vera/features/home/state/home_controller.dart';
 import 'package:vera/features/home/state/upcoming_bills_controller.dart';
 import 'package:vera/features/subscriptions/state/subscriptions_controller.dart';
@@ -52,24 +51,6 @@ void main() {
 
       expect(find.text('Henüz bağlı hesap görünmüyor'), findsOneWidget);
       expect(find.textContaining('bakiyeni ana ekranda izler'), findsOneWidget);
-    });
-
-    testWidgets('UmaInsightStrip renders contextual CTA label', (tester) async {
-      await tester.pumpWidget(
-        _buildTestShell(
-          child: const Scaffold(
-            body: UmaInsightStrip(
-              text: 'Henüz işlem görünmüyor.',
-              ctaLabel: 'İlk işlemi ekle',
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('UMA İÇGÖRÜ'), findsOneWidget);
-      expect(find.text('Henüz işlem görünmüyor.'), findsOneWidget);
-      expect(find.text('İlk işlemi ekle'), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
     });
 
     testWidgets('GoalCard empty state shows hint and CTA', (tester) async {

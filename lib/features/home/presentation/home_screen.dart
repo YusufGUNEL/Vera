@@ -11,7 +11,6 @@ import '../data/savings_summary.dart';
 import '../data/transaction.dart';
 import '../data/upcoming_bill.dart';
 import '../state/home_controller.dart';
-import '../state/spending_insight_controller.dart';
 import '../state/upcoming_bills_controller.dart';
 import 'widgets/add_bank_sheet.dart';
 import 'widgets/add_bill_sheet.dart';
@@ -29,7 +28,6 @@ import 'widgets/savings_story_card.dart';
 import 'widgets/top_bar.dart';
 import 'widgets/transaction_detail_sheet.dart';
 import 'widgets/transaction_list.dart';
-import 'widgets/uma_insight_strip.dart';
 import 'widgets/upcoming_bills_strip.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -129,7 +127,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeControllerProvider);
     final bills = ref.watch(upcomingBillsControllerProvider);
-    final insight = ref.watch(spendingInsightControllerProvider);
     final l10n = context.l10n;
     final savings = summarizeSavings(state.transactions);
     final hasTransactions = state.transactions.isNotEmpty;
@@ -157,13 +154,6 @@ class HomeScreen extends ConsumerWidget {
                   : l10n.updatedAt(state.lastUpdatedTime!),
               refreshing: state.refreshing,
               history: state.history,
-              onSend: () =>
-                  openUma(context, ref, prompt: l10n.umaPromptSend),
-              onRequest: () =>
-                  openUma(context, ref, prompt: l10n.umaPromptRequest),
-              onTopUp: () =>
-                  openUma(context, ref, prompt: l10n.umaPromptTopUp),
-              onPay: () => openUma(context, ref, prompt: l10n.umaPromptPay),
             ),
             if (!hasTransactions && state.banks.isEmpty)
               HomeFirstStepsCard(
@@ -204,26 +194,6 @@ class HomeScreen extends ConsumerWidget {
               onBankTap: (bank) => _openBankActions(context, bank),
               onBankLongPress: (bank) => _openBankActions(context, bank),
               onAddBankTap: () => _openAddBank(context),
-            ),
-            UmaInsightStrip(
-              text: insight.text.isEmpty ? state.insight : insight.text,
-              loading: insight.loading,
-              ctaLabel: !hasTransactions
-                  ? (state.banks.isEmpty
-                      ? l10n.umaInsightImportCta
-                      : l10n.umaInsightAddFirstTxnCta)
-                  : l10n.umaInsightDeepenCta,
-              onTap: () {
-                if (!hasTransactions && state.banks.isEmpty) {
-                  _openStatementImport(context);
-                  return;
-                }
-                if (!hasTransactions) {
-                  _openAddManualTransaction(context);
-                  return;
-                }
-                openUma(context, ref, prompt: l10n.umaPromptAnalyze);
-              },
             ),
             CategoryBudgetCard(
               transactions: state.transactions,

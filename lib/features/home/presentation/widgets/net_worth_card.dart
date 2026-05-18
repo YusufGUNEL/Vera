@@ -14,10 +14,6 @@ class NetWorthCard extends StatelessWidget {
     required this.lastUpdatedLabel,
     required this.refreshing,
     this.history = const [],
-    this.onSend,
-    this.onRequest,
-    this.onTopUp,
-    this.onPay,
     super.key,
   });
 
@@ -26,10 +22,6 @@ class NetWorthCard extends StatelessWidget {
   final String lastUpdatedLabel;
   final bool refreshing;
   final List<NetWorthPoint> history;
-  final VoidCallback? onSend;
-  final VoidCallback? onRequest;
-  final VoidCallback? onTopUp;
-  final VoidCallback? onPay;
 
   @override
   Widget build(BuildContext context) {
@@ -165,34 +157,6 @@ class NetWorthCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    _QuickAction(
-                      icon: Icons.send_outlined,
-                      label: l10n.actionSend,
-                      onTap: onSend,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickAction(
-                      icon: Icons.south_west,
-                      label: l10n.actionRequest,
-                      onTap: onRequest,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickAction(
-                      icon: Icons.add,
-                      label: l10n.actionTopUp,
-                      onTap: onTopUp,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickAction(
-                      icon: Icons.north_east,
-                      label: l10n.actionPay,
-                      onTap: onPay,
-                    ),
-                  ],
-                ),
               ],
             ),
           ],
@@ -289,48 +253,5 @@ class _SparklineCanvas extends CustomPainter {
   @override
   bool shouldRepaint(covariant _SparklineCanvas old) {
     return old.values != values || old.stroke != stroke || old.fill != fill;
-  }
-}
-
-class _QuickAction extends StatelessWidget {
-  const _QuickAction({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    return Expanded(
-      child: Material(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(t.vibe.radiusSmall + 2),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(t.vibe.radiusSmall + 2),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-            child: Column(
-              children: [
-                Icon(icon, color: t.brandFG, size: 18),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: t.brandFG.withValues(alpha: 0.9),
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

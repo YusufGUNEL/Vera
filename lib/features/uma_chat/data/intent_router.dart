@@ -8,20 +8,6 @@ class IntentRouter {
   UmaIntent parse(String userText) {
     final lower = userText.toLowerCase();
 
-    if (_isGoldIntent(lower)) {
-      return UmaIntent(type: UmaIntentType.buyGold, originalText: userText);
-    }
-
-    if (_isCardPaymentIntent(lower)) {
-      return UmaIntent(
-          type: UmaIntentType.payCreditCard, originalText: userText);
-    }
-
-    if (_isSavingsIntent(lower)) {
-      return UmaIntent(
-          type: UmaIntentType.moveToSavings, originalText: userText);
-    }
-
     if (lower.contains('subscription') ||
         lower.contains('subscriptions') ||
         lower.contains('abonelik')) {
@@ -71,35 +57,6 @@ class IntentRouter {
     }
 
     return UmaIntent(type: UmaIntentType.unknown, originalText: userText);
-  }
-
-  bool _isGoldIntent(String lower) {
-    return (lower.contains('gold') || lower.contains('altın') ||
-            lower.contains('altin')) &&
-        (lower.contains('buy') ||
-            lower.contains('al') ||
-            lower.contains('gram') ||
-            lower.contains('10g'));
-  }
-
-  bool _isCardPaymentIntent(String lower) {
-    return (lower.contains('credit card') ||
-            lower.contains('kart') ||
-            lower.contains('statement')) &&
-        (lower.contains('pay') ||
-            lower.contains('ode') ||
-            lower.contains('kapat'));
-  }
-
-  bool _isSavingsIntent(String lower) {
-    return (lower.contains('save') ||
-            lower.contains('savings') ||
-            lower.contains('birikim') ||
-            lower.contains('emergency')) &&
-        (lower.contains('move') ||
-            lower.contains('set aside') ||
-            lower.contains('aktar') ||
-            lower.contains('put'));
   }
 }
 
