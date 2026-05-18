@@ -330,6 +330,7 @@ const Map<String, String> _trStrings = {
     'umaActionPolicyDesc': 'Vera para hareketini bankanda yapar; sen her zaman onay verirsin.',
     'categoryBudgetLabel': 'BU AYKİ HARCAMALAR',
     'categoryOther': 'Diğer',
+    'receiptDefaultName': 'Fiş',
     'categoryBudgetTopHint': 'En çok {category} · %{pct}',
     'categoryRemaining': 'kalan {amount}',
     'categoryOver': 'limit aşıldı · {amount}',
@@ -535,6 +536,25 @@ const Map<String, String> _trStrings = {
     'subsStatusRenewsSoon': 'YAKINDA YENİLENİR',
     'securityEmptyTitle': 'Şu an inceleyecek bir uyarı yok',
     'securityEmptyBody': 'Vera fraud radar her cihazını ve ithal işlemlerini sessizce izliyor. Bir şey olduğunda burada görünür.',
-    'comingSoon': 'Yakında',
     'close': 'Kapat',
+    'wealthInsightAddPortfolio':
+        'Otonom mod kapalı. Portföyünü ekle, Uma sapmayı izlesin ve önerilerini sunsun.',
+    'wealthInsightPaused':
+        'Otonom mod duraklatıldı. Vera sapmayı izliyor ama para hareketi için onayını bekleyecek.',
+    'wealthInsightActive':
+        'Uma "{profile}" politikasıyla aktif. Aylık {limit} TL limitine sadık kalarak {count} portföy ayarlaması yaptı veya hazırladı.',
+    'goalReached': 'Hedefine ulaştın. Yeni bir hedef belirleyebilirsin.',
+    'goalRemainingPlan':
+        'Kalan {remaining} TL\'yi {months} ayda biriktirmek için aylık {monthly} TL ayırmalısın.',
+    'goalNarrativeNewTarget': 'Hedefin için yeni bir tutar belirleyebilirsin.',
+    'goalNarrativeNoData':
+        'Henüz işlem verisi yok. Ekstre yükle veya birkaç manuel işlem ekle, Uma sana özel öneri sunsun.',
+    'goalNarrativeTrim':
+        'Hedef için aylık {monthly} TL ayırman gerek. {topCategory} bütçenden küçük kısmalarla başlamak mantıklı.',
+    'todayAt': 'Bugün, {time}',
+    'loginContinueEmail': 'E-posta ile devam et',
+    'loginEmailPasswordRequired': 'E-posta ve şifre gerekli.',
+    'loginFirebaseError': 'Firebase girişi başarısız: {code}.',
+    'loginFirebaseReadyFooter':
+        'Firebase auth bağlı. Demo modu hackathon akışları için açık.',
   };

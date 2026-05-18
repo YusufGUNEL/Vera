@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/localization/app_strings.dart';
 import '../../auth/state/auth_controller.dart';
 import '../../receipt_scan/domain/parsed_receipt.dart';
 import '../../statement_import/domain/parsed_statement.dart';
@@ -15,8 +16,9 @@ const _kImportedTxnsKey = 'home.imported.txns';
 /// Persistent store for user-imported transactions (from OCR receipts and
 /// statement imports). Lives in SharedPreferences so it survives restarts.
 ///
-/// The HomeController merges this list with the feed-driven mock data: imports
-/// always appear at the top of the transaction list, in newest-first order.
+/// HomeController merges this list with bank/transaction data loaded from the
+/// user's own sources; imports always appear at the top of the transaction
+/// list, in newest-first order.
 class ImportedTransactionsStore {
   const ImportedTransactionsStore(this._firebaseService);
 
@@ -132,14 +134,14 @@ final importedTransactionsStoreProvider =
   return (icon: Icons.payments_outlined, color: const Color(0xFF7F8C8D));
 }
 
-String _todayLabel() {
+String _todayLabel(AppStrings l10n) {
   final now = DateTime.now();
-  return 'Bugün, ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  final time =
+      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+  return l10n.todayAt(time);
 }
 
 int _nextId() {
-  // Monotonic-ish id derived from current millis. Good enough for demo;
-  // imported lists are short and we don't query by id.
   return DateTime.now().millisecondsSinceEpoch ~/ 1000;
 }
 
@@ -147,17 +149,17 @@ extension ParsedReceiptToTxn on ParsedReceipt {
   /// Builds a single transaction from the parsed receipt. Uses `total` when
   /// present, otherwise sums the line items. Returns null if neither yields
   /// a positive amount.
-  Txn? toTxn() {
+  Txn? toTxn(AppStrings l10n) {
     final raw = total ?? lines.fold<double>(0, (s, l) => s + l.amount);
     if (raw <= 0) return null;
     final palette = iconAndColorForCategory(category);
     return Txn(
       id: _nextId(),
-      name: merchant ?? (category ?? 'Fiş'),
-      category: category ?? 'Diğer',
+      name: merchant ?? (category ?? l10n.receiptDefaultName),
+      category: category ?? l10n.categoryOther,
       icon: palette.icon,
       amount: -raw,
-      when: date ?? _todayLabel(),
+      when: date ?? _todayLabel(l10n),
       color: palette.color,
     );
   }
@@ -166,7 +168,7 @@ extension ParsedReceiptToTxn on ParsedReceipt {
 extension ParsedStatementToTxns on ParsedStatement {
   /// Builds one Txn per statement transaction, preserving sign (incoming /
   /// outgoing) and category.
-  List<Txn> toTxns() {
+  List<Txn> toTxns(AppStrings l10n) {
     final out = <Txn>[];
     final baseId = _nextId();
     for (var i = 0; i < transactions.length; i++) {
@@ -176,7 +178,7 @@ extension ParsedStatementToTxns on ParsedStatement {
         Txn(
           id: baseId + i,
           name: src.description,
-          category: src.category ?? 'Diğer',
+          category: src.category ?? l10n.categoryOther,
           icon: palette.icon,
           amount: src.amount,
           when: src.date,

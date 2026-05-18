@@ -332,6 +332,7 @@ const Map<String, String> _enStrings = {
     'umaActionPolicyDesc': 'Vera never moves money itself; every action opens your bank app for your approval.',
     'categoryBudgetLabel': 'SPENDING THIS MONTH',
     'categoryOther': 'Other',
+    'receiptDefaultName': 'Receipt',
     'categoryBudgetTopHint': 'Most on {category} · {pct}%',
     'categoryRemaining': '{amount} left',
     'categoryOver': 'over by {amount}',
@@ -553,6 +554,25 @@ const Map<String, String> _enStrings = {
     'subsStatusRenewsSoon': 'RENEWS SOON',
     'securityEmptyTitle': 'There is no alert to review right now',
     'securityEmptyBody': 'Vera fraud radar quietly watches your devices and imported transactions. If something happens, it appears here.',
-    'comingSoon': 'Coming soon',
     'close': 'Close',
+    'wealthInsightAddPortfolio':
+        'Autonomous mode is off. Add your portfolio so Uma can track drift and suggest moves.',
+    'wealthInsightPaused':
+        'Autonomous mode is paused. Vera still watches drift but will wait for your approval before moving money.',
+    'wealthInsightActive':
+        'Uma is active with the "{profile}" policy. Within the monthly {limit} TL limit, it has made or prepared {count} portfolio adjustments.',
+    'goalReached': 'You reached your goal. You can set a new one now.',
+    'goalRemainingPlan':
+        'To save the remaining {remaining} TL in {months} months, you need to set aside {monthly} TL each month.',
+    'goalNarrativeNewTarget': 'You can set a new amount for your goal.',
+    'goalNarrativeNoData':
+        'No transaction data yet. Import a statement or add a few manual entries so Uma can tailor a plan for you.',
+    'goalNarrativeTrim':
+        'You need to set aside {monthly} TL per month. Starting with small trims from your {topCategory} budget makes sense.',
+    'todayAt': 'Today, {time}',
+    'loginContinueEmail': 'Continue with email',
+    'loginEmailPasswordRequired': 'Email and password are required.',
+    'loginFirebaseError': 'Firebase sign-in failed: {code}.',
+    'loginFirebaseReadyFooter':
+        'Firebase auth is connected. Demo mode is still available for hackathon flows.',
   };

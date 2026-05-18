@@ -259,6 +259,7 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = context.l10n;
     final target = double.tryParse(_targetCtrl.text.trim()) ?? 0;
     final saved = double.tryParse(_savedCtrl.text.trim()) ?? 0;
     if (target <= 0) {
@@ -273,6 +274,7 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
     final result = await ref.read(goalAdvisorProvider).advise(
           goal: ref.read(goalsControllerProvider),
           transactions: ref.read(homeControllerProvider).transactions,
+          l10n: l10n,
           targetMonths: _months,
         );
     if (!mounted) return;

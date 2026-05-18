@@ -377,7 +377,7 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                 onPressed: isFallback
                     ? null
                     : () async {
-                  final txn = r.toTxn();
+                  final txn = r.toTxn(l10n);
                   final messenger = ScaffoldMessenger.of(context);
                   if (txn == null) {
                     messenger.showSnackBar(

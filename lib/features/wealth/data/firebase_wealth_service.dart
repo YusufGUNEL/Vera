@@ -9,7 +9,7 @@ import '../domain/rebalance_action.dart';
 import 'wealth_repository.dart';
 
 /// Portföy ve otonom politika verilerini Firestore'a senkron eder.
-/// Firebase hazır değilse WealthRepository mock verisine düşer.
+/// Firebase hazır değilse WealthRepository'nin yerel boş varsayılanına döner.
 class FirebaseWealthService {
   FirebaseWealthService(
     this._bootstrapState,

@@ -70,7 +70,7 @@ class AuthController extends StateNotifier<AuthSession> {
     );
     await _storage.writeSession(session);
     await _firebaseProfileService.saveProfileShell(
-      displayName: session.displayName ?? 'Vera User',
+      displayName: session.displayName ?? email,
       email: session.email ?? email,
     );
     await _analytics.logLogin(method: 'firebase_email');

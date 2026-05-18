@@ -344,6 +344,27 @@ const Map<String, String> _zhStrings = {
     'proactiveEmptyCta': '导入对账单',
     'securityEmptyTitle': '目前没有需要查看的提醒',
     'securityEmptyBody': 'Vera 的欺诈雷达会静默监控你的设备和导入交易。一旦有异常，就会显示在这里。',
-    'comingSoon': '即将推出',
     'close': '关闭',
+    'categoryOther': '其他',
+    'receiptDefaultName': '收据',
+    'wealthInsightAddPortfolio':
+        '自治模式已关闭。添加你的投资组合，Uma 才能跟踪偏离并给出建议。',
+    'wealthInsightPaused':
+        '自治模式已暂停。Vera 仍在监控偏离，但在动用资金前会等待你的确认。',
+    'wealthInsightActive':
+        'Uma 正在以"{profile}"策略运行。在每月 {limit} TL 限额内，已完成或准备 {count} 项投资组合调整。',
+    'goalReached': '你已达成目标，可以设定一个新目标。',
+    'goalRemainingPlan':
+        '若要在 {months} 个月内存满剩余 {remaining} TL，每月需要预留 {monthly} TL。',
+    'goalNarrativeNewTarget': '可以为你的目标设定一个新金额。',
+    'goalNarrativeNoData':
+        '还没有交易数据。导入对账单或手动添加几笔记录，Uma 就能为你定制计划。',
+    'goalNarrativeTrim':
+        '你需要每月预留 {monthly} TL。从 {topCategory} 预算上做小幅削减是一个合理的起点。',
+    'todayAt': '今天，{time}',
+    'loginContinueEmail': '使用邮箱继续',
+    'loginEmailPasswordRequired': '邮箱和密码必填。',
+    'loginFirebaseError': 'Firebase 登录失败：{code}。',
+    'loginFirebaseReadyFooter':
+        'Firebase auth 已连接。Demo 模式仍可用于 hackathon 流程。',
   };

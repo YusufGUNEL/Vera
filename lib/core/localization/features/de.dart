@@ -352,6 +352,27 @@ const Map<String, String> _deStrings = {
     'proactiveEmptyCta': 'Auszug importieren',
     'securityEmptyTitle': 'Zurzeit gibt es keine Warnung zur Prüfung',
     'securityEmptyBody': 'Das Fraud-Radar von Vera überwacht still deine Geräte und importierten Transaktionen. Wenn etwas passiert, erscheint es hier.',
-    'comingSoon': 'Demnächst',
     'close': 'Schließen',
+    'categoryOther': 'Sonstiges',
+    'receiptDefaultName': 'Beleg',
+    'wealthInsightAddPortfolio':
+        'Autonomer Modus ist aus. Füge dein Portfolio hinzu, damit Uma Abweichungen verfolgen und Vorschläge machen kann.',
+    'wealthInsightPaused':
+        'Autonomer Modus pausiert. Vera beobachtet weiter, wartet aber auf deine Bestätigung, bevor Geld bewegt wird.',
+    'wealthInsightActive':
+        'Uma ist mit der "{profile}"-Richtlinie aktiv. Innerhalb des monatlichen Limits von {limit} TL wurden {count} Portfolioanpassungen vorbereitet oder ausgeführt.',
+    'goalReached': 'Du hast dein Ziel erreicht. Du kannst jetzt ein neues setzen.',
+    'goalRemainingPlan':
+        'Um die verbleibenden {remaining} TL in {months} Monaten anzusparen, musst du monatlich {monthly} TL zurücklegen.',
+    'goalNarrativeNewTarget': 'Du kannst einen neuen Betrag für dein Ziel festlegen.',
+    'goalNarrativeNoData':
+        'Noch keine Transaktionsdaten. Importiere einen Auszug oder füge manuelle Einträge hinzu, damit Uma einen Plan vorschlagen kann.',
+    'goalNarrativeTrim':
+        'Du musst monatlich {monthly} TL zurücklegen. Kleine Kürzungen im {topCategory}-Budget sind ein guter Anfang.',
+    'todayAt': 'Heute, {time}',
+    'loginContinueEmail': 'Mit E-Mail fortfahren',
+    'loginEmailPasswordRequired': 'E-Mail und Passwort sind erforderlich.',
+    'loginFirebaseError': 'Firebase-Anmeldung fehlgeschlagen: {code}.',
+    'loginFirebaseReadyFooter':
+        'Firebase-Auth verbunden. Demo-Modus bleibt für Hackathon-Flows verfügbar.',
   };

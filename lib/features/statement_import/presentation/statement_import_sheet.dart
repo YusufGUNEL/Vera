@@ -378,7 +378,7 @@ class StatementImportSheet extends ConsumerWidget {
                     ? null
                     : () async {
                   final messenger = ScaffoldMessenger.of(context);
-                  final txns = s.toTxns();
+                  final txns = s.toTxns(l10n);
                   if (txns.isEmpty) {
                     messenger.showSnackBar(
                       SnackBar(

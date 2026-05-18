@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/localization/app_strings.dart';
+import '../../../core/localization/locale_controller.dart';
 import '../data/firebase_wealth_service.dart';
 import '../data/wealth_repository.dart';
 import '../domain/autonomy_policy.dart';
@@ -60,7 +62,7 @@ class WealthState {
 }
 
 class WealthController extends StateNotifier<WealthState> {
-  WealthController(this._service, this._repository)
+  WealthController(this._service, this._repository, this._l10n)
       : super(
           WealthState(
             policy: _repository.initialPolicy(),
@@ -69,6 +71,7 @@ class WealthController extends StateNotifier<WealthState> {
             insight: _repository.insightFor(
               _repository.initialPolicy(),
               const [],
+              _l10n,
             ),
           ),
         ) {
@@ -77,6 +80,14 @@ class WealthController extends StateNotifier<WealthState> {
 
   final FirebaseWealthService _service;
   final WealthRepository _repository;
+  AppStrings _l10n;
+
+  void updateL10n(AppStrings l10n) {
+    _l10n = l10n;
+    state = state.copyWith(
+      insight: _repository.insightFor(state.policy, state.actions, l10n),
+    );
+  }
 
   Future<void> _load() async {
     final policy = await _service.loadPolicy();
@@ -87,7 +98,7 @@ class WealthController extends StateNotifier<WealthState> {
       policy: policy,
       allocations: _recomputeWeights(allocations),
       actions: actions,
-      insight: _repository.insightFor(policy, actions),
+      insight: _repository.insightFor(policy, actions, _l10n),
     );
   }
 
@@ -145,7 +156,7 @@ class WealthController extends StateNotifier<WealthState> {
   void _updatePolicy(AutonomyPolicy policy) {
     state = state.copyWith(
       policy: policy,
-      insight: _repository.insightFor(policy, state.actions),
+      insight: _repository.insightFor(policy, state.actions, _l10n),
     );
   }
 
@@ -156,7 +167,7 @@ class WealthController extends StateNotifier<WealthState> {
     ];
     state = state.copyWith(
       actions: updated,
-      insight: _repository.insightFor(state.policy, updated),
+      insight: _repository.insightFor(state.policy, updated, _l10n),
     );
   }
 
@@ -179,8 +190,13 @@ class WealthController extends StateNotifier<WealthState> {
 
 final wealthControllerProvider =
     StateNotifierProvider<WealthController, WealthState>((ref) {
-  return WealthController(
+  final controller = WealthController(
     ref.watch(firebaseWealthServiceProvider),
     ref.watch(wealthRepositoryProvider),
+    ref.read(stringsProvider),
   );
+  ref.listen<AppStrings>(stringsProvider, (_, next) {
+    controller.updateL10n(next);
+  });
+  return controller;
 });

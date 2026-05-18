@@ -352,6 +352,27 @@ const Map<String, String> _ruStrings = {
     'proactiveEmptyCta': 'Импортировать выписку',
     'securityEmptyTitle': 'Сейчас нет предупреждений для проверки',
     'securityEmptyBody': 'Радар мошенничества Vera тихо следит за вашими устройствами и импортированными транзакциями. Если что-то случится, это появится здесь.',
-    'comingSoon': 'Скоро',
     'close': 'Закрыть',
+    'categoryOther': 'Прочее',
+    'receiptDefaultName': 'Чек',
+    'wealthInsightAddPortfolio':
+        'Автономный режим выключен. Добавь портфель, чтобы Uma отслеживала отклонения и предлагала шаги.',
+    'wealthInsightPaused':
+        'Автономный режим приостановлен. Vera следит за отклонениями, но ждёт твоего подтверждения перед движением средств.',
+    'wealthInsightActive':
+        'Uma активна с политикой "{profile}". В пределах месячного лимита {limit} TL выполнено или подготовлено {count} корректировок портфеля.',
+    'goalReached': 'Цель достигнута. Можно поставить новую.',
+    'goalRemainingPlan':
+        'Чтобы накопить оставшиеся {remaining} TL за {months} мес., нужно откладывать {monthly} TL в месяц.',
+    'goalNarrativeNewTarget': 'Можно задать новую сумму для цели.',
+    'goalNarrativeNoData':
+        'Пока нет данных о транзакциях. Импортируй выписку или добавь несколько записей вручную, чтобы Uma предложила план.',
+    'goalNarrativeTrim':
+        'Нужно откладывать {monthly} TL в месяц. Начать стоит с небольших сокращений по категории {topCategory}.',
+    'todayAt': 'Сегодня, {time}',
+    'loginContinueEmail': 'Продолжить с email',
+    'loginEmailPasswordRequired': 'Email и пароль обязательны.',
+    'loginFirebaseError': 'Ошибка входа Firebase: {code}.',
+    'loginFirebaseReadyFooter':
+        'Firebase auth подключён. Демо-режим остаётся доступным для hackathon-сценариев.',
   };

@@ -349,6 +349,27 @@ const Map<String, String> _arStrings = {
     'proactiveEmptyCta': 'استيراد كشف',
     'securityEmptyTitle': 'لا توجد تنبيهات للمراجعة الآن',
     'securityEmptyBody': 'يراقب رادار الاحتيال في Vera أجهزتك ومعاملاتك المستوردة بهدوء. إذا حدث شيء فسيظهر هنا.',
-    'comingSoon': 'قريباً',
     'close': 'إغلاق',
+    'categoryOther': 'أخرى',
+    'receiptDefaultName': 'إيصال',
+    'wealthInsightAddPortfolio':
+        'الوضع المستقل متوقف. أضف محفظتك حتى تتمكن Uma من تتبع الانحراف واقتراح الخطوات.',
+    'wealthInsightPaused':
+        'الوضع المستقل متوقف مؤقتاً. تواصل Vera مراقبة الانحراف لكنها تنتظر موافقتك قبل تحريك أي أموال.',
+    'wealthInsightActive':
+        'Uma نشطة بسياسة "{profile}". ضمن حد {limit} ليرة شهرياً، نفّذت أو حضّرت {count} تعديلاً على المحفظة.',
+    'goalReached': 'لقد وصلت إلى هدفك. يمكنك تحديد هدف جديد الآن.',
+    'goalRemainingPlan':
+        'لتوفير المبلغ المتبقي {remaining} ليرة خلال {months} شهراً، عليك تخصيص {monthly} ليرة شهرياً.',
+    'goalNarrativeNewTarget': 'يمكنك تحديد مبلغ جديد لهدفك.',
+    'goalNarrativeNoData':
+        'لا توجد بيانات معاملات بعد. استورد كشفاً أو أضف بضع معاملات يدوياً لتقترح Uma خطة مخصصة لك.',
+    'goalNarrativeTrim':
+        'عليك تخصيص {monthly} ليرة شهرياً. البدء بتخفيضات صغيرة في فئة {topCategory} خيار منطقي.',
+    'todayAt': 'اليوم، {time}',
+    'loginContinueEmail': 'المتابعة بالبريد الإلكتروني',
+    'loginEmailPasswordRequired': 'البريد الإلكتروني وكلمة المرور مطلوبان.',
+    'loginFirebaseError': 'فشل تسجيل الدخول عبر Firebase: {code}.',
+    'loginFirebaseReadyFooter':
+        'Firebase auth متصل. الوضع التجريبي لا يزال متاحاً لتدفقات الـ hackathon.',
   };

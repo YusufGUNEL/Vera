@@ -16,6 +16,8 @@ class AppStrings {
 
   final AppLocale locale;
 
+  String get localeCode => locale.code;
+
   String _t(String key) {
     return _strings[locale]?[key] ?? _strings[AppLocale.en]?[key] ?? key;
   }
@@ -395,6 +397,7 @@ class AppStrings {
   // ---- Category budget ----
   String get categoryBudgetLabel => _t('categoryBudgetLabel');
   String get categoryOther => _t('categoryOther');
+  String get receiptDefaultName => _t('receiptDefaultName');
   String categoryBudgetTopHint(String category, String pct) => _t(
         'categoryBudgetTopHint',
       ).replaceAll('{category}', category).replaceAll('{pct}', pct);
@@ -535,8 +538,40 @@ class AppStrings {
   String get demoResetDone => _t('demoResetDone');
 
   // ---- Generic ----
-  String get comingSoon => _t('comingSoon');
   String get close => _t('close');
+
+  // ---- Wealth insight (autonomy policy summary) ----
+  String get wealthInsightAddPortfolio => _t('wealthInsightAddPortfolio');
+  String get wealthInsightPaused => _t('wealthInsightPaused');
+  String wealthInsightActive(String profile, String limit, int count) =>
+      _t('wealthInsightActive')
+          .replaceAll('{profile}', profile)
+          .replaceAll('{limit}', limit)
+          .replaceAll('{count}', '$count');
+
+  // ---- Goal advisor narrative ----
+  String get goalReached => _t('goalReached');
+  String goalRemainingPlan(String remaining, int months, String monthly) =>
+      _t('goalRemainingPlan')
+          .replaceAll('{remaining}', remaining)
+          .replaceAll('{months}', '$months')
+          .replaceAll('{monthly}', monthly);
+  String get goalNarrativeNewTarget => _t('goalNarrativeNewTarget');
+  String get goalNarrativeNoData => _t('goalNarrativeNoData');
+  String goalNarrativeTrim(String monthly, String topCategory) =>
+      _t('goalNarrativeTrim')
+          .replaceAll('{monthly}', monthly)
+          .replaceAll('{topCategory}', topCategory);
+
+  // ---- Transaction time labels ----
+  String todayAt(String time) => _t('todayAt').replaceAll('{time}', time);
+
+  // ---- Login screen ----
+  String get loginContinueEmail => _t('loginContinueEmail');
+  String get loginEmailPasswordRequired => _t('loginEmailPasswordRequired');
+  String loginFirebaseError(String code) =>
+      _t('loginFirebaseError').replaceAll('{code}', code);
+  String get loginFirebaseReadyFooter => _t('loginFirebaseReadyFooter');
 
   // ---- Recovered Subscriptions & Wealth ----
   String subscriptionsAttentionCount(int n) =>

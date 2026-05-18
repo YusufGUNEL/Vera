@@ -46,10 +46,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _signInWithFirebase() async {
+    final l10n = context.l10n;
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Email and password are required.');
+      setState(() => _error = l10n.loginEmailPasswordRequired);
       return;
     }
 
@@ -67,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final message = error.message?.trim();
       setState(() {
         _error = message == null || message.isEmpty
-            ? 'Firebase sign-in failed: ${error.code}.'
+            ? l10n.loginFirebaseError(error.code)
             : message;
       });
     } catch (error) {
@@ -168,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               color: t.brandFG,
                             ),
                           )
-                        : const Text('Continue with email'),
+                        : Text(l10n.loginContinueEmail),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -199,7 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 12),
               Text(
                 firebase.ready
-                    ? 'Firebase auth is connected. Demo mode is still available for hackathon flows.'
+                    ? l10n.loginFirebaseReadyFooter
                     : l10n.loginFooter,
                 style: TextStyle(fontSize: 12, color: t.muted, height: 1.45),
               ),

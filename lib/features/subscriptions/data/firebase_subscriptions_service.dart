@@ -8,7 +8,8 @@ import '../domain/subscription_item.dart';
 import 'subscriptions_repository.dart';
 
 /// Abonelikleri Firestore'a senkron eder.
-/// Firebase hazır değilse SubscriptionsRepository mock verisine düşer.
+/// Firebase hazır değilse sadece kullanıcının kendi işlemlerinden tespit edilen
+/// listeyi döner; canlı brand seed asla yüklemez.
 class FirebaseSubscriptionsService {
   FirebaseSubscriptionsService(
     this._bootstrapState,
