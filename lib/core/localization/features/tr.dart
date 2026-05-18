@@ -657,15 +657,15 @@ const Map<String, String> _trStrings = {
       'Vera hesabÄ±n, senkronize verilerin ve bu cihazdaki yerel Ã¶nbellek kalÄ±cÄ± olarak silinecek. Bu iÅŸlem geri alÄ±namaz.',
   'deleteAccountDemoBody':
       'Demo hesabÄ± ve bu cihazdaki yerel veriler temizlenecek. Bu iÅŸlem geri alÄ±namaz.',
-  'deleteAccountConfirm': 'HesabÄ± sil',
-  'deleteAccountCancel': 'VazgeÃ§',
+  'deleteAccountConfirm': 'Hesabi sil',
+  'deleteAccountCancel': 'Vazgec',
   'deleteAccountProcessing': 'Hesap siliniyor...',
   'deleteAccountDone': 'Hesap silindi.',
   'deleteAccountError':
-      'Hesap silinemedi. LÃ¼tfen tekrar giriÅŸ yapÄ±p yeniden dene.',
+      'Hesap silinemedi. Lutfen tekrar giris yapip yeniden dene.',
   'deleteAccountRecentLogin':
-      'GÃ¼venlik nedeniyle hesabÄ± silmeden Ã¶nce tekrar giriÅŸ yapman gerekiyor.',
+      'Guvenlik nedeniyle hesabi silmeden once tekrar giris yapman gerekiyor.',
   'continueWithGoogle': 'Google ile devam et',
   'googleSignInUnavailable':
-      'Google ile giriÅŸ iÃ§in bu build\'de Firebase yapÄ±landÄ±rÄ±lmÄ±ÅŸ olmalÄ±.',
+      'Google ile giris icin bu buildde Firebase yapilandirilmis olmali.',
 };

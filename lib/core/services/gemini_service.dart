@@ -1,93 +1,93 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../config/env.dart';
+import '../firebase/firebase_bootstrap.dart';
 import '../firebase/remote_config_service.dart';
 
-/// Gemini API ile tek dokunma noktasi.
-/// Tum feature'lar buradan gecsin - direkt GenerativeModel insantsiate etmeyin.
-///
-/// API key tanimsiz ise servis "offline mode"da boot eder; uretim cagrilari
-/// [MissingGeminiKeyException] firlatir. Repository katmaninda her cagri
-/// try/catch ile fallback'e baglanmalidir (bkz. docs/PROMPTS.md).
+/// Gemini requests are proxied through Firebase Functions so the API key stays
+/// in Secret Manager instead of shipping inside the client app.
 class GeminiService {
-  GeminiService._({this.apiKey, this.modelName, GenerativeModel? model})
-      : _model = model;
+  GeminiService._({
+    required this.modelName,
+    required HttpsCallable? generateTextCallable,
+    required HttpsCallable? analyzeImageCallable,
+    required HttpsCallable? runAgentCallable,
+  })  : _generateTextCallable = generateTextCallable,
+        _analyzeImageCallable = analyzeImageCallable,
+        _runAgentCallable = runAgentCallable;
 
-  final String? apiKey;
-  final String? modelName;
-  final GenerativeModel? _model;
+  final String modelName;
+  final HttpsCallable? _generateTextCallable;
+  final HttpsCallable? _analyzeImageCallable;
+  final HttpsCallable? _runAgentCallable;
 
-  bool get isAvailable => _model != null;
+  bool get isAvailable =>
+      _generateTextCallable != null &&
+      _analyzeImageCallable != null &&
+      _runAgentCallable != null;
 
   factory GeminiService.create(RemoteConfigService rc) {
-    final apiKey = Env.geminiApiKey;
-    if (apiKey == null) {
-      return GeminiService._();
+    if (!FirebaseBootstrap.state.ready || !Env.hasFirebaseCoreConfig) {
+      return GeminiService._(
+        modelName: rc.geminiModel,
+        generateTextCallable: null,
+        analyzeImageCallable: null,
+        runAgentCallable: null,
+      );
     }
-    final model = GenerativeModel(
-      model: rc.geminiModel,
-      apiKey: apiKey,
-      generationConfig: GenerationConfig(
-        temperature: 0.7,
-        maxOutputTokens: 2048,
-      ),
+
+    final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
+    return GeminiService._(
+      modelName: rc.geminiModel,
+      generateTextCallable: functions.httpsCallable('geminiGenerateText'),
+      analyzeImageCallable: functions.httpsCallable('geminiAnalyzeImage'),
+      runAgentCallable: functions.httpsCallable('geminiRunAgent'),
     );
-    return GeminiService._(apiKey: apiKey, modelName: rc.geminiModel, model: model);
   }
 
-  /// Tek seferlik metin uretimi (tek prompt, tek cevap).
   Future<String> generateText(String prompt) async {
-    final model = _model;
-    if (model == null) throw const MissingGeminiKeyException();
-    final response = await model.generateContent([Content.text(prompt)]);
-    return response.text ?? '';
+    final callable = _generateTextCallable;
+    if (callable == null) throw const MissingGeminiBackendException();
+    final result = await callable.call(<String, Object?>{
+      'prompt': prompt,
+      'model': modelName,
+    });
+    final data = _asMap(result.data);
+    return (data['text'] as String?) ?? '';
   }
 
-  /// Streaming metin uretimi - chat icin ideal.
   Stream<String> streamText(String prompt) async* {
-    final model = _model;
-    if (model == null) throw const MissingGeminiKeyException();
-    final stream = model.generateContentStream([Content.text(prompt)]);
-    await for (final chunk in stream) {
-      if (chunk.text != null) yield chunk.text!;
-    }
+    yield await generateText(prompt);
   }
 
-  /// Multi-turn chat baslatir. Konusma gecmisini Gemini saklar.
   ChatSession startChat({List<Content>? history}) {
-    final model = _model;
-    if (model == null) throw const MissingGeminiKeyException();
-    return model.startChat(history: history ?? []);
+    throw UnsupportedError(
+      'Stateful chat sessions are handled by the backend proxy.',
+    );
   }
 
-  /// Multimodal: gorsel + metin.
   Future<String> analyzeImage({
     required Uint8List imageBytes,
     required String prompt,
     String mimeType = 'image/jpeg',
   }) async {
-    final model = _model;
-    if (model == null) throw const MissingGeminiKeyException();
-    final response = await model.generateContent([
-      Content.multi([
-        TextPart(prompt),
-        DataPart(mimeType, imageBytes),
-      ]),
-    ]);
-    return response.text ?? '';
+    final callable = _analyzeImageCallable;
+    if (callable == null) throw const MissingGeminiBackendException();
+    final result = await callable.call(<String, Object?>{
+      'prompt': prompt,
+      'mimeType': mimeType,
+      'data': base64Encode(imageBytes),
+      'model': modelName,
+    });
+    final data = _asMap(result.data);
+    return (data['text'] as String?) ?? '';
   }
 
-  /// Function-calling loop. Builds a fresh model with [tools] attached, runs
-  /// up to [maxIterations] turns, executes each function call via [onCall],
-  /// and returns the model's final text reply together with the list of tool
-  /// names that were actually invoked.
-  ///
-  /// If [maxIterations] is exhausted before the model returns plain text,
-  /// the last partial text (or an empty string) is returned with the recorded
-  /// calls — the caller can still surface what happened.
   Future<AgentResult> runAgent({
     required String prompt,
     required List<Tool> tools,
@@ -97,73 +97,59 @@ class GeminiService {
     ) onCall,
     int maxIterations = 3,
   }) async {
-    final key = apiKey;
-    final name = modelName;
-    if (key == null || name == null) {
-      throw const MissingGeminiKeyException();
-    }
-    final agent = GenerativeModel(
-      model: name,
-      apiKey: key,
-      tools: tools,
-      generationConfig: GenerationConfig(
-        temperature: 0.3,
-        maxOutputTokens: 1024,
-      ),
-    );
-    final history = <Content>[Content.text(prompt)];
+    final callable = _runAgentCallable;
+    if (callable == null) throw const MissingGeminiBackendException();
+    final result = await callable.call(<String, Object?>{
+      'prompt': prompt,
+      'tools': tools.map((tool) => tool.toJson()).toList(),
+      'model': modelName,
+      'maxIterations': maxIterations,
+    });
+    final data = _asMap(result.data);
+    final callEntries = (data['calls'] as List?) ?? const [];
     final calls = <String>[];
-    String text = '';
 
-    for (var i = 0; i < maxIterations; i++) {
-      final response = await agent.generateContent(history);
-      final fnCalls = response.functionCalls.toList();
-      if (fnCalls.isEmpty) {
-        text = response.text ?? '';
-        break;
-      }
-
-      final candidate = response.candidates.first;
-      history.add(candidate.content);
-
-      final responses = <FunctionResponse>[];
-      for (final fc in fnCalls) {
-        calls.add(fc.name);
-        Map<String, Object?> result;
-        try {
-          result = await onCall(fc.name, fc.args);
-        } catch (e) {
-          result = {'error': e.toString()};
-        }
-        responses.add(FunctionResponse(fc.name, result));
-      }
-      history.add(Content.functionResponses(responses));
+    for (final entry in callEntries) {
+      final call = _asMap(entry);
+      final name = (call['name'] as String?)?.trim();
+      if (name == null || name.isEmpty) continue;
+      calls.add(name);
+      final args = _asMap(call['args']);
+      await onCall(name, args);
     }
 
-    return AgentResult(text: text, calls: calls);
+    return AgentResult(
+      text: ((data['text'] as String?) ?? '').trim(),
+      calls: calls,
+    );
+  }
+
+  Map<String, Object?> _asMap(Object? value) {
+    if (value is Map) {
+      return value.map(
+        (key, mapValue) => MapEntry(key.toString(), mapValue as Object?),
+      );
+    }
+    return const <String, Object?>{};
   }
 }
 
 class AgentResult {
   const AgentResult({required this.text, required this.calls});
 
-  /// Final natural-language reply from the model.
   final String text;
-
-  /// Ordered list of tool names invoked during the loop. Caller uses this to
-  /// decide which UI confirmation to surface.
   final List<String> calls;
 }
 
-class MissingGeminiKeyException implements Exception {
-  const MissingGeminiKeyException();
+class MissingGeminiBackendException implements Exception {
+  const MissingGeminiBackendException();
 
   @override
   String toString() =>
-      'GEMINI_API_KEY tanimli degil. .env dosyasina ekleyince Gemini aktiflesir.';
+      'Gemini backend hazir degil. Firebase Functions deploy ve secret ayarini kontrol et.';
 }
 
-/// Riverpod provider - tum feature'lar bunu kullansin.
 final geminiServiceProvider = Provider<GeminiService>((ref) {
+  ref.watch(firebaseBootstrapProvider);
   return GeminiService.create(ref.watch(remoteConfigServiceProvider));
 });

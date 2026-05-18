@@ -7,14 +7,7 @@ import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/app_tokens.dart';
-import '../../onboarding/state/onboarding_controller.dart';
-import '../data/demo_seeder.dart';
 import '../state/auth_controller.dart';
-
-/// Hard-coded credentials that trigger the in-app sample dataset. Anything
-/// else is passed to Firebase Auth as a regular sign-in.
-const _kDemoEmail = 'a';
-const _kDemoPassword = 'b';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -38,7 +31,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _signIn() async {
     final l10n = context.l10n;
-    final messenger = ScaffoldMessenger.maybeOf(context);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
@@ -53,23 +45,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      if (email == _kDemoEmail && password == _kDemoPassword) {
-        // Local seeded demo path — no Firebase round-trip.
-        await ref.read(demoSeederProvider).seed(l10n);
-        await ref.read(onboardingControllerProvider.notifier).complete();
-        await ref.read(authControllerProvider.notifier).signInDemo(
-              displayName: l10n.defaultUserName,
-              email: email,
-            );
-        messenger?.showSnackBar(
-          SnackBar(content: Text(l10n.demoSampleLoaded)),
-        );
-      } else {
-        await ref.read(authControllerProvider.notifier).signInWithEmail(
-              email: email,
-              password: password,
-            );
-      }
+      await ref.read(authControllerProvider.notifier).signInWithEmail(
+            email: email,
+            password: password,
+          );
     } on FirebaseAuthException catch (error) {
       final message = error.message?.trim();
       setState(() {
@@ -121,7 +100,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final l10n = context.l10n;
-    final firebase = ref.watch(firebaseBootstrapProvider);
 
     return Scaffold(
       backgroundColor: t.bg,
@@ -180,7 +158,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _Field(
                     label: l10n.passwordField,
                     controller: _passwordController,
-                    hint: '••••••••',
+                    hint: '********',
                     obscure: true,
                   ),
                   const SizedBox(height: 18),
@@ -210,8 +188,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _busy ? null : _signInWithGoogle,
-                      icon: Icon(Icons.g_mobiledata_rounded,
-                          color: t.brand, size: 22),
+                      icon: Icon(
+                        Icons.g_mobiledata_rounded,
+                        color: t.brand,
+                        size: 22,
+                      ),
                       label: Text(l10n.continueWithGoogle),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: t.brand,
@@ -231,34 +212,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: t.uma.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: t.uma.withValues(alpha: 0.18)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.science_outlined, size: 16, color: t.uma),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.loginDemoHint(_kDemoEmail, _kDemoPassword),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.ink2,
-                              height: 1.45,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -304,14 +257,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    firebase.ready
-                        ? l10n.loginFirebaseReadyFooter
-                        : l10n.loginFooter,
-                    style:
-                        TextStyle(fontSize: 11.5, color: t.muted, height: 1.45),
                   ),
                   const SizedBox(height: 12),
                 ],

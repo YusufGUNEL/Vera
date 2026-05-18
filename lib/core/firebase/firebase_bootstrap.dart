@@ -45,15 +45,15 @@ class FirebaseBootstrap {
         await Firebase.initializeApp(options: options);
       }
 
-      // App Check: debug modda DebugProvider, production'da PlayIntegrity.
-      await FirebaseAppCheck.instance.activate(
-        androidProvider: kDebugMode
-            ? AndroidProvider.debug
-            : AndroidProvider.playIntegrity,
-        appleProvider: kDebugMode
-            ? AppleProvider.debug
-            : AppleProvider.deviceCheck,
-      );
+      if (!kIsWeb) {
+        await FirebaseAppCheck.instance.activate(
+          androidProvider: kDebugMode
+              ? AndroidProvider.debug
+              : AndroidProvider.playIntegrity,
+          appleProvider:
+              kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+        );
+      }
 
       _state = const FirebaseBootstrapState(
         enabled: true,

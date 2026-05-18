@@ -5,18 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class Env {
   Env._();
 
-  /// Gemini API key. `null` ise key tanimsiz veya placeholder — caller
-  /// fallback'e dusmeli.
-  static String? get geminiApiKey {
-    final key = dotenv.maybeGet('GEMINI_API_KEY') ?? '';
-    if (key.isEmpty || key == 'your_gemini_api_key_here') return null;
-    return key;
-  }
-
-  static bool get hasGeminiKey => geminiApiKey != null;
-
   static String get geminiModel =>
-      dotenv.maybeGet('GEMINI_MODEL') ?? 'gemini-2.0-flash-exp';
+      dotenv.maybeGet('GEMINI_MODEL') ?? 'gemini-2.5-flash';
 
   static String? get homeFeedUrl => dotenv.maybeGet('HOME_FEED_URL');
 
@@ -37,8 +27,7 @@ class Env {
 
   static String? get firebaseAuthDomain => _clean('FIREBASE_AUTH_DOMAIN');
 
-  static String? get firebaseMeasurementId =>
-      _clean('FIREBASE_MEASUREMENT_ID');
+  static String? get firebaseMeasurementId => _clean('FIREBASE_MEASUREMENT_ID');
 
   static bool get hasFirebaseCoreConfig {
     return firebaseApiKey != null &&

@@ -75,7 +75,7 @@ class AuthController extends StateNotifier<AuthSession> {
     );
     await _analytics.logLogin(method: 'firebase_email');
     await _analytics.setUserId(session.userId);
-    if (!kDebugMode) {
+    if (!kDebugMode && !kIsWeb) {
       await FirebaseCrashlytics.instance
           .setUserIdentifier(session.userId ?? '');
     }
@@ -99,7 +99,7 @@ class AuthController extends StateNotifier<AuthSession> {
     );
     await _analytics.logSignUp(method: 'firebase_email');
     await _analytics.setUserId(session.userId);
-    if (!kDebugMode) {
+    if (!kDebugMode && !kIsWeb) {
       await FirebaseCrashlytics.instance
           .setUserIdentifier(session.userId ?? '');
     }
@@ -116,7 +116,7 @@ class AuthController extends StateNotifier<AuthSession> {
     );
     await _analytics.logLogin(method: 'google');
     await _analytics.setUserId(session.userId);
-    if (!kDebugMode) {
+    if (!kDebugMode && !kIsWeb) {
       await FirebaseCrashlytics.instance
           .setUserIdentifier(session.userId ?? '');
     }

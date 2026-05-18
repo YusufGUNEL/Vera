@@ -18,9 +18,8 @@ Future<void> main() async {
   await NotificationService.instance.init();
 
   // Crashlytics: Firebase hazırsa hata yakalama aktif.
-  if (bootstrap.ready && !kDebugMode) {
-    FlutterError.onError =
-        FirebaseCrashlytics.instance.recordFlutterFatalError;
+  if (bootstrap.ready && !kDebugMode && !kIsWeb) {
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
