@@ -42,11 +42,17 @@ Vera, sıradan bir "bankacılık arayüzü" veya basit bir chat bot değildir. Y
 
 ## 🎨 Arayüz & Görsel Deneyim
 
-Vera, modern mobil tasarım trendlerini (Glassmorphism, Neon gradyanlar, Karanlık mod öncelikli şablonlar) en üst seviyede uygular.
+Vera, modern mobil tasarım trendlerini en üst seviyede uygulayarak sade, premium ve kullanışlı bir görsel deneyim sunar.
 
-<p align="center">
-  <img src="assets/images/vera_mockup.png" alt="Vera Mobile Mockup" width="80%" />
-</p>
+### 📱 Uygulama Ekran Görüntüleri
+
+| 🏠 Ana Sayfa | 💬 UMA AI Asistanı | 🛡️ Güvenlik & Öngörü |
+| :---: | :---: | :---: |
+| <img src="assets/images/vera_home.jpg" width="220" alt="Ana Sayfa" /> | <img src="assets/images/vera_uma_chat.jpg" width="220" alt="UMA Asistanı" /> | <img src="assets/images/vera_security.jpg" width="220" alt="Güvenlik" /> |
+
+| 📈 Servet (Wealth) | 📅 Planlar (Abonelikler) |
+| :---: | :---: |
+| <img src="assets/images/vera_wealth.jpg" width="220" alt="Servet" /> | <img src="assets/images/vera_subscriptions.jpg" width="220" alt="Planlar" /> |
 
 ### 🛠️ Gelişmiş Kişiselleştirme & Tema Motoru
 Uygulama, kullanıcının ruh haline ve tarzına göre anında değişebilen **24 farklı görsel kombinasyon** sunar:
