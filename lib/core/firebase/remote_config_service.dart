@@ -21,7 +21,7 @@ class RemoteConfigService {
 
     // Default değerler (Firebase Console'dan override edilebilir).
     await rc.setDefaults({
-      _kGeminiModel: 'gemini-2.0-flash-exp',
+      _kGeminiModel: 'gemini-2.5-flash',
       _kUmaFallbackMessage: 'Şu an yardımcı olamıyorum, lütfen tekrar dene.',
       _kFraudAlertThreshold: 85,        // Güven skoru eşiği (0-100)
       _kReceiptOcrEnabled: true,
@@ -55,8 +55,9 @@ class RemoteConfigService {
   static const _kMaxImportTransactions = 'max_import_transactions';
 
   String get geminiModel {
-    if (!isEnabled) return 'gemini-2.0-flash-exp';
-    return FirebaseRemoteConfig.instance.getString(_kGeminiModel);
+    if (!isEnabled) return 'gemini-2.5-flash';
+    final fromRc = FirebaseRemoteConfig.instance.getString(_kGeminiModel);
+    return fromRc.isEmpty ? 'gemini-2.5-flash' : fromRc;
   }
 
   String get umaFallbackMessage {

@@ -1,4 +1,5 @@
 /// Design-specific TL format with dot thousands separators.
+/// Amount comes first, currency suffix last (Turkish convention: "1.234 TL").
 String fmtTL(num value) {
   final n = value.round().abs();
   final s = n.toString();
@@ -7,5 +8,5 @@ String fmtTL(num value) {
     if (i != 0 && (s.length - i) % 3 == 0) buf.write('.');
     buf.write(s[i]);
   }
-  return 'TL ${buf.toString()}';
+  return '${buf.toString()} TL';
 }

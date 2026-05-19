@@ -8,6 +8,8 @@ class Env {
   static String get geminiModel =>
       dotenv.maybeGet('GEMINI_MODEL') ?? 'gemini-2.5-flash';
 
+  static String? get geminiApiKey => _clean('GEMINI_API_KEY');
+
   static String? get homeFeedUrl => dotenv.maybeGet('HOME_FEED_URL');
 
   static String? get securityFeedUrl => dotenv.maybeGet('SECURITY_FEED_URL');

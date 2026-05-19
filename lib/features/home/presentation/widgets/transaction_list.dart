@@ -209,19 +209,17 @@ class _TransactionGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final l10n = context.l10n;
-    final spent = group.transactions
-        .where((txn) => !txn.isCredit)
-        .fold<double>(0, (sum, txn) => sum + txn.amount.abs());
-    final income = group.transactions
-        .where((txn) => txn.isCredit)
-        .fold<double>(0, (sum, txn) => sum + txn.amount.abs());
-    final net = income - spent;
+    final net = group.transactions.fold<double>(
+      0,
+      (sum, txn) =>
+          sum + (txn.isCredit ? txn.amount.abs() : -txn.amount.abs()),
+    );
 
     return Column(
       children: [
         if (!isFirst) Divider(height: 1, color: t.line),
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
           child: Row(
             children: [
               Expanded(
@@ -247,24 +245,6 @@ class _TransactionGroup extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: net >= 0 ? t.green : t.ink,
                 ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-          child: Row(
-            children: [
-              _SummaryPill(
-                label: '${l10n.spent} ${fmtTL(spent)}',
-                color: t.ink2,
-                background: t.bgSoft,
-              ),
-              const SizedBox(width: 8),
-              _SummaryPill(
-                label: '${l10n.incoming} ${fmtTL(income)}',
-                color: t.green,
-                background: t.green.withValues(alpha: 0.08),
               ),
             ],
           ),

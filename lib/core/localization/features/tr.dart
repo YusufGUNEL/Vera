@@ -331,6 +331,7 @@ const Map<String, String> _trStrings = {
   'umaThinking': 'Uma düşünüyor...',
   'umaAskHint': "Uma'ya sor...",
   'umaStatusOnline': 'AI asistan · çevrimiçi',
+  'umaNewChat': 'Yeni sohbet',
   'categoryBudgetLabel': 'BU AYKİ HARCAMALAR',
   'categoryOther': 'Diğer',
   'receiptDefaultName': 'Fiş',

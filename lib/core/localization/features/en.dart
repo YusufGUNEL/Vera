@@ -331,6 +331,7 @@ const Map<String, String> _enStrings = {
   'umaThinking': 'Uma is thinking...',
   'umaAskHint': 'Ask Uma anything...',
   'umaStatusOnline': 'AI assistant · online',
+  'umaNewChat': 'New chat',
   'categoryBudgetLabel': 'SPENDING THIS MONTH',
   'categoryOther': 'Other',
   'receiptDefaultName': 'Receipt',

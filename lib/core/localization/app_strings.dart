@@ -369,6 +369,7 @@ class AppStrings {
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
   String get umaStatusOnline => _t('umaStatusOnline');
+  String get umaNewChat => _t('umaNewChat');
   String get umaVoiceStart => _t('umaVoiceStart');
   String get umaVoiceStop => _t('umaVoiceStop');
   String get umaVoiceListening => _t('umaVoiceListening');
