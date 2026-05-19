@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,7 +54,33 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
     final lower = name.toLowerCase();
     if (lower.endsWith('.png')) return 'image/png';
     if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.pdf')) return 'application/pdf';
     return 'image/jpeg';
+  }
+
+  Future<void> _pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['pdf', 'png', 'jpg', 'jpeg', 'webp'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final picked = result.files.first;
+      final bytes = picked.bytes;
+      if (bytes == null) return;
+      if (!mounted) return;
+      await ref.read(receiptControllerProvider.notifier).scan(
+            bytes: bytes,
+            mimeType: _guessMime(picked.name),
+            fileName: picked.name,
+          );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e')),
+      );
+    }
   }
 
   @override
@@ -140,6 +168,10 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                               ],
                             ),
                           ),
+                          IconButton(
+                            icon: Icon(Icons.close_rounded, color: t.muted),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 18),
@@ -180,20 +212,30 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
       },
       child: Column(
         children: [
-        _BigAction(
-          icon: Icons.photo_camera_outlined,
-          label: l10n.takePhoto,
-          color: t.brand,
-          onTap: () => _pick(ImageSource.camera),
-        ),
-        const SizedBox(height: 10),
-        _BigAction(
-          icon: Icons.photo_library_outlined,
-          label: l10n.pickFromGallery,
-          color: t.uma,
-          onTap: () => _pick(ImageSource.gallery),
-        ),
-        const SizedBox(height: 14),
+        if (kIsWeb) ...[
+          _BigAction(
+            icon: Icons.upload_file_outlined,
+            label: l10n.pickStatementFile,
+            color: t.brand,
+            onTap: _pickFile,
+          ),
+          const SizedBox(height: 10),
+        ] else ...[
+          _BigAction(
+            icon: Icons.photo_camera_outlined,
+            label: l10n.takePhoto,
+            color: t.brand,
+            onTap: () => _pick(ImageSource.camera),
+          ),
+          const SizedBox(height: 10),
+          _BigAction(
+            icon: Icons.photo_library_outlined,
+            label: l10n.pickFromGallery,
+            color: t.uma,
+            onTap: () => _pick(ImageSource.gallery),
+          ),
+          const SizedBox(height: 10),
+        ],
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -272,12 +314,12 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
           ],
         ),
         const SizedBox(height: 6),
-        Row(
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            if (r.category != null) ...[
-              Pill(label: r.category!, color: t.brand),
-              const SizedBox(width: 6),
-            ],
+            if (r.category != null) Pill(label: r.category!, color: t.brand),
             if (r.date != null)
               Text(
                 r.date!,
@@ -615,13 +657,17 @@ class _BigAction extends StatelessWidget {
             children: [
               Icon(icon, color: Colors.white, size: 20),
               const SizedBox(width: 12),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],

@@ -10,16 +10,14 @@ class DragDropZone extends StatefulWidget {
     required this.onFileDropped,
     required this.child,
     this.enabled = true,
+    this.showIdleHint = true,
     super.key,
   });
 
-  /// Çağrıldığında dosyanın içeriğini ve adını döndürür.
   final void Function(Uint8List bytes, String filename) onFileDropped;
-  
-  /// İçine yerleştirilecek normal butonlar/içerikler
   final Widget child;
-  
   final bool enabled;
+  final bool showIdleHint;
 
   @override
   State<DragDropZone> createState() => _DragDropZoneState();
@@ -28,12 +26,16 @@ class DragDropZone extends StatefulWidget {
 class _DragDropZoneState extends State<DragDropZone> {
   bool _isDragging = false;
 
+  bool get _supportsDrop {
+    if (!widget.enabled) return false;
+    if (kIsWeb) return true;
+    return defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.android;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Sadece masaüstü veya Web ortamında sürükle-bırak desteği verelim
-    final isMobile = !kIsWeb && (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android);
-    
-    if (!widget.enabled || isMobile) {
+    if (!_supportsDrop) {
       return widget.child;
     }
 
@@ -46,7 +48,7 @@ class _DragDropZoneState extends State<DragDropZone> {
       onDragDone: (details) async {
         setState(() => _isDragging = false);
         if (details.files.isEmpty) return;
-        
+
         final file = details.files.first;
         final bytes = await file.readAsBytes();
         widget.onFileDropped(bytes, file.name);
@@ -54,23 +56,28 @@ class _DragDropZoneState extends State<DragDropZone> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: _isDragging ? t.umaSoft.withValues(alpha: 0.5) : Colors.transparent,
+          color: _isDragging ? t.umaSoft.withValues(alpha: 0.35) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isDragging ? t.uma : Colors.transparent,
-            width: 2,
-            strokeAlign: BorderSide.strokeAlignOutside,
+            color: _isDragging ? t.uma : t.line,
+            width: _isDragging ? 2 : 1.5,
           ),
         ),
         child: Stack(
-          alignment: Alignment.center,
           children: [
-            widget.child,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (widget.showIdleHint && !_isDragging)
+                  _IdleDropHint(l10n: l10n, tokens: t),
+                widget.child,
+              ],
+            ),
             if (_isDragging)
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: t.bg.withValues(alpha: 0.85),
+                    color: t.bg.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
@@ -94,6 +101,56 @@ class _DragDropZoneState extends State<DragDropZone> {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _IdleDropHint extends StatelessWidget {
+  const _IdleDropHint({
+    required this.l10n,
+    required this.tokens,
+  });
+
+  final AppStrings l10n;
+  final AppTokens tokens;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = tokens;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: t.umaSoft.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: t.uma.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.file_upload_outlined, color: t.uma, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.dragDropHint,
+                  style: TextStyle(
+                    color: t.ink,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.dragDropOr,
+                  style: TextStyle(color: t.muted, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

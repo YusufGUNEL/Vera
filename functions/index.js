@@ -5,6 +5,12 @@ const { defineSecret } = require('firebase-functions/params');
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
 const defaultModel = 'gemini-2.5-flash';
 
+/** Gen2 callable + Cloud Run: without public invoker, web clients get 401. */
+const callableBase = {
+  secrets: [geminiApiKey],
+  invoker: 'public',
+};
+
 function getClient() {
   return new GoogleGenAI({ apiKey: geminiApiKey.value() });
 }
@@ -78,7 +84,7 @@ function extractText(response) {
 
 exports.geminiGenerateText = onCall(
   {
-    secrets: [geminiApiKey],
+    ...callableBase,
     timeoutSeconds: 60,
     memory: '512MiB',
   },
@@ -104,7 +110,7 @@ exports.geminiGenerateText = onCall(
 
 exports.geminiAnalyzeImage = onCall(
   {
-    secrets: [geminiApiKey],
+    ...callableBase,
     timeoutSeconds: 120,
     memory: '1GiB',
   },
@@ -137,7 +143,7 @@ exports.geminiAnalyzeImage = onCall(
         ],
         config: {
           temperature: 0.2,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 8192,
         },
       });
       return { text: extractText(response), model };
@@ -149,7 +155,7 @@ exports.geminiAnalyzeImage = onCall(
 
 exports.geminiRunAgent = onCall(
   {
-    secrets: [geminiApiKey],
+    ...callableBase,
     timeoutSeconds: 120,
     memory: '1GiB',
   },

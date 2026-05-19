@@ -22,6 +22,11 @@ class AppStrings {
     return _strings[locale]?[key] ?? _strings[AppLocale.en]?[key] ?? key;
   }
 
+  String _tOr(String key, String fallback) {
+    final value = _t(key);
+    return value == key ? fallback : value;
+  }
+
   // ---- Bottom nav ----
   String get navHome => _t('navHome');
   String get navWealth => _t('navWealth');
@@ -202,6 +207,33 @@ class AppStrings {
   String get securityPillKept => _t('securityPillKept');
   String get securityPillApproved => _t('securityPillApproved');
   String get fraudAlertTitle => _t('fraudAlertTitle');
+  String get spendingInsightAlertTitle {
+    final localized = _t('spendingInsightAlertTitle');
+    if (localized != 'spendingInsightAlertTitle') return localized;
+    return fraudAlertTitle;
+  }
+  String get securityInsightsSection =>
+      _tOr('securityInsightsSection', 'Spending insights');
+  String get securityTipsSection =>
+      _tOr('securityTipsSection', 'Protect yourself at the bank');
+  String get securityTipBankTitle =>
+      _tOr('securityTipBankTitle', 'Confirm in your bank app');
+  String get securityTipBankBody => _tOr(
+        'securityTipBankBody',
+        'Vera only advises. Complete payments inside your real banking app.',
+      );
+  String get securityTipPinTitle =>
+      _tOr('securityTipPinTitle', 'PIN & biometrics');
+  String get securityTipPinBody => _tOr(
+        'securityTipPinBody',
+        'Enable Face ID and alerts in Profile settings.',
+      );
+  String get securityTipAlertsTitle =>
+      _tOr('securityTipAlertsTitle', 'Keep data fresh');
+  String get securityTipAlertsBody => _tOr(
+        'securityTipAlertsBody',
+        'Import statements or scan receipts for better insights.',
+      );
   String fraudReasonOutlier(String median, String ratio) => _t(
         'fraudReasonOutlier',
       ).replaceAll('{median}', median).replaceAll('{ratio}', ratio);

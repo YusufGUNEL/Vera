@@ -54,6 +54,8 @@ class UmaMessageBubble extends StatelessWidget {
                   ),
                   child: Text(
                     spec.badge!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -100,18 +102,26 @@ class UmaMessageBubble extends StatelessWidget {
                 ],
                 if (envelope.pendingToolCall != null && onConfirmTool != null) ...[
                   const SizedBox(height: 10),
-                  FilledButton.icon(
-                    onPressed: onConfirmTool,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: t.uma,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: onConfirmTool,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: t.uma,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                      ),
+                      icon: const Icon(Icons.check_circle_outline, size: 16),
+                      label: Text(
+                        context.l10n.umaConfirmAction,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    icon: const Icon(Icons.check_circle_outline, size: 16),
-                    label: Text(context.l10n.umaConfirmAction),
                   ),
                 ] else if (envelope.nextStep != null) ...[
                   const SizedBox(height: 10),
@@ -189,6 +199,8 @@ class _SourceChip extends StatelessWidget {
           const SizedBox(height: 1),
           Text(
             source.detail,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 11,
               color: t.ink2,

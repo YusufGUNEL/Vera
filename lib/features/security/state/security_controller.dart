@@ -35,32 +35,28 @@ class SecurityState {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
-  int get blockedCount => checks.where((check) {
-        return check.blocked &&
-            decisions[check.id] != ReviewDecision.approvedByUser;
+  /// Open spending insights the user has not marked as normal yet.
+  int get openInsightCount => checks.where((check) {
+        return decisions[check.id] != ReviewDecision.approvedByUser;
       }).length;
 
-  /// Checks the user has resolved (kept blocked or approved) plus the
-  /// non-blocked items that Fraud Radar already cleared in the current feed.
+  /// Insights the user reviewed or that were already low-priority.
   int get reviewedCount {
     final cleared = checks.where((c) => !c.blocked).length;
     return cleared + decisions.length;
   }
 
-  /// Distinct device labels seen in the feed (e.g. MacBook Pro, iPhone 17).
-  /// We pull "device-like" check names; the count never goes below 1 since
-  /// the user is always on at least one device.
-  int get trustedDevices {
-    final pattern = RegExp(
-      r'(macbook|iphone|ipad|android|samsung|xiaomi|cihaz|device|laptop|pc|windows|browser|tarayıcı)',
-      caseSensitive: false,
-    );
-    final unique = checks
-        .where((c) => pattern.hasMatch(c.name))
-        .map((c) => c.location)
-        .toSet();
-    return unique.isEmpty ? 1 : unique.length;
+  /// Distinct categories / merchants Vera is watching in the current feed.
+  int get patternsMonitored {
+    if (checks.isEmpty) return 0;
+    return checks.map((c) => c.location.trim().toLowerCase()).toSet().length;
   }
+
+  @Deprecated('Use openInsightCount')
+  int get blockedCount => openInsightCount;
+
+  @Deprecated('Use patternsMonitored')
+  int get trustedDevices => patternsMonitored == 0 ? 0 : patternsMonitored;
 
   SecurityState copyWith({
     List<SecurityCheck>? checks,
@@ -192,7 +188,7 @@ class SecurityController extends StateNotifier<SecurityState> {
       _notifiedIds.add(check.id);
       try {
         await _notifications.showFraudAlert(
-          title: strings.fraudAlertTitle,
+          title: strings.spendingInsightAlertTitle,
           body: '${check.name} · ${check.location}',
           payload: '/security',
         );

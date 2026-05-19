@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../config/env.dart';
 import '../firebase/firebase_bootstrap.dart';
 import '../firebase/remote_config_service.dart';
+import 'gemini_web_rest.dart';
 
 /// Gemini requests prefer the Firebase Functions proxy (key in Secret Manager).
 /// When the proxy is unreachable but a GEMINI_API_KEY is shipped in .env, we
@@ -60,10 +61,16 @@ class GeminiService {
     }
 
     final functions = FirebaseFunctions.instanceFor(region: 'us-central1');
+    final imageCallOptions = HttpsCallableOptions(
+      timeout: const Duration(seconds: 120),
+    );
     return GeminiService._(
       modelName: model,
       generateTextCallable: functions.httpsCallable('geminiGenerateText'),
-      analyzeImageCallable: functions.httpsCallable('geminiAnalyzeImage'),
+      analyzeImageCallable: functions.httpsCallable(
+        'geminiAnalyzeImage',
+        options: imageCallOptions,
+      ),
       runAgentCallable: functions.httpsCallable('geminiRunAgent'),
       directApiKey: directKey,
     );
@@ -120,41 +127,48 @@ class GeminiService {
           'model': modelName,
         });
         final data = _asMap(result.data);
-        return (data['text'] as String?) ?? '';
+        final proxyText = (data['text'] as String?)?.trim() ?? '';
+        if (proxyText.isNotEmpty) return proxyText;
+        if (!_hasDirect) {
+          throw Exception('Gemini proxy returned empty text');
+        }
       } catch (e) {
         if (!_hasDirect) rethrow;
       }
     }
     if (!_hasDirect) throw const MissingGeminiBackendException();
-    // Direct API path: try a sequence of models with exponential-backoff
-    // retries on transient 503/UNAVAILABLE. Each model gets up to 3 attempts.
-    // Less-throttled / older-stable models come first so we route around the
-    // hot 'gemini-2.0-flash' pool when Google is shedding load.
+
+    final fallbackChain = _modelFallbackChain(modelName);
+    Object? lastError;
+
+    if (kIsWeb) {
+      const rest = GeminiWebRest();
+      for (final model in fallbackChain) {
+        try {
+          final text = await rest.generateContent(
+            apiKey: _directApiKey!,
+            model: model,
+            prompt: prompt,
+            bytes: imageBytes,
+            mimeType: mimeType,
+          );
+          if (text.isNotEmpty) return text;
+        } catch (e) {
+          lastError = e;
+          if (_isQuotaExhausted(e)) break;
+        }
+      }
+      throw GeminiBusyException(lastError?.toString() ?? 'web-rest-failed');
+    }
+
     final parts = [
       Content.multi([
         TextPart(prompt),
         DataPart(mimeType, imageBytes),
       ]),
     ];
-    // 2.5-flash leads (free-tier 2.0-* models are usually quota-exhausted),
-    // then fall through to lite / 2.0 variants as a last resort.
-    final fallbackChain = <String>[modelName];
-    for (final alt in const [
-      'gemini-2.5-flash',
-      'gemini-flash-latest',
-      'gemini-2.5-flash-lite',
-      'gemini-2.0-flash-001',
-      'gemini-2.0-flash',
-      'gemini-2.0-flash-lite',
-    ]) {
-      if (!fallbackChain.contains(alt)) fallbackChain.add(alt);
-    }
 
-    Object? lastError;
     for (final model in fallbackChain) {
-      // Up to 2 attempts per model. 429/quota is treated as 'this model is
-      // exhausted for now' — jump to the next model immediately. Only retry
-      // the same model for true transient 503/overloaded.
       var attempts = 2;
       while (attempts-- > 0) {
         try {
@@ -163,28 +177,56 @@ class GeminiService {
           return response.text ?? '';
         } catch (e) {
           lastError = e;
-          final msg = e.toString();
-          final quotaExhausted = msg.contains('exceeded your current quota') ||
-              msg.contains('RESOURCE_EXHAUSTED') ||
-              msg.contains('429');
-          final overloaded = msg.contains('503') ||
-              msg.contains('UNAVAILABLE') ||
-              msg.contains('overloaded') ||
-              msg.contains('high demand');
-          if (quotaExhausted) {
-            // Don't retry same model — its quota window is closed. Try next.
-            break;
+          if (_isQuotaExhausted(e)) break;
+          if (_isTransientOverload(e)) {
+            if (attempts > 0) {
+              await Future.delayed(const Duration(milliseconds: 1500));
+            }
+            continue;
           }
-          if (!overloaded) {
-            throw Exception(lastError);
-          }
-          if (attempts > 0) {
-            await Future.delayed(const Duration(milliseconds: 1500));
-          }
+          if (_isWebIncompatibleSdkError(e)) break;
+          throw Exception('$e');
         }
       }
     }
     throw GeminiBusyException(lastError?.toString() ?? 'overloaded');
+  }
+
+  List<String> _modelFallbackChain(String primary) {
+    final chain = <String>[primary];
+    for (final alt in const [
+      'gemini-2.5-flash',
+      'gemini-flash-latest',
+      'gemini-2.5-flash-lite',
+      'gemini-2.0-flash-001',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+    ]) {
+      if (!chain.contains(alt)) chain.add(alt);
+    }
+    return chain;
+  }
+
+  bool _isQuotaExhausted(Object e) {
+    final msg = e.toString();
+    return msg.contains('exceeded your current quota') ||
+        msg.contains('RESOURCE_EXHAUSTED') ||
+        msg.contains('429');
+  }
+
+  bool _isTransientOverload(Object e) {
+    final msg = e.toString();
+    return msg.contains('503') ||
+        msg.contains('UNAVAILABLE') ||
+        msg.contains('overloaded') ||
+        msg.contains('high demand');
+  }
+
+  bool _isWebIncompatibleSdkError(Object e) {
+    final msg = e.toString();
+    return msg.contains('Int64 accessor') ||
+        msg.contains('dart2js') ||
+        msg.contains('Unsupported operation');
   }
 
   Future<AgentResult> runAgent({

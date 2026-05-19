@@ -84,29 +84,37 @@ class UmaOrderCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 12),
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: FilledButton(
-                  onPressed: isDone ? null : onForward,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: card.status == OrderStatus.forwarded
-                        ? t.green
-                        : t.brand,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text(statusLabel),
+              FilledButton(
+                onPressed: isDone ? null : onForward,
+                style: FilledButton.styleFrom(
+                  backgroundColor: card.status == OrderStatus.forwarded
+                      ? t.green
+                      : t.brand,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  statusLabel,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (!isDone) ...[
-                const SizedBox(width: 10),
+                const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: onDismiss,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: t.ink2,
                     side: BorderSide(color: t.line),
                   ),
-                  child: const Text('Şimdilik beklet'),
+                  child: const Text(
+                    'Şimdilik beklet',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ],
@@ -145,6 +153,8 @@ class _OrderRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

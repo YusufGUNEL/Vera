@@ -263,83 +263,115 @@ class _Header extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: t.line)),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                center: const Alignment(-0.4, -0.4),
-                colors: [t.umaLight, t.uma],
-              ),
-            ),
-            alignment: Alignment.center,
-            child:
-                const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Uma',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: t.ink,
-                    letterSpacing: -0.3,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compactHeader = constraints.maxWidth < 380;
+          return Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.4, -0.4),
+                    colors: [t.umaLight, t.uma],
                   ),
                 ),
-                Row(
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        shape: BoxShape.circle,
+                    Text(
+                      'Uma',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: t.ink,
+                        letterSpacing: -0.3,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      statusText,
-                      style: TextStyle(fontSize: 11, color: statusColor),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            statusText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 11, color: statusColor),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: onNewChat,
-            style: TextButton.styleFrom(
-              foregroundColor: t.uma,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            ),
-            child: Text(
-              l10n.umaNewChat,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
               ),
-            ),
-          ),
-          IconButton(
-            onPressed: onToggleSettings,
-            icon: Icon(Icons.settings_outlined, color: t.ink2, size: 19),
-            style: IconButton.styleFrom(
-              backgroundColor: showSettings ? t.bgSoft : Colors.transparent,
-              shape: const CircleBorder(),
-            ),
-          ),
-          IconButton(
-            onPressed: onClose,
-            icon: Icon(Icons.close, color: t.ink2, size: 20),
-          ),
-        ],
+              if (compactHeader)
+                IconButton(
+                  onPressed: onNewChat,
+                  tooltip: l10n.umaNewChat,
+                  icon: Icon(Icons.add_comment_outlined, color: t.uma, size: 20),
+                  style: IconButton.styleFrom(
+                    padding: const EdgeInsets.all(8),
+                    minimumSize: const Size(36, 36),
+                  ),
+                )
+              else
+                TextButton(
+                  onPressed: onNewChat,
+                  style: TextButton.styleFrom(
+                    foregroundColor: t.uma,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  ),
+                  child: Text(
+                    l10n.umaNewChat,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              IconButton(
+                onPressed: onToggleSettings,
+                icon: Icon(Icons.settings_outlined, color: t.ink2, size: 19),
+                style: IconButton.styleFrom(
+                  backgroundColor: showSettings ? t.bgSoft : Colors.transparent,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(8),
+                  minimumSize: const Size(36, 36),
+                ),
+              ),
+              IconButton(
+                onPressed: onClose,
+                icon: Icon(Icons.close, color: t.ink2, size: 20),
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(8),
+                  minimumSize: const Size(36, 36),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -581,12 +613,17 @@ class _SuggestionStrip extends ConsumerWidget {
                     children: [
                       Icon(Icons.auto_awesome, size: 12, color: t.uma),
                       const SizedBox(width: 5),
-                      Text(
-                        suggestion,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: t.ink2,
-                          fontWeight: FontWeight.w500,
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 220),
+                        child: Text(
+                          suggestion,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: t.ink2,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -827,25 +864,26 @@ class _FeedbackBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Text(
+            l10n.umaFeedbackLabel,
+            style: TextStyle(
+              color: t.muted,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
             children: [
-              Text(
-                l10n.umaFeedbackLabel,
-                style: TextStyle(
-                  color: t.muted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const Spacer(),
               _FeedbackChip(
                 icon: Icons.thumb_up_alt_outlined,
                 label: l10n.umaFeedbackHelpful,
                 selected: selectedVote == UmaFeedbackVote.helpful,
                 onTap: () => onVote(UmaFeedbackVote.helpful),
               ),
-              const SizedBox(width: 6),
               _FeedbackChip(
                 icon: Icons.thumb_down_alt_outlined,
                 label: l10n.umaFeedbackNotHelpful,
@@ -856,23 +894,28 @@ class _FeedbackBar extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextButton.icon(
-                onPressed: () => onAddNote(
-                  selectedVote ?? UmaFeedbackVote.notHelpful,
-                ),
-                style: TextButton.styleFrom(
-                  foregroundColor: t.uma,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  minimumSize: const Size(0, 0),
-                ),
-                icon: const Icon(Icons.edit_note, size: 16),
-                label: Text(
-                  note == null || note.isEmpty
-                      ? l10n.umaFeedbackAddNote
-                      : l10n.umaFeedbackEditNote,
+              Flexible(
+                child: TextButton.icon(
+                  onPressed: () => onAddNote(
+                    selectedVote ?? UmaFeedbackVote.notHelpful,
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: t.uma,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    minimumSize: const Size(0, 0),
+                  ),
+                  icon: const Icon(Icons.edit_note, size: 16),
+                  label: Text(
+                    note == null || note.isEmpty
+                        ? l10n.umaFeedbackAddNote
+                        : l10n.umaFeedbackEditNote,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               if (note != null && note.isNotEmpty) ...[
@@ -924,15 +967,20 @@ class _FeedbackChip extends StatelessWidget {
           border: Border.all(color: selected ? t.uma : t.line),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 14, color: selected ? t.uma : t.muted),
             const SizedBox(width: 5),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: selected ? t.uma : t.muted,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? t.uma : t.muted,
+                ),
               ),
             ),
           ],
@@ -1202,6 +1250,8 @@ class _AuditTile extends StatelessWidget {
               ),
               Text(
                 _fmtAuditTime(item.timestamp),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 11, color: t.muted),
               ),
             ],
@@ -1251,6 +1301,8 @@ class _AuditPill extends StatelessWidget {
       ),
       child: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,

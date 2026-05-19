@@ -887,6 +887,9 @@ class _SegmentedSelector<T> extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Text(
                           option.$2,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,

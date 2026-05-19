@@ -80,6 +80,8 @@ class TopBar extends ConsumerWidget {
                 ),
                 Text(
                   name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,

@@ -316,14 +316,23 @@ class _GoalEditSheetState extends ConsumerState<GoalEditSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  l10n.goalEditTitle,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: t.ink,
-                    letterSpacing: -0.3,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.goalEditTitle,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close_rounded, color: t.muted),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(

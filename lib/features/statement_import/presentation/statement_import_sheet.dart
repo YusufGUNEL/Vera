@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -140,6 +141,10 @@ class StatementImportSheet extends ConsumerWidget {
                               ],
                             ),
                           ),
+                          IconButton(
+                            icon: Icon(Icons.close_rounded, color: t.muted),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 18),
@@ -194,12 +199,16 @@ class StatementImportSheet extends ConsumerWidget {
                 children: [
                   Icon(Icons.attach_file, color: t.brandFG),
                   const SizedBox(width: 12),
-                  Text(
-                    l10n.pickStatementFile,
-                    style: TextStyle(
-                      color: t.brandFG,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      l10n.pickStatementFile,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: t.brandFG,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -470,13 +479,21 @@ class StatementImportSheet extends ConsumerWidget {
       AppStrings l10n, String error) {
     return Column(
       children: [
-        Icon(Icons.error_outline, color: t.red, size: 36),
+        Icon(Icons.warning_amber_rounded, color: t.gold, size: 36),
         const SizedBox(height: 10),
         Text(
-          error,
+          l10n.statementFallbackWarning,
           textAlign: TextAlign.center,
-          style: TextStyle(color: t.ink2, fontSize: 13),
+          style: TextStyle(color: t.ink2, fontSize: 13, height: 1.4),
         ),
+        if (kDebugMode && error.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: t.muted, fontSize: 11),
+          ),
+        ],
         const SizedBox(height: 14),
         OutlinedButton(
           onPressed: () =>

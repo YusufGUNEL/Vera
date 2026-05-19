@@ -77,7 +77,10 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  Text(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
                     l10n.addHoldingTitle,
                     style: TextStyle(
                       fontSize: 18,
@@ -85,6 +88,12 @@ class _AddHoldingSheetState extends ConsumerState<AddHoldingSheet> {
                       color: t.ink,
                       letterSpacing: -0.3,
                     ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close_rounded, color: t.muted),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(

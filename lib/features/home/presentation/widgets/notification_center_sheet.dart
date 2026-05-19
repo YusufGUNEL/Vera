@@ -47,63 +47,128 @@ class NotificationCenterSheet extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: t.uma.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(Icons.notifications_outlined,
-                            color: t.uma, size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final stackActions = constraints.maxWidth < 360;
+                      final titleRow = Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: t.uma.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.notifications_outlined,
+                              color: t.uma,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.notifTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: t.ink,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.notifSubtitle(notices.length),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style:
+                                      TextStyle(fontSize: 12, color: t.muted),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                      if (!stackActions || notices.isEmpty) {
+                        return Row(
                           children: [
-                            Text(
-                              l10n.notifTitle,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                                color: t.ink,
-                                letterSpacing: -0.3,
+                            Expanded(child: titleRow),
+                            if (notices.isNotEmpty)
+                              Flexible(
+                                child: Wrap(
+                                  alignment: WrapAlignment.end,
+                                  spacing: 4,
+                                  runSpacing: 0,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () => ref
+                                          .read(
+                                            notificationCenterControllerProvider
+                                                .notifier,
+                                          )
+                                          .markAllRead(),
+                                      child: Text(
+                                        l10n.notifMarkAllRead,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => ref
+                                          .read(
+                                            notificationCenterControllerProvider
+                                                .notifier,
+                                          )
+                                          .dismissAllVisible(),
+                                      child: Text(
+                                        l10n.notifClear,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.notifSubtitle(notices.length),
-                              style: TextStyle(fontSize: 12, color: t.muted),
-                            ),
                           ],
-                        ),
-                      ),
-                      if (notices.isNotEmpty)
-                        Wrap(
-                          spacing: 4,
-                          runSpacing: 0,
-                          children: [
-                            TextButton(
-                              onPressed: () => ref
-                                  .read(notificationCenterControllerProvider
-                                      .notifier)
-                                  .markAllRead(),
-                              child: Text(l10n.notifMarkAllRead),
-                            ),
-                            TextButton(
-                              onPressed: () => ref
-                                  .read(notificationCenterControllerProvider
-                                      .notifier)
-                                  .dismissAllVisible(),
-                              child: Text(l10n.notifClear),
-                            ),
-                          ],
-                        ),
-                    ],
+                        );
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          titleRow,
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 0,
+                            children: [
+                              TextButton(
+                                onPressed: () => ref
+                                    .read(
+                                      notificationCenterControllerProvider
+                                          .notifier,
+                                    )
+                                    .markAllRead(),
+                                child: Text(l10n.notifMarkAllRead),
+                              ),
+                              TextButton(
+                                onPressed: () => ref
+                                    .read(
+                                      notificationCenterControllerProvider
+                                          .notifier,
+                                    )
+                                    .dismissAllVisible(),
+                                child: Text(l10n.notifClear),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 Expanded(

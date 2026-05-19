@@ -114,6 +114,18 @@ class RecurringTransactionParser {
 
     final grouped = <String, _Group>{};
     for (final txn in outgoing) {
+      final lowerName = txn.name.toLowerCase();
+      // Skip obvious transfers/EFTs
+      if (lowerName.contains('eft') ||
+          lowerName.contains('havale') ||
+          lowerName.contains('transfer') ||
+          lowerName.contains('fast') ||
+          lowerName.contains('gelen') ||
+          lowerName.contains('ödeme') ||
+          lowerName.contains('odeme')) {
+        continue;
+      }
+
       final key = _normalize(txn.name);
       final group = grouped.putIfAbsent(
         key,
@@ -132,6 +144,12 @@ class RecurringTransactionParser {
       final catalog = _matchCatalog(key);
       final isRecurring = group.count >= 2;
       if (catalog == null && !isRecurring) return;
+
+      // If it matches a catalog vendor (like Apple, Claude) but only occurred once
+      // and has a price too high for a subscription (>1500 TL), filter it out.
+      if (catalog != null && !isRecurring && group.amount > 1500.0) {
+        return;
+      }
 
       final display = catalog?.name ?? group.displayName;
       final id = 'detected_${_slug(key)}';

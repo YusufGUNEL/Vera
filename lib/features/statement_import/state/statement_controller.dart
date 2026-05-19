@@ -74,10 +74,13 @@ class StatementController extends StateNotifier<StatementState> {
         fileName: fileName,
         mimeType: mimeType,
       );
-    } catch (e) {
+    } catch (_) {
       state = state.copyWith(
-        status: StatementStatus.error,
-        error: e.toString(),
+        status: StatementStatus.ready,
+        statement: const ParsedStatement(source: StatementSource.fallback),
+        sourceBytes: bytes,
+        fileName: fileName,
+        mimeType: mimeType,
       );
     }
   }

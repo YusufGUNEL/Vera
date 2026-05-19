@@ -120,7 +120,10 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
                   isEdit ? l10n.editBillTitle : l10n.addBillTitle,
                   style: TextStyle(
                     fontSize: 18,
@@ -128,6 +131,12 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                     color: t.ink,
                     letterSpacing: -0.3,
                   ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close_rounded, color: t.muted),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 14),
                 _Field(

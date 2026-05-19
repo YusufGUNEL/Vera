@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../../../core/services/gemini_service.dart';
 import '../../home/data/transaction.dart';
 import '../domain/subscription_alert.dart';
 import '../domain/subscription_item.dart';
@@ -13,16 +15,43 @@ import 'recurring_transaction_parser.dart';
 /// the user's own transactions (manual entry, statement import, receipt OCR)
 /// so the list reflects real spending — never a marketing demo.
 class SubscriptionsRepository {
-  SubscriptionsRepository(this._parser);
+  SubscriptionsRepository(this._parser, this._gemini);
 
   final RecurringTransactionParser _parser;
+  final GeminiService _gemini;
 
-  List<SubscriptionItem> getSubscriptions({
+  Future<List<SubscriptionItem>> getSubscriptions({
     List<Txn> userTxns = const [],
     required AppStrings l10n,
-  }) {
+  }) async {
     if (userTxns.isEmpty) return const [];
-    return _parser.detectSubscriptions(userTxns, l10n);
+    final candidates = _parser.detectSubscriptions(userTxns, l10n);
+    if (candidates.isEmpty) return candidates;
+
+    if (_gemini.isAvailable) {
+      try {
+        final prompt = '''
+You are an expert financial assistant analyzing bank transactions to detect recurring subscriptions.
+Here is a list of candidate subscriptions detected by simple keyword matching:
+\${candidates.map((c) => '- ID: \${c.id}, Name: \${c.name}, Monthly Price: \${c.monthlyPrice} TL, Vendor: \${c.vendor}, Category: \${c.category}').join('\\n')}
+
+Analyze these candidates and determine which ones are actual recurring subscriptions (like software licenses, streaming services, gym memberships, utilities, SaaS, cloud storage, etc.) and which ones are likely NOT subscriptions (like one-off retail purchases of hardware, personal money transfers, rent/bills, one-off hotel/flight bookings, salary, etc.).
+
+Output only a valid JSON array containing the IDs of the VALID subscriptions to keep, for example:
+["detected_netflix", "detected_spotify"]
+
+Do not include markdown code blocks, do not include any other text, just the raw JSON array.
+''';
+        final responseText = await _gemini.generateText(prompt);
+        final cleanText = responseText.replaceAll('```json', '').replaceAll('```', '').trim();
+        final List<dynamic> validIds = jsonDecode(cleanText);
+        final validSet = validIds.map((id) => id.toString()).toSet();
+        return candidates.where((c) => validSet.contains(c.id)).toList();
+      } catch (_) {
+        return candidates;
+      }
+    }
+    return candidates;
   }
 
   List<SubscriptionAlert> buildAlerts(
@@ -100,5 +129,8 @@ final recurringTransactionParserProvider = Provider<RecurringTransactionParser>(
 
 final subscriptionsRepositoryProvider =
     Provider<SubscriptionsRepository>((ref) {
-  return SubscriptionsRepository(ref.watch(recurringTransactionParserProvider));
+  return SubscriptionsRepository(
+    ref.watch(recurringTransactionParserProvider),
+    ref.watch(geminiServiceProvider),
+  );
 });

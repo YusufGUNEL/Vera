@@ -37,10 +37,11 @@ class StatementRepository {
   }
 
   ParsedStatement? _tryParseJson(String raw) {
-    final start = raw.indexOf('{');
-    final end = raw.lastIndexOf('}');
+    final normalized = _extractJsonPayload(raw);
+    final start = normalized.indexOf('{');
+    final end = normalized.lastIndexOf('}');
     if (start == -1 || end == -1 || end <= start) return null;
-    final jsonStr = raw.substring(start, end + 1);
+    final jsonStr = normalized.substring(start, end + 1);
     try {
       final map = jsonDecode(jsonStr) as Map<String, dynamic>;
       final txList = (map['transactions'] as List?) ?? const [];
@@ -66,6 +67,19 @@ class StatementRepository {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Strips markdown fences and preamble so Gemini prose still parses.
+  static String _extractJsonPayload(String raw) {
+    var text = raw.trim();
+    final fence = RegExp(r'^```(?:json)?\s*', caseSensitive: false);
+    if (fence.hasMatch(text)) {
+      text = text.replaceFirst(fence, '').trim();
+      if (text.endsWith('```')) {
+        text = text.substring(0, text.length - 3).trim();
+      }
+    }
+    return text;
   }
 
   ParsedStatement _fallback({String? rawText}) {

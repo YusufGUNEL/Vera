@@ -40,7 +40,7 @@ class FirebaseSubscriptionsService {
     // The cheapest source of truth: re-detect from the user's transactions.
     // Firestore only persists user-edited overrides on top of that — never a
     // canned seed of brand names.
-    final detected = _local.getSubscriptions(
+    final detected = await _local.getSubscriptions(
       userTxns: userTxns.cast(),
       l10n: l10n,
     );

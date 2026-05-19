@@ -7,10 +7,12 @@ import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/vera_card.dart';
-import '../../uma_chat/presentation/open_uma.dart';
+
 import '../domain/autonomy_policy.dart';
 import '../domain/rebalance_action.dart';
 import '../state/wealth_controller.dart';
+import '../domain/investment_recommendation.dart';
+import '../state/investment_recommendations_provider.dart';
 import 'widgets/add_holding_sheet.dart';
 import 'widgets/portfolio_donut.dart';
 
@@ -144,10 +146,186 @@ class WealthScreen extends ConsumerWidget {
     );
   }
 
+  void _openMoreRecommendations(
+    BuildContext context,
+    List<InvestmentRecommendation> recommendations,
+  ) {
+    final t = context.tokens;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (sheetCtx) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scrollCtrl) => Container(
+          decoration: BoxDecoration(
+            color: t.bg,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 4),
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: t.isDark ? t.line : const Color(0xFFD9D4C8),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 16, 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.of(sheetCtx).pop(),
+                      icon: Icon(Icons.close_rounded, color: t.ink, size: 24),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Akıllı Yatırım Önerileri',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: t.ink,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  controller: scrollCtrl,
+                  padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
+                  itemCount: recommendations.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final item = recommendations[index];
+                    IconData icon = Icons.trending_up_rounded;
+                    Color iconColor = t.brand;
+                    if (item.type == 'commodity') {
+                      icon = Icons.blur_circular_rounded;
+                      iconColor = t.gold;
+                    } else if (item.type == 'crypto') {
+                      icon = Icons.currency_bitcoin_rounded;
+                      iconColor = t.green;
+                    }
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: t.card,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: t.line),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: iconColor.withValues(alpha: 0.12),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(icon, color: iconColor, size: 18),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: t.ink,
+                                      ),
+                                    ),
+                                    Text(
+                                      item.symbol,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: t.muted,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: t.green.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  item.returnRate,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: t.green,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            item.explanation,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: t.ink2,
+                              height: 1.45,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.auto_awesome, color: t.uma, size: 12),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  item.reason,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontStyle: FontStyle.italic,
+                                    color: t.muted,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final l10n = context.l10n;
+    final recommendationsAsync = ref.watch(investmentRecommendationsProvider);
     final state = ref.watch(wealthControllerProvider);
     final portfolio = [
       for (final allocation in state.allocations)
@@ -438,21 +616,138 @@ class WealthScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => openUma(
-                        context,
-                        ref,
-                        prompt: state.insight,
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.lightbulb_outline_rounded, color: t.uma, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Yatırım Önerileri (Gemini)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: t.ink,
+                        ),
                       ),
-                      icon: const Icon(Icons.open_in_new, size: 16),
-                      label: Text(l10n.applyAtBank),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: t.brand,
-                        foregroundColor: t.brandFG,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  recommendationsAsync.when(
+                    data: (items) {
+                      final top3 = items.take(3).toList();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 100,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: top3.length,
+                              separatorBuilder: (_, __) => const SizedBox(width: 10),
+                              itemBuilder: (context, idx) {
+                                final item = top3[idx];
+                                IconData icon = Icons.trending_up_rounded;
+                                Color iconColor = t.brand;
+                                if (item.type == 'commodity') {
+                                  icon = Icons.blur_circular_rounded;
+                                  iconColor = t.gold;
+                                } else if (item.type == 'crypto') {
+                                  icon = Icons.currency_bitcoin_rounded;
+                                  iconColor = t.green;
+                                }
+                                return Container(
+                                  width: 200,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: t.card,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: t.line),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Icon(icon, color: iconColor, size: 16),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: t.green.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              item.returnRate,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w700,
+                                                color: t.green,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        item.symbol,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          color: t.ink,
+                                        ),
+                                      ),
+                                      Text(
+                                        item.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: t.muted,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => _openMoreRecommendations(context, items),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: t.line),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text(
+                                'Daha Fazla Gör',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    error: (err, _) => Center(
+                      child: Text(
+                        'Öneriler yüklenemedi.',
+                        style: TextStyle(color: t.red, fontSize: 12),
                       ),
                     ),
                   ),
