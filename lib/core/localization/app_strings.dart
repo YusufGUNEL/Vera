@@ -38,6 +38,10 @@ class AppStrings {
   String get liveFeed => _t('liveFeed');
   String get syncing => _t('syncing');
   String get thisMonth => _t('thisMonth');
+  String get actionSend => _t('actionSend');
+  String get actionRequest => _t('actionRequest');
+  String get actionTopUp => _t('actionTopUp');
+  String get actionPay => _t('actionPay');
 
   // ---- Home sections ----
   String get connectedAccounts => _t('connectedAccounts');
@@ -65,25 +69,32 @@ class AppStrings {
   String get incoming => _t('incoming');
 
   // ---- Credit screen ----
+  String get creditHealthScore => _t('creditHealthScore');
+  String get creditStatIncome => _t('creditStatIncome');
+  String get creditStatDti => _t('creditStatDti');
+  String get creditStatTerm => _t('creditStatTerm');
+  String creditTermMo(int n) => _t('creditTermMo').replaceAll('{n}', '$n');
   String creditTermMonths(int n) =>
       _t('creditTermMonths').replaceAll('{n}', '$n');
-  String get creditScoreDisclaimer => _t('creditScoreDisclaimer');
+  String get creditRunSimulation => _t('creditRunSimulation');
+  String get creditCurrentDecision => _t('creditCurrentDecision');
+  String creditPersonalLoan(String amount) =>
+      _t('creditPersonalLoan').replaceAll('{amount}', amount);
+  String creditMonthsApr(int n, String apr) =>
+      _t('creditMonthsApr').replaceAll('{n}', '$n').replaceAll('{apr}', apr);
+  String get creditUmaInsight => _t('creditUmaInsight');
+  String get creditEligibleProducts => _t('creditEligibleProducts');
   String get creditLoanSimulation => _t('creditLoanSimulation');
   String get creditLoanSimulationSubtitle => _t('creditLoanSimulationSubtitle');
   String get creditFieldLoanAmount => _t('creditFieldLoanAmount');
   String get creditFieldTerm => _t('creditFieldTerm');
   String get creditFieldIncome => _t('creditFieldIncome');
   String get creditFieldDebt => _t('creditFieldDebt');
-  String get creditResultMonthlyPayment => _t('creditResultMonthlyPayment');
-  String get creditResultTotalCost => _t('creditResultTotalCost');
-  String get creditResultPaymentLoad => _t('creditResultPaymentLoad');
-  String get creditResultDtiAfter => _t('creditResultDtiAfter');
-  String get creditResultGuidance => _t('creditResultGuidance');
 
   // ---- Credit card on home ----
   String get creditTitle => _t('creditTitle');
   String get creditSubtitle => _t('creditSubtitle');
-  String get creditSummaryCardSubtitle => _t('creditSummaryCardSubtitle');
+  String get creditScoreLabel => _t('creditScoreLabel');
   String get openCredit => _t('openCredit');
 
   // ---- Wealth screen ----
@@ -139,6 +150,18 @@ class AppStrings {
   String profileConnectedAccount(String last4) =>
       _t('profileConnectedAccount').replaceAll('{last4}', last4);
 
+  // ---- UMA order card titles ----
+  String get orderTitleBuyGold => _t('orderTitleBuyGold');
+  String get orderTitlePayCard => _t('orderTitlePayCard');
+  String get orderTitleGoldRate => _t('orderTitleGoldRate');
+  String get orderTitleDue => _t('orderTitleDue');
+  String get orderTitleDueToday => _t('orderTitleDueToday');
+
+  // ---- UMA order card ----
+  String get orderPillReady => _t('orderPillReady');
+  String get orderPillSent => _t('orderPillSent');
+  String get orderPillDismissed => _t('orderPillDismissed');
+
   // ---- Plans / Subscriptions ----
   String get plansTitle => _t('plansTitle');
   String get plansSubtitle => _t('plansSubtitle');
@@ -148,6 +171,8 @@ class AppStrings {
   String get filterAttention => _t('filterAttention');
   String get filterUnused => _t('filterUnused');
   String get filterPriceChanges => _t('filterPriceChanges');
+  String get freezePlan => _t('freezePlan');
+  String get reviewPlan => _t('reviewPlan');
   String get askUma => _t('askUma');
 
   // ---- Security ----
@@ -177,7 +202,6 @@ class AppStrings {
   String get sectionConnected => _t('sectionConnected');
   String get sectionAccount => _t('sectionAccount');
   String get sectionLanguage => _t('sectionLanguage');
-  String get sectionNotifications => _t('sectionNotifications');
   String get brandPalette => _t('brandPalette');
   String get mood => _t('mood');
   String get moodLight => _t('moodLight');
@@ -236,6 +260,14 @@ class AppStrings {
   String get statementNoTransactions => _t('statementNoTransactions');
   String get importToVera => _t('importToVera');
 
+  // ---- UMA forward to bank ----
+  String openBankApp(String bank) =>
+      _t('openBankApp').replaceAll('{bank}', bank);
+  String get umaForwardNote => _t('umaForwardNote');
+  String forwardedToBank(String bank) =>
+      _t('forwardedToBank').replaceAll('{bank}', bank);
+  String get keep => _t('keep');
+
   // ---- Wealth AI plan ----
   String get thisMonthsAiPlan => _t('thisMonthsAiPlan');
   String get aiPlanFooter => _t('aiPlanFooter');
@@ -264,20 +296,23 @@ class AppStrings {
   String get loginFooter => _t('loginFooter');
   String get continueWithGoogle => _t('continueWithGoogle');
   String get googleSignInUnavailable => _t('googleSignInUnavailable');
+  String get googleSignInConfigMissing => _t('googleSignInConfigMissing');
   String loginDemoHint(String email, String password) => _t('loginDemoHint')
       .replaceAll('{email}', email)
       .replaceAll('{password}', password);
 
   // ---- UMA chat ----
+  String get umaSuggestionPay => _t('umaSuggestionPay');
   String get umaSuggestionSubs => _t('umaSuggestionSubs');
   String get umaSuggestionAnalyze => _t('umaSuggestionAnalyze');
   String get voiceCommandTooltip => _t('voiceCommandTooltip');
+  String get requireConfirmation => _t('requireConfirmation');
+  String get requireConfirmationDesc => _t('requireConfirmationDesc');
 
-  // ---- UMA audit trail ----
-  String get umaAuditTrailTitle => _t('umaAuditTrailTitle');
-  String get umaAuditTrailEmpty => _t('umaAuditTrailEmpty');
-  String umaAuditTrailCount(int n) =>
-      _t('umaAuditTrailCount').replaceAll('{n}', '$n');
+  // ---- UMA order card ----
+  String get orderFrom => _t('orderFrom');
+  String get orderTo => _t('orderTo');
+  String get orderAmount => _t('orderAmount');
 
   // ---- Profile / account tiles ----
   String get accountTilePersonal => _t('accountTilePersonal');
@@ -285,7 +320,6 @@ class AppStrings {
   String get accountTileSecurity => _t('accountTileSecurity');
   String get accountTileStorage => _t('accountTileStorage');
   String get accountTileHelp => _t('accountTileHelp');
-  String get accountTileHelpValue => _t('accountTileHelpValue');
   String get deleteAccountTile => _t('deleteAccountTile');
   String get deleteAccountTileValue => _t('deleteAccountTileValue');
   String get deleteAccountDemoTileValue => _t('deleteAccountDemoTileValue');
@@ -315,26 +349,6 @@ class AppStrings {
   String get infoSyncMode => _t('infoSyncMode');
   String get infoLocalData => _t('infoLocalData');
   String get infoLocalDataDescription => _t('infoLocalDataDescription');
-  String get infoCloudSync => _t('infoCloudSync');
-  String get infoCloudSyncActive => _t('infoCloudSyncActive');
-  String get infoCloudSyncInactive => _t('infoCloudSyncInactive');
-  String get fraudAlertTitle => _t('fraudAlertTitle');
-  String get googleSignInConfigMissing => _t('googleSignInConfigMissing');
-  String fraudReasonOutlier(String median, String multiplier) =>
-      _t('fraudReasonOutlier')
-          .replaceAll('{median}', median)
-          .replaceAll('{multiplier}', multiplier);
-  String fraudNameRoundTransfer(String amount) =>
-      _t('fraudNameRoundTransfer').replaceAll('{amount}', amount);
-  String get fraudReasonRoundTransfer => _t('fraudReasonRoundTransfer');
-  String fraudNameBurst(String merchant, int count) =>
-      _t('fraudNameBurst')
-          .replaceAll('{merchant}', merchant)
-          .replaceAll('{count}', '$count');
-  String fraudLocationBurstTotal(String total) =>
-      _t('fraudLocationBurstTotal').replaceAll('{total}', total);
-  String fraudReasonBurst(int count) =>
-      _t('fraudReasonBurst').replaceAll('{count}', '$count');
   String get helpFaqQ1 => _t('helpFaqQ1');
   String get helpFaqA1 => _t('helpFaqA1');
   String get helpFaqQ2 => _t('helpFaqQ2');
@@ -349,6 +363,12 @@ class AppStrings {
       _t('umaGreeting').replaceAll('{name}', name);
 
   // ---- UMA fallback replies ----
+  String umaReplyBuyGold(String bank) =>
+      _t('umaReplyBuyGold').replaceAll('{bank}', bank);
+  String umaReplyPayCard(String bank) =>
+      _t('umaReplyPayCard').replaceAll('{bank}', bank);
+  String umaReplyMoveSavings(int pct) =>
+      _t('umaReplyMoveSavings').replaceAll('{pct}', '$pct');
   String umaReplySubscriptions(int n, String total) =>
       _t('umaReplySubscriptions')
           .replaceAll('{n}', '$n')
@@ -374,7 +394,6 @@ class AppStrings {
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
   String get umaStatusOnline => _t('umaStatusOnline');
-  String get umaNewChat => _t('umaNewChat');
   String get umaStatusLocalOnly => _t('umaStatusLocalOnly');
   String get umaStatusNeedsData => _t('umaStatusNeedsData');
   String get umaVoiceStart => _t('umaVoiceStart');
@@ -463,9 +482,6 @@ class AppStrings {
   String get umaAuditCorrectionFeedback => _t('umaAuditCorrectionFeedback');
   String get umaAuditMemoryUpdated => _t('umaAuditMemoryUpdated');
   String get umaAuditConfidenceReduced => _t('umaAuditConfidenceReduced');
-  String get umaAuditTrailEmptyState => _t('umaAuditTrailEmptyState');
-  String get umaAuditActionReplyGenerated =>
-      _t('umaAuditActionReplyGenerated');
 
   // ---- Category budget ----
   String get categoryBudgetLabel => _t('categoryBudgetLabel');
@@ -512,7 +528,11 @@ class AppStrings {
       _t('bankDeleted').replaceAll('{name}', name);
   String get bankActionsFeedNote => _t('bankActionsFeedNote');
 
-  // ---- UMA prompts ----
+  // ---- UMA prompts (quick actions on home) ----
+  String get umaPromptSend => _t('umaPromptSend');
+  String get umaPromptRequest => _t('umaPromptRequest');
+  String get umaPromptTopUp => _t('umaPromptTopUp');
+  String get umaPromptPay => _t('umaPromptPay');
   String get umaPromptAnalyze => _t('umaPromptAnalyze');
 
   // ---- Transaction detail ----

@@ -154,6 +154,7 @@ class AuthController extends StateNotifier<AuthSession> {
       'uma.audit.events',
       'uma.feedback',
       'uma.feedback.entries',
+      'onboarding.completed',
       'profile.notifications',
       'profile.face_id',
       'profile.fraud_alerts',

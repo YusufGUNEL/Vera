@@ -19,10 +19,33 @@ class IntentRouter {
 
     if (lower.contains('spend') ||
         lower.contains('analyze') ||
-        lower.contains('analiz') ||
-        lower.contains('harca')) {
+        lower.contains('analiz')) {
       return UmaIntent(
           type: UmaIntentType.analyzeSpending, originalText: userText);
+    }
+
+    if (lower.contains('gold') || lower.contains('altin')) {
+      return UmaIntent(type: UmaIntentType.buyGold, originalText: userText);
+    }
+
+    if ((lower.contains('pay') || lower.contains('ode')) &&
+        (lower.contains('card') ||
+            lower.contains('credit') ||
+            lower.contains('kart'))) {
+      return UmaIntent(
+        type: UmaIntentType.payCreditCard,
+        originalText: userText,
+      );
+    }
+
+    if (lower.contains('savings') ||
+        lower.contains('save') ||
+        lower.contains('birikim') ||
+        lower.contains('tasarruf')) {
+      return UmaIntent(
+        type: UmaIntentType.moveToSavings,
+        originalText: userText,
+      );
     }
 
     if (lower.contains('wealth') ||

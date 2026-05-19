@@ -259,7 +259,7 @@ class GeminiService {
     return AgentResult(
       text: (response.text ?? '').trim(),
       calls: calls,
-      payload: data,
+      payload: const <String, Object?>{},
     );
   }
 

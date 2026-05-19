@@ -1,4 +1,7 @@
 enum UmaIntentType {
+  buyGold,
+  payCreditCard,
+  moveToSavings,
   showSubscriptions,
   analyzeSpending,
   explainWealth,
