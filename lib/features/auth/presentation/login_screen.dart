@@ -8,6 +8,8 @@ import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/utils/responsive.dart';
+import 'auth_error_messages.dart';
 import '../state/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -119,11 +121,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
     } on PlatformException catch (error) {
       setState(() {
-        _error = error.code == 'sign_in_failed'
-            ? l10n.googleSignInConfigMissing
-            : (error.message?.trim().isNotEmpty == true
-                ? error.message!
-                : l10n.loginFirebaseError(error.code));
+        _error = googleSignInErrorMessage(
+          l10n: l10n,
+          error: error,
+          fallback: l10n.loginFirebaseError(error.code),
+        );
       });
     } catch (error) {
       setState(() => _error = '$error');
@@ -142,171 +144,207 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       backgroundColor: t.bg,
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-            child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(minHeight: constraints.maxHeight - 44),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 12),
-                  Container(
-                    width: 68,
-                    height: 68,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        center: const Alignment(-0.4, -0.4),
-                        colors: [t.umaLight, t.uma],
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.auto_awesome,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+          builder: (context, constraints) {
+            final responsive = context.responsive;
+            final outerPadding = EdgeInsets.fromLTRB(
+              responsive.pageGutter,
+              responsive.isDesktop ? 28 : 20,
+              responsive.pageGutter,
+              24,
+            );
+            return SingleChildScrollView(
+              padding: outerPadding,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - outerPadding.vertical,
+                    maxWidth: responsive.authMaxWidth,
                   ),
-                  const SizedBox(height: 18),
-                  Text(
-                    l10n.loginTitle,
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w700,
-                      color: t.ink,
-                      letterSpacing: -0.9,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.loginSubtitle,
-                    style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
-                  ),
-                  const SizedBox(height: 14),
-                  _AuthStatusBanner(
-                    message: firebase.ready
-                        ? l10n.loginFirebaseReadyFooter
-                        : '${l10n.loginFooter}\n${l10n.loginDemoHint(_demoEmail, _demoPassword)}',
-                    isWarning: !firebase.ready,
-                  ),
-                  const SizedBox(height: 24),
-                  _Field(
-                    label: l10n.emailField,
-                    controller: _emailController,
-                    hint: l10n.loginEmailHint,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 14),
-                  _Field(
-                    label: l10n.passwordField,
-                    controller: _passwordController,
-                    hint: '********',
-                    obscure: true,
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _busy ? null : _signIn,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: t.brand,
-                        foregroundColor: t.brandFG,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                      ),
-                      child: _busy
-                          ? SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: t.brandFG,
+                  child: Container(
+                    padding: EdgeInsets.all(responsive.isDesktop ? 28 : 0),
+                    decoration: responsive.isDesktop
+                        ? BoxDecoration(
+                            color: t.card,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: t.line),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
                               ),
-                            )
-                          : Text(l10n.loginContinueEmail),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _busy ? null : _signInWithGoogle,
-                      icon: Icon(
-                        Icons.g_mobiledata_rounded,
-                        color: t.brand,
-                        size: 22,
-                      ),
-                      label: Text(l10n.continueWithGoogle),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: t.brand,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: t.line),
-                      ),
-                    ),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      _error!,
-                      style: TextStyle(
-                        color: t.red,
-                        fontSize: 12,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: t.line, thickness: 1)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          l10n.dividerOr,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: t.muted,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.4,
+                            ],
+                          )
+                        : null,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 12),
+                        Container(
+                          width: 68,
+                          height: 68,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              center: const Alignment(-0.4, -0.4),
+                              colors: [t.umaLight, t.uma],
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.white,
+                            size: 30,
                           ),
                         ),
-                      ),
-                      Expanded(child: Divider(color: t.line, thickness: 1)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: OutlinedButton.icon(
-                      onPressed: _busy ? null : () => context.push(Routes.signup),
-                      icon: Icon(
-                        Icons.person_add_alt_1_outlined,
-                        size: 18,
-                        color: t.brand,
-                      ),
-                      label: Text(
-                        l10n.loginCreateAccount,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: t.brand,
+                        const SizedBox(height: 18),
+                        Text(
+                          l10n.loginTitle,
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            color: t.ink,
+                            letterSpacing: -0.9,
+                          ),
                         ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: t.brand, width: 1.4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.loginSubtitle,
+                          style: TextStyle(
+                              fontSize: 14, color: t.muted, height: 1.5),
                         ),
-                      ),
+                        const SizedBox(height: 14),
+                        _AuthStatusBanner(
+                          message: firebase.ready
+                              ? l10n.loginFirebaseReadyFooter
+                              : '${l10n.loginFooter}\n${l10n.loginDemoHint(_demoEmail, _demoPassword)}',
+                          isWarning: !firebase.ready,
+                        ),
+                        const SizedBox(height: 24),
+                        _Field(
+                          label: l10n.emailField,
+                          controller: _emailController,
+                          hint: l10n.loginEmailHint,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 14),
+                        _Field(
+                          label: l10n.passwordField,
+                          controller: _passwordController,
+                          hint: '********',
+                          obscure: true,
+                        ),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _busy ? null : _signIn,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: t.brand,
+                              foregroundColor: t.brandFG,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                            ),
+                            child: _busy
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: t.brandFG,
+                                    ),
+                                  )
+                                : Text(l10n.loginContinueEmail),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _busy ? null : _signInWithGoogle,
+                            icon: Icon(
+                              Icons.g_mobiledata_rounded,
+                              color: t.brand,
+                              size: 22,
+                            ),
+                            label: Text(l10n.continueWithGoogle),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: t.brand,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: BorderSide(color: t.line),
+                            ),
+                          ),
+                        ),
+                        if (_error != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            _error!,
+                            style: TextStyle(
+                              color: t.red,
+                              fontSize: 12,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                                child: Divider(color: t.line, thickness: 1)),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                l10n.dividerOr,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: t.muted,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                                child: Divider(color: t.line, thickness: 1)),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            onPressed: _busy
+                                ? null
+                                : () => context.push(Routes.signup),
+                            icon: Icon(
+                              Icons.person_add_alt_1_outlined,
+                              size: 18,
+                              color: t.brand,
+                            ),
+                            label: Text(
+                              l10n.loginCreateAccount,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: t.brand,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: t.brand, width: 1.4),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

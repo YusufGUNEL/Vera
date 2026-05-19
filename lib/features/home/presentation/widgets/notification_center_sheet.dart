@@ -3,27 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
-import '../../../../core/utils/formatters.dart';
-import '../../../security/state/security_controller.dart';
-import '../../../subscriptions/domain/subscription_status.dart';
-import '../../../subscriptions/state/subscriptions_controller.dart';
-import '../../state/upcoming_bills_controller.dart';
-
-class _Notice {
-  const _Notice({
-    required this.icon,
-    required this.title,
-    required this.body,
-    required this.accent,
-    required this.when,
-  });
-
-  final IconData icon;
-  final String title;
-  final String body;
-  final Color accent;
-  final String when;
-}
+import '../../../../core/utils/responsive.dart';
+import '../../state/notification_center_controller.dart';
 
 class NotificationCenterSheet extends ConsumerWidget {
   const NotificationCenterSheet({super.key});
@@ -32,125 +13,115 @@ class NotificationCenterSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final l10n = context.l10n;
-    final security = ref.watch(securityControllerProvider);
-    final subs = ref.watch(subscriptionsControllerProvider);
-    final bills = ref.watch(upcomingBillsControllerProvider);
-
-    final notices = <_Notice>[
-      for (final check
-          in security.checks.where((c) => c.blocked).take(3))
-        _Notice(
-          icon: Icons.shield_outlined,
-          title: check.name,
-          body: check.reason ?? l10n.notifBlockedDefault,
-          accent: t.red,
-          when: check.when,
-        ),
-      for (final sub
-          in subs.items.where((s) => s.status == SubscriptionStatus.priceIncreased).take(3))
-        _Notice(
-          icon: Icons.trending_up,
-          title: l10n.notifPriceIncreaseTitle(sub.name),
-          body: l10n.notifPriceIncreaseBody(
-              fmtTL(sub.priceDelta), fmtTL(sub.monthlyPrice)),
-          accent: t.gold,
-          when: sub.renewalLabel,
-        ),
-      for (final sub in subs.items
-          .where((s) => s.status == SubscriptionStatus.unused)
-          .take(2))
-        _Notice(
-          icon: Icons.subscriptions_outlined,
-          title: l10n.notifUnusedTitle(sub.name),
-          body: l10n.notifUnusedBody(sub.lastUsedLabel),
-          accent: t.muted,
-          when: sub.renewalLabel,
-        ),
-      for (final bill in bills.where((b) => b.daysUntilDue <= 5))
-        _Notice(
-          icon: bill.icon,
-          title: l10n.notifBillTitle(bill.name),
-          body: l10n.notifBillBody(fmtTL(bill.amount)),
-          accent: bill.daysUntilDue <= 3 ? t.red : bill.accent,
-          when: l10n.daysLeft(bill.daysUntilDue),
-        ),
-    ];
+    final responsive = context.responsive;
+    final state = ref.watch(notificationCenterControllerProvider);
+    final notices = state.visibleNotices;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       minChildSize: 0.4,
       maxChildSize: 0.92,
       expand: false,
-      builder: (_, scrollCtrl) => Container(
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 6),
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: t.line,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
+      builder: (_, scrollCtrl) => Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: responsive.sheetMaxWidth),
+          child: Container(
+            decoration: BoxDecoration(
+              color: t.bg,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 6),
+                  child: Container(
+                    width: 40,
+                    height: 4,
                     decoration: BoxDecoration(
-                      color: t.uma.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(Icons.notifications_outlined,
-                        color: t.uma, size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.notifTitle,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: t.ink,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          l10n.notifSubtitle(notices.length),
-                          style: TextStyle(fontSize: 12, color: t.muted),
-                        ),
-                      ],
+                      color: t.line,
+                      borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: t.uma.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(Icons.notifications_outlined,
+                            color: t.uma, size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.notifTitle,
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: t.ink,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.notifSubtitle(notices.length),
+                              style: TextStyle(fontSize: 12, color: t.muted),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (notices.isNotEmpty)
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 0,
+                          children: [
+                            TextButton(
+                              onPressed: () => ref
+                                  .read(notificationCenterControllerProvider
+                                      .notifier)
+                                  .markAllRead(),
+                              child: Text(l10n.notifMarkAllRead),
+                            ),
+                            TextButton(
+                              onPressed: () => ref
+                                  .read(notificationCenterControllerProvider
+                                      .notifier)
+                                  .dismissAllVisible(),
+                              child: Text(l10n.notifClear),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: notices.isEmpty
+                      ? _EmptyState()
+                      : ListView.separated(
+                          controller: scrollCtrl,
+                          padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
+                          itemCount: notices.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (_, i) =>
+                              _NoticeTile(notice: notices[i]),
+                        ),
+                ),
+              ],
             ),
-            Expanded(
-              child: notices.isEmpty
-                  ? _EmptyState()
-                  : ListView.separated(
-                      controller: scrollCtrl,
-                      padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
-                      itemCount: notices.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _NoticeTile(notice: notices[i]),
-                    ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -182,14 +153,20 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _NoticeTile extends StatelessWidget {
+class _NoticeTile extends ConsumerWidget {
   const _NoticeTile({required this.notice});
 
-  final _Notice notice;
+  final AppNotice notice;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
+    final accent = switch (notice.accent) {
+      NoticeAccent.red => t.red,
+      NoticeAccent.gold => t.gold,
+      NoticeAccent.muted => t.muted,
+      NoticeAccent.blue => t.blue,
+    };
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -204,11 +181,11 @@ class _NoticeTile extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: notice.accent.withValues(alpha: 0.14),
+              color: accent.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
-            child: Icon(notice.icon, color: notice.accent, size: 17),
+            child: Icon(notice.icon, color: accent, size: 17),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -241,6 +218,38 @@ class _NoticeTile extends StatelessWidget {
                     color: t.ink2,
                     height: 1.4,
                   ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => ref
+                          .read(notificationCenterControllerProvider.notifier)
+                          .markRead(notice.id),
+                      icon: const Icon(Icons.done, size: 16),
+                      label: Text(context.l10n.notifRead),
+                      style: TextButton.styleFrom(
+                        foregroundColor: accent,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: const Size(0, 0),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    TextButton.icon(
+                      onPressed: () => ref
+                          .read(notificationCenterControllerProvider.notifier)
+                          .dismiss(notice.id),
+                      icon: const Icon(Icons.delete_outline, size: 16),
+                      label: Text(context.l10n.notifDismiss),
+                      style: TextButton.styleFrom(
+                        foregroundColor: t.muted,
+                        padding: EdgeInsets.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: const Size(0, 0),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../data/upcoming_bill.dart';
 
 class UpcomingBillsStrip extends StatelessWidget {
@@ -23,6 +24,29 @@ class UpcomingBillsStrip extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: _EmptyAddCard(onTap: onAddTap),
+      );
+    }
+    final responsive = context.responsive;
+    if (!responsive.isMobile) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final bill in bills)
+              _BillCard(
+                bill: bill,
+                width: responsive.isDesktop ? 228 : 204,
+                onTap: onBillTap == null ? null : () => onBillTap!(bill),
+              ),
+            if (onAddTap != null)
+              _AddCard(
+                width: responsive.isDesktop ? 188 : 168,
+                onTap: onAddTap!,
+              ),
+          ],
+        ),
       );
     }
     return SizedBox(
@@ -47,9 +71,14 @@ class UpcomingBillsStrip extends StatelessWidget {
 }
 
 class _BillCard extends StatelessWidget {
-  const _BillCard({required this.bill, this.onTap});
+  const _BillCard({
+    required this.bill,
+    this.width = 200,
+    this.onTap,
+  });
 
   final UpcomingBill bill;
+  final double width;
   final VoidCallback? onTap;
 
   @override
@@ -64,7 +93,7 @@ class _BillCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(t.vibe.radius - 2),
         child: Container(
-          width: 200,
+          width: width,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(t.vibe.radius - 2),
@@ -89,12 +118,11 @@ class _BillCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: isUrgent
-                          ? t.red.withValues(alpha: 0.10)
-                          : t.bgSoft,
+                      color:
+                          isUrgent ? t.red.withValues(alpha: 0.10) : t.bgSoft,
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -134,8 +162,12 @@ class _BillCard extends StatelessWidget {
 }
 
 class _AddCard extends StatelessWidget {
-  const _AddCard({required this.onTap});
+  const _AddCard({
+    required this.onTap,
+    this.width = 160,
+  });
   final VoidCallback onTap;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +183,7 @@ class _AddCard extends StatelessWidget {
           color: t.brand,
           radius: t.vibe.radius - 2,
           child: Container(
-            width: 160,
+            width: width,
             padding: const EdgeInsets.all(14),
             alignment: Alignment.center,
             child: Column(

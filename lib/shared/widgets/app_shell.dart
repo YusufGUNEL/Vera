@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/localization/app_strings.dart';
 import '../../core/routing/routes.dart';
 import '../../core/theme/app_tokens.dart';
+import '../../core/utils/responsive.dart';
 import '../../features/uma_chat/presentation/uma_chat_sheet.dart';
 
 class AppShell extends ConsumerWidget {
@@ -48,6 +49,7 @@ class AppShell extends ConsumerWidget {
     final l10n = context.l10n;
     final location = GoRouterState.of(context).uri.path;
     final current = _index(location);
+    final responsive = context.responsive;
 
     final labels = [
       l10n.navHome,
@@ -59,14 +61,108 @@ class AppShell extends ConsumerWidget {
     return Scaffold(
       backgroundColor: t.bg,
       extendBody: true,
-      body: child,
-      bottomNavigationBar: _BottomBar(
-        icons: _tabIcons,
-        labels: labels,
-        umaLabel: l10n.navUma,
-        current: current,
-        onTap: (i) => context.go(_tabRoutes[i]),
-        onUma: () => _openUma(context),
+      body: responsive.useDesktopNav
+          ? Row(
+              children: [
+                _SideRail(
+                  icons: _tabIcons,
+                  labels: labels,
+                  umaLabel: l10n.navUma,
+                  current: current,
+                  onTap: (i) => context.go(_tabRoutes[i]),
+                  onUma: () => _openUma(context),
+                ),
+                Expanded(child: child),
+              ],
+            )
+          : child,
+      bottomNavigationBar: responsive.useDesktopNav
+          ? null
+          : _BottomBar(
+              icons: _tabIcons,
+              labels: labels,
+              umaLabel: l10n.navUma,
+              current: current,
+              onTap: (i) => context.go(_tabRoutes[i]),
+              onUma: () => _openUma(context),
+            ),
+    );
+  }
+}
+
+class _SideRail extends StatelessWidget {
+  const _SideRail({
+    required this.icons,
+    required this.labels,
+    required this.umaLabel,
+    required this.current,
+    required this.onTap,
+    required this.onUma,
+  });
+
+  final List<_TabIcon> icons;
+  final List<String> labels;
+  final String umaLabel;
+  final int current;
+  final ValueChanged<int> onTap;
+  final VoidCallback onUma;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return SafeArea(
+      right: false,
+      child: Container(
+        width: 96,
+        decoration: BoxDecoration(
+          color: t.card,
+          border: Border(right: BorderSide(color: t.line)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 18),
+            for (var i = 0; i < icons.length; i++) ...[
+              _RailBtn(
+                icon: icons[i],
+                label: labels[i],
+                active: current == i,
+                onTap: () => onTap(i),
+              ),
+              const SizedBox(height: 8),
+            ],
+            const Spacer(),
+            GestureDetector(
+              onTap: onUma,
+              child: Container(
+                width: 62,
+                height: 62,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.4, -0.4),
+                    colors: [t.umaLight, t.uma],
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.auto_awesome,
+                  size: 26,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              umaLabel,
+              style: TextStyle(
+                color: t.uma,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 22),
+          ],
+        ),
       ),
     );
   }
@@ -256,7 +352,8 @@ class _NavBtn extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(active ? icon.activeIcon : icon.icon, color: color, size: 22),
+              Icon(active ? icon.activeIcon : icon.icon,
+                  color: color, size: 22),
               const SizedBox(height: 3),
               Text(
                 label,
@@ -265,6 +362,57 @@ class _NavBtn extends StatelessWidget {
                   color: color,
                   fontWeight: active ? FontWeight.w600 : FontWeight.w500,
                   letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RailBtn extends StatelessWidget {
+  const _RailBtn({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  final _TabIcon icon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final color = active ? t.brand : t.muted;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 72,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          decoration: BoxDecoration(
+            color: active ? t.bgSoft : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Icon(active ? icon.activeIcon : icon.icon,
+                  color: color, size: 22),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: color,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ],

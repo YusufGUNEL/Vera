@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../receipt_scan/presentation/receipt_scan_sheet.dart';
 import '../../statement_import/presentation/statement_import_sheet.dart';
@@ -127,7 +128,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeControllerProvider);
     final bills = ref.watch(upcomingBillsControllerProvider);
-    final l10n = context.l10n;
+    final responsive = context.responsive;
     final savings = summarizeSavings(state.transactions);
     final hasTransactions = state.transactions.isNotEmpty;
 
@@ -136,90 +137,267 @@ class HomeScreen extends ConsumerWidget {
       child: RefreshIndicator(
         onRefresh: () => ref.read(homeControllerProvider.notifier).refresh(),
         child: ListView(
-          padding: const EdgeInsets.only(top: 6, bottom: 140),
+          padding: EdgeInsets.only(
+            top: 6,
+            bottom: responsive.useDesktopNav ? 32 : 140,
+          ),
           children: [
-            TopBar(
-              onScanTap: () => _openScanner(context),
-              onImportTap: () => _openStatementImport(context),
-              onNotificationsTap: () => _openNotifications(context),
-            ),
-            const SizedBox(height: 4),
-            NetWorthCard(
-              balance: state.banks.isEmpty
-                  ? 0
-                  : state.banks
-                      .fold<double>(0, (sum, bank) => sum + bank.balance),
-              monthDelta: savings.income - savings.spending,
-              lastUpdatedLabel: state.lastUpdatedTime == null
-                  ? l10n.firstSyncPending
-                  : l10n.updatedAt(state.lastUpdatedTime!),
-              refreshing: state.refreshing,
-              history: state.history,
-            ),
-            if (!hasTransactions && state.banks.isEmpty)
-              HomeFirstStepsCard(
-                onImport: () => _openStatementImport(context),
-                onScan: () => _openScanner(context),
-                onAddBank: () => _openAddBank(context),
+            Center(
+              child: ConstrainedBox(
+                constraints:
+                    BoxConstraints(maxWidth: responsive.contentMaxWidth),
+                child: responsive.useHomeColumns
+                    ? _buildWideLayout(
+                        context,
+                        ref,
+                        state,
+                        bills,
+                        savings,
+                        hasTransactions,
+                      )
+                    : _buildMobileLayout(
+                        context,
+                        ref,
+                        state,
+                        bills,
+                        savings,
+                        hasTransactions,
+                      ),
               ),
-            if (hasTransactions)
-              SavingsStoryCard(
-                savedAmount: savings.saved,
-                deltaPercent: savings.deltaPercent,
-                onTap: () =>
-                    openUma(context, ref, prompt: l10n.umaPromptAnalyze),
-              ),
-            const GoalCard(),
-            const ProactiveInsightCard(),
-            SectionTitle(
-              title: l10n.upcomingBills,
-              actionLabel: '+ ${l10n.actionAdd}',
-              onAction: () => _openAddBill(context),
-            ),
-            UpcomingBillsStrip(
-              bills: bills,
-              onBillTap: (bill) => _openBillDetail(context, ref, bill),
-              onAddTap: () => _openAddBill(context),
-            ),
-            SectionTitle(
-              title: l10n.connectedAccounts,
-              actionLabel: state.banks.isEmpty
-                  ? '+ ${l10n.actionAdd}'
-                  : (state.refreshing ? l10n.syncingDots : l10n.refresh),
-              onAction: () => state.banks.isEmpty
-                  ? _openAddBank(context)
-                  : ref.read(homeControllerProvider.notifier).refresh(),
-            ),
-            ConnectedBanks(
-              banks: state.banks,
-              onBankTap: (bank) => _openBankActions(context, bank),
-              onBankLongPress: (bank) => _openBankActions(context, bank),
-              onAddBankTap: () => _openAddBank(context),
-            ),
-            CategoryBudgetCard(
-              transactions: state.transactions,
-              onTap: () =>
-                  openUma(context, ref, prompt: l10n.umaPromptAnalyze),
-            ),
-            const SizedBox(height: 4),
-            const CreditSummaryCard(),
-            SectionTitle(
-              title: l10n.recentTransactions,
-              actionLabel: state.transactions.isEmpty
-                  ? '+ ${l10n.actionAdd}'
-                  : '+ ${l10n.actionAdd} (${state.transactions.length})',
-              onAction: () => _openAddManualTransaction(context),
-            ),
-            TransactionList(
-              transactions: state.transactions,
-              onTap: (txn) => _openTxnDetail(context, txn),
-              onAddManual: () => _openAddManualTransaction(context),
-              onScan: () => _openScanner(context),
-              onImport: () => _openStatementImport(context),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMobileLayout(
+    BuildContext context,
+    WidgetRef ref,
+    HomeState state,
+    List<UpcomingBill> bills,
+    SavingsSummary savings,
+    bool hasTransactions,
+  ) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        _topBand(context, state, savings),
+        if (!hasTransactions && state.banks.isEmpty)
+          HomeFirstStepsCard(
+            onImport: () => _openStatementImport(context),
+            onScan: () => _openScanner(context),
+            onAddBank: () => _openAddBank(context),
+          ),
+        if (hasTransactions)
+          SavingsStoryCard(
+            savedAmount: savings.saved,
+            deltaPercent: savings.deltaPercent,
+            onTap: () => openUma(context, ref, prompt: l10n.umaPromptAnalyze),
+          ),
+        const GoalCard(),
+        const ProactiveInsightCard(),
+        SectionTitle(
+          title: l10n.upcomingBills,
+          actionLabel: '+ ${l10n.actionAdd}',
+          onAction: () => _openAddBill(context),
+        ),
+        UpcomingBillsStrip(
+          bills: bills,
+          onBillTap: (bill) => _openBillDetail(context, ref, bill),
+          onAddTap: () => _openAddBill(context),
+        ),
+        _accountSection(context, ref, state),
+        CategoryBudgetCard(
+          transactions: state.transactions,
+          onTap: () => openUma(context, ref, prompt: l10n.umaPromptAnalyze),
+        ),
+        const SizedBox(height: 4),
+        const CreditSummaryCard(),
+        _transactionsSection(
+          context,
+          state,
+          onAdd: () => _openAddManualTransaction(context),
+          onTap: (txn) => _openTxnDetail(context, txn),
+          onScan: () => _openScanner(context),
+          onImport: () => _openStatementImport(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWideLayout(
+    BuildContext context,
+    WidgetRef ref,
+    HomeState state,
+    List<UpcomingBill> bills,
+    SavingsSummary savings,
+    bool hasTransactions,
+  ) {
+    final l10n = context.l10n;
+    final responsive = context.responsive;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: responsive.pageGutter),
+      child: Column(
+        children: [
+          _topBand(context, state, savings),
+          if (!hasTransactions && state.banks.isEmpty)
+            HomeFirstStepsCard(
+              onImport: () => _openStatementImport(context),
+              onScan: () => _openScanner(context),
+              onAddBank: () => _openAddBank(context),
+            ),
+          if (hasTransactions)
+            SavingsStoryCard(
+              savedAmount: savings.saved,
+              deltaPercent: savings.deltaPercent,
+              onTap: () => openUma(context, ref, prompt: l10n.umaPromptAnalyze),
+            ),
+          const GoalCard(),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columnWidth =
+                  responsive.twoColumnWidth(constraints.maxWidth, gap: 24);
+              return Wrap(
+                spacing: 24,
+                runSpacing: 24,
+                children: [
+                  SizedBox(
+                    width: columnWidth,
+                    child: Column(
+                      children: [
+                        const ProactiveInsightCard(),
+                        SectionTitle(
+                          title: l10n.upcomingBills,
+                          actionLabel: '+ ${l10n.actionAdd}',
+                          onAction: () => _openAddBill(context),
+                        ),
+                        UpcomingBillsStrip(
+                          bills: bills,
+                          onBillTap: (bill) =>
+                              _openBillDetail(context, ref, bill),
+                          onAddTap: () => _openAddBill(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: columnWidth,
+                    child: Column(
+                      children: [
+                        _accountSection(context, ref, state),
+                        CategoryBudgetCard(
+                          transactions: state.transactions,
+                          onTap: () => openUma(
+                            context,
+                            ref,
+                            prompt: l10n.umaPromptAnalyze,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const CreditSummaryCard(),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: _transactionsSection(
+                      context,
+                      state,
+                      onAdd: () => _openAddManualTransaction(context),
+                      onTap: (txn) => _openTxnDetail(context, txn),
+                      onScan: () => _openScanner(context),
+                      onImport: () => _openStatementImport(context),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _topBand(
+    BuildContext context,
+    HomeState state,
+    SavingsSummary savings,
+  ) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        TopBar(
+          onScanTap: () => _openScanner(context),
+          onImportTap: () => _openStatementImport(context),
+          onNotificationsTap: () => _openNotifications(context),
+        ),
+        const SizedBox(height: 4),
+        NetWorthCard(
+          balance: state.banks.isEmpty
+              ? 0
+              : state.banks.fold<double>(0, (sum, bank) => sum + bank.balance),
+          monthDelta: savings.income - savings.spending,
+          lastUpdatedLabel: state.lastUpdatedTime == null
+              ? l10n.firstSyncPending
+              : l10n.updatedAt(state.lastUpdatedTime!),
+          refreshing: state.refreshing,
+          history: state.history,
+        ),
+      ],
+    );
+  }
+
+  Widget _accountSection(BuildContext context, WidgetRef ref, HomeState state) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        SectionTitle(
+          title: l10n.connectedAccounts,
+          actionLabel: state.banks.isEmpty
+              ? '+ ${l10n.actionAdd}'
+              : (state.refreshing ? l10n.syncingDots : l10n.refresh),
+          onAction: () => state.banks.isEmpty
+              ? _openAddBank(context)
+              : ref.read(homeControllerProvider.notifier).refresh(),
+        ),
+        ConnectedBanks(
+          banks: state.banks,
+          onBankTap: (bank) => _openBankActions(context, bank),
+          onBankLongPress: (bank) => _openBankActions(context, bank),
+          onAddBankTap: () => _openAddBank(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _transactionsSection(
+    BuildContext context,
+    HomeState state, {
+    required VoidCallback onAdd,
+    required ValueChanged<Txn> onTap,
+    required VoidCallback onScan,
+    required VoidCallback onImport,
+  }) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        SectionTitle(
+          title: l10n.recentTransactions,
+          actionLabel: state.transactions.isEmpty
+              ? '+ ${l10n.actionAdd}'
+              : '+ ${l10n.actionAdd} (${state.transactions.length})',
+          onAction: onAdd,
+        ),
+        TransactionList(
+          transactions: state.transactions,
+          onTap: onTap,
+          onAddManual: onAdd,
+          onScan: onScan,
+          onImport: onImport,
+        ),
+      ],
     );
   }
 }

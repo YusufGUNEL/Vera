@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/data/imported_transactions_store.dart';
@@ -28,9 +29,7 @@ class StatementImportSheet extends ConsumerWidget {
       if (bytes == null) return;
       final mime = _mimeForExtension(picked.extension);
       if (!context.mounted) return;
-      await ref
-          .read(statementControllerProvider.notifier)
-          .parse(
+      await ref.read(statementControllerProvider.notifier).parse(
             bytes: bytes,
             mimeType: mime,
             fileName: picked.name,
@@ -60,90 +59,101 @@ class StatementImportSheet extends ConsumerWidget {
     final l10n = context.l10n;
     final state = ref.watch(statementControllerProvider);
     final mq = MediaQuery.of(context);
+    final responsive = context.responsive;
 
     return Padding(
       padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
-      child: Container(
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: mq.size.height * 0.85),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: t.line,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: responsive.sheetMaxWidth,
+            maxHeight: mq.size.height * responsive.modalHeightFactor,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: t.bg,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: mq.size.height * 0.85),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: t.brand,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.upload_file_outlined,
-                          color: t.brandFG,
-                          size: 18,
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: t.line,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.statementImportTitle,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                                color: t.ink,
-                                letterSpacing: -0.3,
-                              ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: t.brand,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.statementImportSubtitle,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.muted,
-                                height: 1.4,
-                              ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.upload_file_outlined,
+                              color: t.brandFG,
+                              size: 18,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.statementImportTitle,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: t.ink,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.statementImportSubtitle,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: t.muted,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 18),
+                      if (state.status == StatementStatus.idle)
+                        _picker(context, ref, t, l10n),
+                      if (state.status == StatementStatus.parsing)
+                        _parsing(t, l10n),
+                      if (state.status == StatementStatus.ready &&
+                          state.statement != null)
+                        _result(context, ref, t, l10n, state.statement!),
+                      if (state.status == StatementStatus.error)
+                        _error(context, ref, t, l10n, state.error ?? ''),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  if (state.status == StatementStatus.idle)
-                    _picker(context, ref, t, l10n),
-                  if (state.status == StatementStatus.parsing)
-                    _parsing(t, l10n),
-                  if (state.status == StatementStatus.ready &&
-                      state.statement != null)
-                    _result(context, ref, t, l10n, state.statement!),
-                  if (state.status == StatementStatus.error)
-                    _error(context, ref, t, l10n, state.error ?? ''),
-                ],
+                ),
               ),
             ),
           ),
@@ -186,20 +196,20 @@ class StatementImportSheet extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: t.umaSoft,
+            color: t.bgSoft,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: t.uma.withValues(alpha: 0.16)),
+            border: Border.all(color: t.line),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.lightbulb_outline, color: t.uma, size: 16),
+              Icon(Icons.info_outline, color: t.muted, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   l10n.statementImportHint,
                   style: TextStyle(
-                    color: t.ink2,
+                    color: t.muted,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -384,55 +394,53 @@ class StatementImportSheet extends ConsumerWidget {
                 onPressed: isFallback
                     ? null
                     : () async {
-                  final messenger = ScaffoldMessenger.of(context);
-                  final txns = s.toTxns(l10n);
-                  if (txns.isEmpty) {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.statementNoTransactions),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-                  await ref
-                      .read(homeControllerProvider.notifier)
-                      .addImportedTransactions(txns);
-                  final artifacts =
-                      ref.read(firebaseImportArtifactsServiceProvider);
-                  if (artifacts.isEnabled &&
-                      importState.sourceBytes != null &&
-                      importState.mimeType != null) {
-                    try {
-                      await artifacts.uploadStatement(
-                        fileName: importState.fileName ?? 'statement.pdf',
-                        bytes: importState.sourceBytes!,
-                        mimeType: importState.mimeType!,
-                        statement: s,
-                        transactions: txns,
-                      );
-                    } catch (_) {
-                      // Local import already succeeded; cloud backup is best-effort.
-                    }
-                  }
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.statementImported),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
+                        final messenger = ScaffoldMessenger.of(context);
+                        final txns = s.toTxns(l10n);
+                        if (txns.isEmpty) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.statementNoTransactions),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+                        await ref
+                            .read(homeControllerProvider.notifier)
+                            .addImportedTransactions(txns);
+                        final artifacts =
+                            ref.read(firebaseImportArtifactsServiceProvider);
+                        if (artifacts.isEnabled &&
+                            importState.sourceBytes != null &&
+                            importState.mimeType != null) {
+                          try {
+                            await artifacts.uploadStatement(
+                              fileName: importState.fileName ?? 'statement.pdf',
+                              bytes: importState.sourceBytes!,
+                              mimeType: importState.mimeType!,
+                              statement: s,
+                              transactions: txns,
+                            );
+                          } catch (_) {
+                            // Local import already succeeded; cloud backup is best-effort.
+                          }
+                        }
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.statementImported),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
                 style: FilledButton.styleFrom(
                   backgroundColor: t.brand,
                   foregroundColor: t.brandFG,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  isFallback
-                      ? l10n.statementFallbackAction
-                      : l10n.importToVera,
+                  isFallback ? l10n.statementFallbackAction : l10n.importToVera,
                 ),
               ),
             ),
@@ -613,7 +621,10 @@ class _TxnRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '${txn.isCredit ? '+' : ''}${fmtTL(txn.amount)}',
+            fmtSignedTL(
+              txn.isCredit ? txn.amount : -txn.amount,
+              showPlus: txn.isCredit,
+            ),
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

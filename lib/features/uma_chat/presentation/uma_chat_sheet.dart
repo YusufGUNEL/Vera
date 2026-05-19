@@ -5,6 +5,7 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/orchestration/user_readiness.dart';
 import '../../../core/services/voice_input_service.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/utils/responsive.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_audit_event.dart';
 import '../domain/uma_feedback.dart';
@@ -82,110 +83,129 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
     ref.listen(umaControllerProvider, (_, __) => _scrollToBottom());
 
     final mq = MediaQuery.of(context);
-    final sheetHeight = mq.size.height * 0.88;
+    final responsive = context.responsive;
+    final sheetHeight = mq.size.height * responsive.modalHeightFactor;
+    final messageMaxWidth =
+        responsive.isDesktop ? 620.0 : MediaQuery.of(context).size.width * 0.78;
 
     return Padding(
       padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
-      child: Container(
-        height: sheetHeight,
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            _DragHandle(),
-            _Header(
-              showSettings: _showSettings,
-              readiness: ref.watch(userReadinessProvider),
-              onToggleSettings: () =>
-                  setState(() => _showSettings = !_showSettings),
-              onClose: () => Navigator.of(context).pop(),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: responsive.sheetMaxWidth,
+            maxHeight: sheetHeight,
+          ),
+          child: Container(
+            height: sheetHeight,
+            decoration: BoxDecoration(
+              color: t.bg,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            if (_showSettings) _SettingsDrawer(state: state),
-            Expanded(
-              child: Stack(
-                children: [
-                  ListView.separated(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                    itemCount: state.messages.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) {
-                      final message = state.messages[i];
-                      return Column(
-                        crossAxisAlignment: message.role == UmaRole.user
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          UmaMessageBubble(
-                            message: message,
-                            onConfirmTool: message.envelope?.pendingToolCall == null
-                                ? null
-                                : () => ref
-                                    .read(umaControllerProvider.notifier)
-                                    .confirmPendingTool(i),
-                          ),
-                          if (message.card != null)
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.78,
+            child: Column(
+              children: [
+                _DragHandle(),
+                _Header(
+                  showSettings: _showSettings,
+                  readiness: ref.watch(userReadinessProvider),
+                  onNewChat: () {
+                    ref
+                        .read(umaControllerProvider.notifier)
+                        .resetConversation();
+                    _inputController.clear();
+                  },
+                  onToggleSettings: () =>
+                      setState(() => _showSettings = !_showSettings),
+                  onClose: () => Navigator.of(context).pop(),
+                ),
+                if (_showSettings) _SettingsDrawer(state: state),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      ListView.separated(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                        itemCount: state.messages.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (_, i) {
+                          final message = state.messages[i];
+                          return Column(
+                            crossAxisAlignment: message.role == UmaRole.user
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              UmaMessageBubble(
+                                message: message,
+                                onConfirmTool: message
+                                            .envelope?.pendingToolCall ==
+                                        null
+                                    ? null
+                                    : () => ref
+                                        .read(umaControllerProvider.notifier)
+                                        .confirmPendingTool(i),
                               ),
-                              child: UmaOrderCard(
-                                card: message.card!,
-                                onForward: () => ref
-                                    .read(umaControllerProvider.notifier)
-                                    .forwardOrder(i),
-                                onDismiss: () => ref
-                                    .read(umaControllerProvider.notifier)
-                                    .dismissOrder(i),
-                              ),
-                            ),
-                          if (message.role == UmaRole.uma)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.78,
+                              if (message.card != null)
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: messageMaxWidth,
+                                  ),
+                                  child: UmaOrderCard(
+                                    card: message.card!,
+                                    onForward: () => ref
+                                        .read(umaControllerProvider.notifier)
+                                        .forwardOrder(i),
+                                    onDismiss: () => ref
+                                        .read(umaControllerProvider.notifier)
+                                        .dismissOrder(i),
+                                  ),
                                 ),
-                                child: _FeedbackBar(
-                                  message: message,
-                                  onVote: (vote) => ref
-                                      .read(umaControllerProvider.notifier)
-                                      .setFeedback(i, vote),
-                                  onAddNote: (vote) =>
-                                      _openFeedbackSheet(context, i, message, vote),
+                              if (message.role == UmaRole.uma)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: messageMaxWidth,
+                                    ),
+                                    child: _FeedbackBar(
+                                      message: message,
+                                      onVote: (vote) => ref
+                                          .read(umaControllerProvider.notifier)
+                                          .setFeedback(i, vote),
+                                      onAddNote: (vote) => _openFeedbackSheet(
+                                          context, i, message, vote),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
+                            ],
+                          );
+                        },
+                      ),
+                      if (state.toast != null)
+                        Positioned(
+                          top: 8,
+                          left: 12,
+                          right: 12,
+                          child: _Toast(text: state.toast!),
+                        ),
+                    ],
                   ),
-                  if (state.toast != null)
-                    Positioned(
-                      top: 8,
-                      left: 12,
-                      right: 12,
-                      child: _Toast(text: state.toast!),
-                    ),
-                ],
-              ),
+                ),
+                _SuggestionStrip(onTap: _send, disabled: state.thinking),
+                _Input(
+                  controller: _inputController,
+                  onSubmit: _send,
+                  busy: state.thinking,
+                  onVoiceResult: (recognized) {
+                    final trimmed = recognized.trim();
+                    if (trimmed.isEmpty) return;
+                    _send(trimmed);
+                  },
+                ),
+              ],
             ),
-            _SuggestionStrip(onTap: _send, disabled: state.thinking),
-            _Input(
-              controller: _inputController,
-              onSubmit: _send,
-              busy: state.thinking,
-              onVoiceResult: (recognized) {
-                final trimmed = recognized.trim();
-                if (trimmed.isEmpty) return;
-                _send(trimmed);
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -216,12 +236,14 @@ class _Header extends StatelessWidget {
   const _Header({
     required this.showSettings,
     required this.readiness,
+    required this.onNewChat,
     required this.onToggleSettings,
     required this.onClose,
   });
 
   final bool showSettings;
   final UserReadiness readiness;
+  final VoidCallback onNewChat;
   final VoidCallback onToggleSettings;
   final VoidCallback onClose;
 
@@ -234,9 +256,8 @@ class _Header extends StatelessWidget {
         : readiness.needsUserData
             ? l10n.umaStatusNeedsData
             : l10n.umaStatusOnline;
-    final statusColor = readiness.localOnly || readiness.needsUserData
-        ? t.gold
-        : t.green;
+    final statusColor =
+        readiness.localOnly || readiness.needsUserData ? t.gold : t.green;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 12, 12, 14),
       decoration: BoxDecoration(
@@ -290,6 +311,20 @@ class _Header extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+          ),
+          TextButton(
+            onPressed: onNewChat,
+            style: TextButton.styleFrom(
+              foregroundColor: t.uma,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            ),
+            child: Text(
+              l10n.umaNewChat,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
           IconButton(
@@ -645,12 +680,10 @@ class _InputState extends ConsumerState<_Input> {
           child: Row(
             children: [
               Tooltip(
-                message:
-                    listening ? l10n.umaVoiceStop : l10n.umaVoiceStart,
+                message: listening ? l10n.umaVoiceStop : l10n.umaVoiceStart,
                 child: GestureDetector(
-                  onTap: widget.busy
-                      ? null
-                      : () => _toggleVoice(context, voice),
+                  onTap:
+                      widget.busy ? null : () => _toggleVoice(context, voice),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -700,9 +733,8 @@ class _InputState extends ConsumerState<_Input> {
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: widget.busy
-                        ? t.brand.withValues(alpha: 0.4)
-                        : t.brand,
+                    color:
+                        widget.busy ? t.brand.withValues(alpha: 0.4) : t.brand,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -924,7 +956,8 @@ class _FeedbackNoteSheet extends StatelessWidget {
     final t = context.tokens;
     final l10n = context.l10n;
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
           color: t.bg,

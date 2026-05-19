@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/data/imported_transactions_store.dart';
@@ -33,9 +34,7 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
       final bytes = await picked.readAsBytes();
       final mime = picked.mimeType ?? _guessMime(picked.name);
       if (!mounted) return;
-      await ref
-          .read(receiptControllerProvider.notifier)
-          .scan(
+      await ref.read(receiptControllerProvider.notifier).scan(
             bytes: bytes,
             mimeType: mime,
             fileName: picked.name,
@@ -61,89 +60,100 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
     final l10n = context.l10n;
     final state = ref.watch(receiptControllerProvider);
     final mq = MediaQuery.of(context);
+    final responsive = context.responsive;
 
     return Padding(
       padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
-      child: Container(
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: t.line,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: responsive.sheetMaxWidth,
+            maxHeight: mq.size.height * responsive.modalHeightFactor,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: t.bg,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: t.uma,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.document_scanner_outlined,
-                          color: Colors.white,
-                          size: 18,
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: t.line,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.scanReceiptTitle,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                                color: t.ink,
-                                letterSpacing: -0.3,
-                              ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: t.uma,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.scanReceiptSubtitle,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: t.muted,
-                                height: 1.4,
-                              ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.document_scanner_outlined,
+                              color: Colors.white,
+                              size: 18,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.scanReceiptTitle,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    color: t.ink,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.scanReceiptSubtitle,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: t.muted,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 18),
+                      if (state.status == ReceiptScanStatus.idle)
+                        _pickerButtons(t, l10n),
+                      if (state.status == ReceiptScanStatus.scanning)
+                        _scanningView(t, l10n),
+                      if (state.status == ReceiptScanStatus.ready &&
+                          state.receipt != null)
+                        _resultView(t, l10n, state.receipt!),
+                      if (state.status == ReceiptScanStatus.error)
+                        _errorView(t, l10n, state.error ?? ''),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  if (state.status == ReceiptScanStatus.idle)
-                    _pickerButtons(t, l10n),
-                  if (state.status == ReceiptScanStatus.scanning)
-                    _scanningView(t, l10n),
-                  if (state.status == ReceiptScanStatus.ready &&
-                      state.receipt != null)
-                    _resultView(t, l10n, state.receipt!),
-                  if (state.status == ReceiptScanStatus.error)
-                    _errorView(t, l10n, state.error ?? ''),
-                ],
+                ),
               ),
             ),
           ),
@@ -172,20 +182,20 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: t.umaSoft,
+            color: t.bgSoft,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: t.uma.withValues(alpha: 0.16)),
+            border: Border.all(color: t.line),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.auto_awesome, color: t.uma, size: 16),
+              Icon(Icons.info_outline, color: t.muted, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   l10n.scanHint,
                   style: TextStyle(
-                    color: t.ink2,
+                    color: t.muted,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -384,55 +394,53 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                 onPressed: isFallback
                     ? null
                     : () async {
-                  final txn = r.toTxn(l10n);
-                  final messenger = ScaffoldMessenger.of(context);
-                  if (txn == null) {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.scanNoTotal),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-                  await ref
-                      .read(homeControllerProvider.notifier)
-                      .addImportedTransactions([txn]);
-                  final artifacts =
-                      ref.read(firebaseImportArtifactsServiceProvider);
-                  if (artifacts.isEnabled &&
-                      scanState.sourceBytes != null &&
-                      scanState.mimeType != null) {
-                    try {
-                      await artifacts.uploadReceipt(
-                        fileName: scanState.fileName ?? 'receipt.jpg',
-                        bytes: scanState.sourceBytes!,
-                        mimeType: scanState.mimeType!,
-                        receipt: r,
-                        transactions: [txn],
-                      );
-                    } catch (_) {
-                      // Local import already succeeded; cloud backup is best-effort.
-                    }
-                  }
-                  if (!mounted) return;
-                  Navigator.of(context).pop();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.addedToTransactions),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
+                        final txn = r.toTxn(l10n);
+                        final messenger = ScaffoldMessenger.of(context);
+                        if (txn == null) {
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.scanNoTotal),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                          return;
+                        }
+                        await ref
+                            .read(homeControllerProvider.notifier)
+                            .addImportedTransactions([txn]);
+                        final artifacts =
+                            ref.read(firebaseImportArtifactsServiceProvider);
+                        if (artifacts.isEnabled &&
+                            scanState.sourceBytes != null &&
+                            scanState.mimeType != null) {
+                          try {
+                            await artifacts.uploadReceipt(
+                              fileName: scanState.fileName ?? 'receipt.jpg',
+                              bytes: scanState.sourceBytes!,
+                              mimeType: scanState.mimeType!,
+                              receipt: r,
+                              transactions: [txn],
+                            );
+                          } catch (_) {
+                            // Local import already succeeded; cloud backup is best-effort.
+                          }
+                        }
+                        if (!mounted) return;
+                        Navigator.of(context).pop();
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.addedToTransactions),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
                 style: FilledButton.styleFrom(
                   backgroundColor: t.brand,
                   foregroundColor: t.brandFG,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  isFallback
-                      ? l10n.scanFallbackAction
-                      : l10n.addToTransactions,
+                  isFallback ? l10n.scanFallbackAction : l10n.addToTransactions,
                 ),
               ),
             ),
@@ -454,8 +462,7 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
         ),
         const SizedBox(height: 14),
         OutlinedButton(
-          onPressed: () =>
-              ref.read(receiptControllerProvider.notifier).reset(),
+          onPressed: () => ref.read(receiptControllerProvider.notifier).reset(),
           child: Text(l10n.scanAgain),
         ),
       ],

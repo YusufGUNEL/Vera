@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/vera_card.dart';
 import '../../data/bank.dart';
 
@@ -29,6 +30,32 @@ class ConnectedBanks extends StatelessWidget {
       );
     }
 
+    final responsive = context.responsive;
+    if (!responsive.isMobile) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final bank in banks)
+              _BankCard(
+                bank: bank,
+                width: responsive.isDesktop ? 208 : 184,
+                onTap: onBankTap == null ? null : () => onBankTap!(bank),
+                onLongPress: onBankLongPress == null
+                    ? null
+                    : () => onBankLongPress!(bank),
+              ),
+            _AddBankCard(
+              width: responsive.isDesktop ? 208 : 184,
+              onTap: onAddBankTap,
+            ),
+          ],
+        ),
+      );
+    }
+
     return SizedBox(
       height: 124,
       child: ListView.separated(
@@ -44,9 +71,8 @@ class ConnectedBanks extends StatelessWidget {
           return _BankCard(
             bank: bank,
             onTap: onBankTap == null ? null : () => onBankTap!(bank),
-            onLongPress: onBankLongPress == null
-                ? null
-                : () => onBankLongPress!(bank),
+            onLongPress:
+                onBankLongPress == null ? null : () => onBankLongPress!(bank),
           );
         },
       ),
@@ -117,9 +143,15 @@ class _EmptyBanksCard extends StatelessWidget {
 }
 
 class _BankCard extends StatelessWidget {
-  const _BankCard({required this.bank, this.onTap, this.onLongPress});
+  const _BankCard({
+    required this.bank,
+    this.width = 168,
+    this.onTap,
+    this.onLongPress,
+  });
 
   final Bank bank;
+  final double width;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -134,7 +166,7 @@ class _BankCard extends StatelessWidget {
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(t.vibe.radius - 2),
         child: Container(
-          width: 168,
+          width: width,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(t.vibe.radius - 2),
@@ -195,8 +227,12 @@ class _BankCard extends StatelessWidget {
 }
 
 class _AddBankCard extends StatelessWidget {
-  const _AddBankCard({this.onTap});
+  const _AddBankCard({
+    this.width = 168,
+    this.onTap,
+  });
 
+  final double width;
   final VoidCallback? onTap;
 
   @override
@@ -210,7 +246,7 @@ class _AddBankCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          width: 168,
+          width: width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
