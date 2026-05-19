@@ -24,7 +24,7 @@ import 'widgets/goal_card.dart';
 import 'widgets/home_first_steps_card.dart';
 import 'widgets/net_worth_card.dart';
 import 'widgets/notification_center_sheet.dart';
-import 'widgets/proactive_insight_card.dart';
+
 import 'widgets/savings_story_card.dart';
 import 'widgets/top_bar.dart';
 import 'widgets/transaction_detail_sheet.dart';
@@ -196,7 +196,7 @@ class HomeScreen extends ConsumerWidget {
             onTap: () => openUma(context, ref, prompt: l10n.umaPromptAnalyze),
           ),
         const GoalCard(),
-        const ProactiveInsightCard(),
+
         SectionTitle(
           title: l10n.upcomingBills,
           actionLabel: '+ ${l10n.actionAdd}',
@@ -267,7 +267,7 @@ class HomeScreen extends ConsumerWidget {
                     width: columnWidth,
                     child: Column(
                       children: [
-                        const ProactiveInsightCard(),
+
                         SectionTitle(
                           title: l10n.upcomingBills,
                           actionLabel: '+ ${l10n.actionAdd}',

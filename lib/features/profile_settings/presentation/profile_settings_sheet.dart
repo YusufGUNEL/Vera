@@ -158,14 +158,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     value: profile.notificationsEnabled,
                     onChanged: profileCtrl.setNotifications,
                   ),
-                  const SizedBox(height: 10),
-                  _ToggleTile(
-                    icon: Icons.face_outlined,
-                    label: l10n.profileFaceId,
-                    subtitle: l10n.profileFaceIdSub,
-                    value: profile.faceIdEnabled,
-                    onChanged: profileCtrl.setFaceId,
-                  ),
+
                   const SizedBox(height: 10),
                   _ToggleTile(
                     icon: Icons.shield_outlined,
