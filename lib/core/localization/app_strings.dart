@@ -358,9 +358,14 @@ class AppStrings {
   String get infoDisplayName => _t('infoDisplayName');
   String get infoMember => _t('infoMember');
   String get infoMemberDescription => _t('infoMemberDescription');
+  String get infoSignInMethod => _t('infoSignInMethod');
   String get infoEmailLabel => _t('infoEmailLabel');
   String get infoEmailUsage => _t('infoEmailUsage');
   String get infoEmailDescription => _t('infoEmailDescription');
+  String get infoEmailDescriptionLive => _t('infoEmailDescriptionLive');
+  String get authMethodGoogle => _t('authMethodGoogle');
+  String get authMethodEmail => _t('authMethodEmail');
+  String get authMethodDemo => _t('authMethodDemo');
   String get infoSessionVault => _t('infoSessionVault');
   String get infoSessionVaultDescription => _t('infoSessionVaultDescription');
   String get infoFaceId => _t('infoFaceId');

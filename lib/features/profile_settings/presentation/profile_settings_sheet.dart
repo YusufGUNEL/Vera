@@ -424,6 +424,9 @@ class ProfileSettingsSheet extends ConsumerWidget {
   }
 
   AccountInfoSheet _personalInfo(AppStrings l10n, AuthSession auth) {
+    final memberSince = auth.signedInAt != null
+        ? fmtShortDate(auth.signedInAt!)
+        : '-';
     return AccountInfoSheet(
       title: l10n.accountTilePersonal,
       icon: Icons.person_outline,
@@ -434,7 +437,11 @@ class ProfileSettingsSheet extends ConsumerWidget {
         ),
         AccountInfoSection(
           label: l10n.infoMember,
-          body: l10n.infoMemberDescription,
+          body: memberSince,
+        ),
+        AccountInfoSection(
+          label: l10n.infoSignInMethod,
+          body: _authMethodLabel(l10n, auth),
         ),
       ],
     );
@@ -451,7 +458,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
         ),
         AccountInfoSection(
           label: l10n.infoEmailUsage,
-          body: l10n.infoEmailDescription,
+          body: _emailUsageDescription(l10n, auth),
         ),
       ],
     );
@@ -1162,4 +1169,17 @@ String _aiToneLabel(AiTone tone) {
     AiTone.coach => 'Coach',
     AiTone.proactive => 'Proactive',
   };
+}
+
+String _authMethodLabel(AppStrings l10n, AuthSession auth) {
+  return switch (auth.authMethod) {
+    'google' => l10n.authMethodGoogle,
+    'firebase auth' => l10n.authMethodEmail,
+    _ => l10n.authMethodDemo,
+  };
+}
+
+String _emailUsageDescription(AppStrings l10n, AuthSession auth) {
+  final isDemo = auth.userId == 'demo-user' || auth.authMethod == 'demo vault';
+  return isDemo ? l10n.infoEmailDescription : l10n.infoEmailDescriptionLive;
 }

@@ -227,7 +227,7 @@ const Map<String, String> _trStrings = {
   'parsedByAi': 'AI',
   'parsedFallback': 'DEMO',
   'scanFallbackWarning':
-      'Gemini API key yok veya fiş çözümlenemedi. Lütfen işlemi manuel gir.',
+      'AI servisine ulaşılamadı veya fiş çözümlenemedi. Lütfen işlemi manuel gir.',
   'scanFallbackAction': 'AI çalışmadı — manuel gir',
   'savingsStoryLabel': 'BU AY TASARRUF',
   'savingsStoryFooter': "Uma'nın 3 önerisiyle",
@@ -250,7 +250,7 @@ const Map<String, String> _trStrings = {
   'statementNoTransactions': 'Ekstreden işlem çıkarılamadı.',
   'importToVera': "Vera'ya aktar",
   'statementFallbackWarning':
-      'Gemini API key yok veya ekstre çözümlenemedi. Lütfen işlemleri manuel gir.',
+      'AI servisine ulaşılamadı veya ekstre çözümlenemedi. Lütfen işlemleri manuel gir.',
   'importFallbackNextTitle': 'Sonraki en iyi adım',
   'importFallbackNextBody':
       'İstersen işlemleri manuel ekleyebilir veya Uma\'dan bunu senin adına kaydetmesini isteyebilirsin.',
@@ -314,11 +314,17 @@ const Map<String, String> _trStrings = {
   'infoDisplayName': 'Görünen ad',
   'infoMember': 'Üyelik',
   'infoMemberDescription':
-      'Vera demo hesabı. Backend bağlandığında gerçek üyelik tarihi ve plan bilgisi burada görünür.',
+      'Demo oturumu bu cihazda yerel olarak çalışır.',
+  'infoSignInMethod': 'Giriş yöntemi',
   'infoEmailLabel': 'E-posta adresi',
   'infoEmailUsage': 'Nerede kullanılır',
   'infoEmailDescription':
       'Demo oturumu için kullanılıyor. Veriler cihazda kalır, sunucuya gönderilmez.',
+  'infoEmailDescriptionLive':
+      'Bu adres Firebase Auth girişi, hesap kurtarma ve önemli Vera bildirimleri için kullanılır.',
+  'authMethodGoogle': 'Google ile devam et',
+  'authMethodEmail': 'E-posta ve şifre',
+  'authMethodDemo': 'Demo kasası',
   'infoSessionVault': 'Oturum kasası',
   'infoSessionVaultDescription':
       'Oturum verisi flutter_secure_storage ile cihazda şifreli saklanır. Yalnızca bu cihazda erişilebilir.',

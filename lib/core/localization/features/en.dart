@@ -225,7 +225,7 @@ const Map<String, String> _enStrings = {
   'parsedByAi': 'AI',
   'parsedFallback': 'DEMO',
   'scanFallbackWarning':
-      'Gemini API key is missing or the receipt could not be parsed. Please enter it manually.',
+      'The AI service was unavailable or the receipt could not be parsed. Please enter it manually.',
   'scanFallbackAction': 'AI failed — enter manually',
   'savingsStoryLabel': 'SAVED THIS MONTH',
   'savingsStoryFooter': "With Uma's 3 suggestions",
@@ -253,7 +253,7 @@ const Map<String, String> _enStrings = {
   'importFallbackAskUma': 'Ask Uma to log it',
   'importFallbackManualEntry': 'Add manual transaction',
   'statementFallbackWarning':
-      'Gemini API key is missing or the statement could not be parsed. Please enter the transactions manually.',
+      'The AI service was unavailable or the statement could not be parsed. Please enter the transactions manually.',
   'statementFallbackAction': 'AI failed — enter manually',
   'openBankApp': 'Open {bank}',
   'umaForwardNote':
@@ -312,11 +312,17 @@ const Map<String, String> _enStrings = {
   'infoDisplayName': 'Display name',
   'infoMember': 'Membership',
   'infoMemberDescription':
-      'Vera demo account. Once a backend is wired in, real membership date and plan show up here.',
+      'This demo session runs locally on this device.',
+  'infoSignInMethod': 'Sign-in method',
   'infoEmailLabel': 'Email address',
   'infoEmailUsage': 'Where it is used',
   'infoEmailDescription':
       'Used for the demo session. Data stays on device; nothing is sent to a server.',
+  'infoEmailDescriptionLive':
+      'This address is used for Firebase Auth sign-in, account recovery, and important Vera alerts.',
+  'authMethodGoogle': 'Continue with Google',
+  'authMethodEmail': 'Email and password',
+  'authMethodDemo': 'Demo vault',
   'infoSessionVault': 'Session vault',
   'infoSessionVaultDescription':
       'Session data is encrypted via flutter_secure_storage and stored locally on this device only.',

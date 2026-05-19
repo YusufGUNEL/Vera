@@ -130,6 +130,27 @@ class TopBar extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
           ],
+          Tooltip(
+            message: l10n.profileAndSettings,
+            child: Material(
+              color: t.card,
+              shape: CircleBorder(side: BorderSide(color: t.line)),
+              child: InkWell(
+                onTap: () => _openProfile(context),
+                customBorder: const CircleBorder(),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: t.ink,
+                    size: 19,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           Material(
             color: t.card,
             shape: CircleBorder(side: BorderSide(color: t.line)),

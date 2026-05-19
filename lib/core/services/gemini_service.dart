@@ -42,8 +42,7 @@ class GeminiService {
 
   factory GeminiService.create(RemoteConfigService rc) {
     final directKey = Env.geminiApiKey;
-    final functionsReady =
-        FirebaseBootstrap.state.ready && Env.hasFirebaseCoreConfig;
+    final functionsReady = FirebaseBootstrap.state.ready;
     // .env override wins over Remote Config so a busted RC default can't
     // strand us on a deprecated model name.
     final model = Env.geminiModel.isNotEmpty

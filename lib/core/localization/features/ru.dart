@@ -185,10 +185,16 @@ const Map<String, String> _ruStrings = {
   'infoMember': 'Членство',
   'infoMemberDescription':
       'Демо-аккаунт Vera. После подключения бэкенда здесь появятся дата регистрации и план.',
+  'infoSignInMethod': 'Способ входа',
   'infoEmailLabel': 'Адрес электронной почты',
   'infoEmailUsage': 'Где используется',
   'infoEmailDescription':
       'Используется для демо-сессии. Данные остаются на устройстве, на сервер ничего не отправляется.',
+  'infoEmailDescriptionLive':
+      'Этот адрес используется для входа через Firebase Auth, восстановления аккаунта и важных уведомлений Vera.',
+  'authMethodGoogle': 'Продолжить через Google',
+  'authMethodEmail': 'Почта и пароль',
+  'authMethodDemo': 'Демо-хранилище',
   'infoSessionVault': 'Хранилище сессии',
   'infoSessionVaultDescription':
       'Данные сессии шифруются через flutter_secure_storage и хранятся только на этом устройстве.',

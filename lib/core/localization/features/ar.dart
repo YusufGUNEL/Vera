@@ -184,10 +184,16 @@ const Map<String, String> _arStrings = {
   'infoMember': 'العضوية',
   'infoMemberDescription':
       'حساب تجريبي في Vera. عند ربط الواجهة الخلفية ستظهر هنا بيانات العضوية الحقيقية والخطة.',
+  'infoSignInMethod': 'طريقة تسجيل الدخول',
   'infoEmailLabel': 'البريد الإلكتروني',
   'infoEmailUsage': 'مكان الاستخدام',
   'infoEmailDescription':
       'يُستخدم في الجلسة التجريبية. البيانات تبقى على الجهاز ولا تُرسل لأي خادم.',
+  'infoEmailDescriptionLive':
+      'يُستخدم هذا العنوان لتسجيل الدخول عبر Firebase Auth واستعادة الحساب وتنبيهات Vera المهمة.',
+  'authMethodGoogle': 'المتابعة عبر Google',
+  'authMethodEmail': 'البريد الإلكتروني وكلمة المرور',
+  'authMethodDemo': 'الخزنة التجريبية',
   'infoSessionVault': 'خزينة الجلسة',
   'infoSessionVaultDescription':
       'بيانات الجلسة مشفّرة عبر flutter_secure_storage وتُحفظ محلياً على هذا الجهاز فقط.',

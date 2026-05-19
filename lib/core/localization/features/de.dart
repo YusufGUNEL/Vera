@@ -186,11 +186,17 @@ const Map<String, String> _deStrings = {
   'infoDisplayName': 'Anzeigename',
   'infoMember': 'Mitgliedschaft',
   'infoMemberDescription':
-      'Vera-Demo-Konto. Sobald ein Backend angeschlossen ist, erscheinen hier echtes Beitrittsdatum und Plan.',
+      'Diese Demo-Sitzung läuft lokal auf diesem Gerät.',
+  'infoSignInMethod': 'Anmeldemethode',
   'infoEmailLabel': 'E-Mail-Adresse',
   'infoEmailUsage': 'Wofür sie verwendet wird',
   'infoEmailDescription':
       'Für die Demo-Sitzung verwendet. Daten bleiben auf dem Gerät, nichts geht an einen Server.',
+  'infoEmailDescriptionLive':
+      'Diese Adresse wird für Firebase Auth, Kontowiederherstellung und wichtige Vera-Benachrichtigungen verwendet.',
+  'authMethodGoogle': 'Mit Google fortfahren',
+  'authMethodEmail': 'E-Mail und Passwort',
+  'authMethodDemo': 'Demo-Tresor',
   'infoSessionVault': 'Session-Vault',
   'infoSessionVaultDescription':
       'Sitzungsdaten werden via flutter_secure_storage verschlüsselt und nur lokal auf diesem Gerät gespeichert.',
