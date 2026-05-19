@@ -221,10 +221,21 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     height: 52,
                     child: OutlinedButton(
                       onPressed: () async {
-                        await ref
-                            .read(authControllerProvider.notifier)
-                            .signOut();
-                        if (context.mounted) Navigator.of(context).pop();
+                        final messenger = ScaffoldMessenger.of(context);
+                        try {
+                          await ref
+                              .read(authControllerProvider.notifier)
+                              .signOut();
+                          if (context.mounted) Navigator.of(context).pop();
+                        } catch (_) {
+                          if (!context.mounted) return;
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.signOutFailed),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: t.red,

@@ -8,7 +8,6 @@ import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/vera_card.dart';
 
-import '../domain/autonomy_policy.dart';
 import '../domain/rebalance_action.dart';
 import '../state/wealth_controller.dart';
 import '../domain/investment_recommendation.dart';
@@ -151,6 +150,11 @@ class WealthScreen extends ConsumerWidget {
     List<InvestmentRecommendation> recommendations,
   ) {
     final t = context.tokens;
+    final l10n = context.l10n;
+    final groups = _groupRecommendations(recommendations);
+    final orderedTypes = _recommendationTypeOrder
+        .where((type) => groups[type]?.isNotEmpty ?? false)
+        .toList();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -202,116 +206,27 @@ class WealthScreen extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: ListView.separated(
+                child: ListView(
                   controller: scrollCtrl,
                   padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
-                  itemCount: recommendations.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = recommendations[index];
-                    IconData icon = Icons.trending_up_rounded;
-                    Color iconColor = t.brand;
-                    if (item.type == 'commodity') {
-                      icon = Icons.blur_circular_rounded;
-                      iconColor = t.gold;
-                    } else if (item.type == 'crypto') {
-                      icon = Icons.currency_bitcoin_rounded;
-                      iconColor = t.green;
-                    }
-                    return Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: t.card,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: t.line),
+                  children: [
+                    for (final type in orderedTypes) ...[
+                      _RecommendationSectionHeader(
+                        spec: _recommendationTypeSpec(type, t, l10n),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: iconColor.withValues(alpha: 0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Icon(icon, color: iconColor, size: 18),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: t.ink,
-                                      ),
-                                    ),
-                                    Text(
-                                      item.symbol,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: t.muted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: t.green.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  item.returnRate,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: t.green,
-                                  ),
-                                ),
-                              ),
-                            ],
+                      const SizedBox(height: 8),
+                      for (final item
+                          in groups[type] ?? const <InvestmentRecommendation>[])
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _RecommendationDetailCard(
+                            item: item,
+                            spec: _recommendationTypeSpec(type, t, l10n),
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            item.explanation,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: t.ink2,
-                              height: 1.45,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(Icons.auto_awesome, color: t.uma, size: 12),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  item.reason,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontStyle: FontStyle.italic,
-                                    color: t.muted,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                        ),
+                      const SizedBox(height: 4),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -517,7 +432,7 @@ class WealthScreen extends ConsumerWidget {
                         ),
                         alignment: Alignment.center,
                         child: const Icon(
-                          Icons.auto_awesome,
+                          Icons.lightbulb_outline_rounded,
                           color: Colors.white,
                           size: 18,
                         ),
@@ -546,32 +461,6 @@ class WealthScreen extends ConsumerWidget {
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _PolicyChip(
-                          label: l10n.profile,
-                          value: state.policy.riskProfile,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _PolicyChip(
-                          label: l10n.moveLimit,
-                          value: fmtTL(state.policy.monthlyMoveLimit),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _PolicyChip(
-                          label: l10n.approval,
-                          value:
-                              _approvalLabel(state.policy.approvalMode, l10n),
                         ),
                       ),
                     ],
@@ -616,100 +505,29 @@ class WealthScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(Icons.lightbulb_outline_rounded, color: t.uma, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Yatırım Önerileri (Gemini)',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: t.ink,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
                   recommendationsAsync.when(
                     data: (items) {
-                      final top3 = items.take(3).toList();
+                      final groups = _groupRecommendations(items);
+                      final orderedTypes = _recommendationTypeOrder
+                          .where((type) => groups[type]?.isNotEmpty ?? false)
+                          .toList();
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: 100,
+                            height: 156,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
-                              itemCount: top3.length,
+                              itemCount: orderedTypes.length,
                               separatorBuilder: (_, __) => const SizedBox(width: 10),
                               itemBuilder: (context, idx) {
-                                final item = top3[idx];
-                                IconData icon = Icons.trending_up_rounded;
-                                Color iconColor = t.brand;
-                                if (item.type == 'commodity') {
-                                  icon = Icons.blur_circular_rounded;
-                                  iconColor = t.gold;
-                                } else if (item.type == 'crypto') {
-                                  icon = Icons.currency_bitcoin_rounded;
-                                  iconColor = t.green;
-                                }
-                                return Container(
-                                  width: 200,
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: t.card,
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: t.line),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Icon(icon, color: iconColor, size: 16),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: t.green.withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              item.returnRate,
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.w700,
-                                                color: t.green,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item.symbol,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: t.ink,
-                                        ),
-                                      ),
-                                      Text(
-                                        item.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: t.muted,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                final type = orderedTypes[idx];
+                                final spec = _recommendationTypeSpec(type, t, l10n);
+                                return _RecommendationTypeCard(
+                                  spec: spec,
+                                  items: groups[type] ??
+                                      const <InvestmentRecommendation>[],
                                 );
                               },
                             ),
@@ -790,6 +608,313 @@ class WealthScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const _recommendationTypeOrder = ['equity', 'commodity', 'crypto'];
+
+Map<String, List<InvestmentRecommendation>> _groupRecommendations(
+    List<InvestmentRecommendation> items) {
+  final grouped = <String, List<InvestmentRecommendation>>{};
+  for (final item in items) {
+    grouped.putIfAbsent(item.type, () => []).add(item);
+  }
+  return grouped;
+}
+
+_RecommendationTypeSpec _recommendationTypeSpec(
+  String type,
+  AppTokens t,
+  AppStrings l10n,
+) {
+  return switch (type) {
+    'commodity' => _RecommendationTypeSpec(
+        label: l10n.recommendationTypeCommodity,
+        icon: Icons.blur_circular_rounded,
+        color: t.gold,
+      ),
+    'crypto' => _RecommendationTypeSpec(
+        label: l10n.recommendationTypeCrypto,
+        icon: Icons.currency_bitcoin_rounded,
+        color: t.green,
+      ),
+    _ => _RecommendationTypeSpec(
+        label: l10n.recommendationTypeEquity,
+        icon: Icons.trending_up_rounded,
+        color: t.brand,
+      ),
+  };
+}
+
+class _RecommendationTypeSpec {
+  const _RecommendationTypeSpec({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+}
+
+class _RecommendationTypeCard extends StatelessWidget {
+  const _RecommendationTypeCard({
+    required this.spec,
+    required this.items,
+  });
+
+  final _RecommendationTypeSpec spec;
+  final List<InvestmentRecommendation> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final preview = items.take(3).toList();
+    return Container(
+      width: 230,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: spec.color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(spec.icon, color: spec.color, size: 14),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  spec.label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (var i = 0; i < preview.length; i++) ...[
+            if (i != 0) const SizedBox(height: 6),
+            _RecommendationMiniRow(
+              item: preview[i],
+              accent: spec.color,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendationMiniRow extends StatelessWidget {
+  const _RecommendationMiniRow({
+    required this.item,
+    required this.accent,
+  });
+
+  final InvestmentRecommendation item;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Row(
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          item.symbol,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: t.ink,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            item.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              color: t.muted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          item.returnRate,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: accent,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RecommendationSectionHeader extends StatelessWidget {
+  const _RecommendationSectionHeader({required this.spec});
+
+  final _RecommendationTypeSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: spec.color.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: Icon(spec.icon, color: spec.color, size: 16),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          spec.label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: t.ink,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RecommendationDetailCard extends StatelessWidget {
+  const _RecommendationDetailCard({
+    required this.item,
+    required this.spec,
+  });
+
+  final InvestmentRecommendation item;
+  final _RecommendationTypeSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: spec.color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(spec.icon, color: spec.color, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                      ),
+                    ),
+                    Text(
+                      item.symbol,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: t.muted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: spec.color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  item.returnRate,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: spec.color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            item.explanation,
+            style: TextStyle(
+              fontSize: 12,
+              color: t.ink2,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.auto_awesome, color: t.uma, size: 12),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  item.reason,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: t.muted,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -901,54 +1026,6 @@ class _Header extends StatelessWidget {
           Text(
             l10n.wealthSubtitle,
             style: TextStyle(fontSize: 13, color: t.muted),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PolicyChip extends StatelessWidget {
-  const _PolicyChip({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: t.bgSoft,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 10,
-              color: t.muted,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: t.ink,
-            ),
           ),
         ],
       ),
@@ -1131,13 +1208,6 @@ class _SmallBtn extends StatelessWidget {
       ),
     );
   }
-}
-
-String _approvalLabel(ApprovalMode mode, AppStrings l10n) {
-  return switch (mode) {
-    ApprovalMode.autoWithinGuardrails => l10n.wealthApprovalAuto,
-    ApprovalMode.confirmLargeMoves => l10n.wealthApprovalHybrid,
-  };
 }
 
 WealthActionVisual _visualFor(WealthActionType type) {

@@ -144,7 +144,7 @@ const Map<String, String> _deStrings = {
   'statementFallbackAction': 'KI fehlgeschlagen — manuell eingeben',
   'thisMonthsAiPlan': 'KI-Plan für diesen Monat',
   'aiPlanFooter':
-      'Uma-Vorschlag — in deiner Bank umsetzen; Vera führt das Protokoll.',
+      'Gemini-Anlageideen — die Entscheidung liegt bei dir.',
   'applyAtBank': 'In meiner Bank umsetzen',
   'securityVeraSideBanner':
       'Vera ist nicht die Sicherheitsschicht der Bank. Sie erkennt Anomalien in deinen Daten und warnt dich; das Blockieren entscheidest du gemeinsam mit deiner Bank.',
@@ -285,6 +285,7 @@ const Map<String, String> _deStrings = {
   'actionAdd': 'Hinzufügen',
   'actionUpdate': 'Aktualisieren',
   'actionDelete': 'Löschen',
+  'actionBack': 'Zurück',
   'actionManual': 'Manuell',
   'addBillTitle': 'Neue Rechnung hinzufügen',
   'editBillTitle': 'Rechnung bearbeiten',

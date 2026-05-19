@@ -101,6 +101,36 @@ class AppStrings {
   String get creditResultPaymentLoad => _t('creditResultPaymentLoad');
   String get creditResultDtiAfter => _t('creditResultDtiAfter');
   String get creditResultGuidance => _t('creditResultGuidance');
+  String get creditEstimateTitle =>
+      _tOr('creditEstimateTitle', 'AI-estimated credit profile');
+  String get creditEstimateSubtitle => _tOr(
+        'creditEstimateSubtitle',
+        'Gemini estimates a Findeks-style band and typical bank offers.',
+      );
+  String get creditEstimateAction =>
+      _tOr('creditEstimateAction', 'Estimate with AI');
+  String get creditEstimateRefresh =>
+      _tOr('creditEstimateRefresh', 'Refresh');
+  String get creditEstimatePrompt => _tOr(
+        'creditEstimatePrompt',
+        'Tap "Estimate" — Vera will ask Gemini to project a Findeks band and typical bank offers for your inputs.',
+      );
+  String get creditEstimateUnavailable => _tOr(
+        'creditEstimateUnavailable',
+        'AI estimate needs an active Gemini backend. Configure the proxy or .env API key to enable it.',
+      );
+  String get creditEstimateError => _tOr(
+        'creditEstimateError',
+        'Could not get an estimate from Gemini. Try again in a moment.',
+      );
+  String get creditEstimateDisclaimer => _tOr(
+        'creditEstimateDisclaimer',
+        'Estimates are informational and do not replace a real bank assessment or your actual Findeks score.',
+      );
+  String get creditEstimateScoreLabel =>
+      _tOr('creditEstimateScoreLabel', 'ESTIMATED FINDEKS');
+  String get creditEstimateOffersTitle =>
+      _tOr('creditEstimateOffersTitle', 'TYPICAL BANK OFFERS');
 
   // ---- Credit card on home ----
   String get creditTitle => _t('creditTitle');
@@ -215,25 +245,15 @@ class AppStrings {
   String get securityInsightsSection =>
       _tOr('securityInsightsSection', 'Spending insights');
   String get securityTipsSection =>
-      _tOr('securityTipsSection', 'Protect yourself at the bank');
-  String get securityTipBankTitle =>
-      _tOr('securityTipBankTitle', 'Confirm in your bank app');
-  String get securityTipBankBody => _tOr(
-        'securityTipBankBody',
-        'Vera only advises. Complete payments inside your real banking app.',
-      );
-  String get securityTipPinTitle =>
-      _tOr('securityTipPinTitle', 'PIN & biometrics');
-  String get securityTipPinBody => _tOr(
-        'securityTipPinBody',
-        'Enable Face ID and alerts in Profile settings.',
-      );
+      _tOr('securityTipsSection', 'Keep data fresh');
   String get securityTipAlertsTitle =>
       _tOr('securityTipAlertsTitle', 'Keep data fresh');
   String get securityTipAlertsBody => _tOr(
         'securityTipAlertsBody',
         'Import statements or scan receipts for better insights.',
       );
+  String get securityTipAlertsAction =>
+      _tOr('securityTipAlertsAction', 'Import statement');
   String fraudReasonOutlier(String median, String ratio) => _t(
         'fraudReasonOutlier',
       ).replaceAll('{median}', median).replaceAll('{ratio}', ratio);
@@ -266,6 +286,7 @@ class AppStrings {
   String get vibeBold => _t('vibeBold');
   String get language => _t('language');
   String get signOut => _t('signOut');
+  String get signOutFailed => _t('signOutFailed');
   String get deleteAccount => _t('deleteAccount');
   String get umaTone => _t('umaTone');
   String get toneConcise => _t('toneConcise');
@@ -287,6 +308,8 @@ class AppStrings {
   String get scanNoTotal => _t('scanNoTotal');
   String get parsedByAi => _t('parsedByAi');
   String get parsedFallback => _t('parsedFallback');
+  String get filePickFailed => _t('filePickFailed');
+  String get scanFailed => _t('scanFailed');
 
   // ---- Savings story ----
   String get savingsStoryLabel => _t('savingsStoryLabel');
@@ -313,6 +336,7 @@ class AppStrings {
   String get statementImported => _t('statementImported');
   String get statementNoTransactions => _t('statementNoTransactions');
   String get importToVera => _t('importToVera');
+  String get statementImportFailed => _t('statementImportFailed');
 
   // ---- UMA forward to bank ----
   String openBankApp(String bank) =>
@@ -326,6 +350,9 @@ class AppStrings {
   String get thisMonthsAiPlan => _t('thisMonthsAiPlan');
   String get aiPlanFooter => _t('aiPlanFooter');
   String get applyAtBank => _t('applyAtBank');
+  String get recommendationTypeEquity => _t('recommendationTypeEquity');
+  String get recommendationTypeCommodity => _t('recommendationTypeCommodity');
+  String get recommendationTypeCrypto => _t('recommendationTypeCrypto');
 
   // ---- Security framing ----
   String get securityVeraSideBanner => _t('securityVeraSideBanner');
@@ -728,6 +755,7 @@ class AppStrings {
   String get loginEmailPasswordRequired => _t('loginEmailPasswordRequired');
   String loginFirebaseError(String code) =>
       _t('loginFirebaseError').replaceAll('{code}', code);
+  String get loginGenericError => _t('loginGenericError');
   String get loginFirebaseReadyFooter => _t('loginFirebaseReadyFooter');
   String get loginCreateAccount => _t('loginCreateAccount');
   String get dividerOr => _t('dividerOr');
@@ -751,6 +779,7 @@ class AppStrings {
   String get signupErrorAcceptTerms => _t('signupErrorAcceptTerms');
   String signupFailedTemplate(String code) =>
       _t('signupFailedTemplate').replaceAll('{code}', code);
+  String get signupGenericError => _t('signupGenericError');
   String get signupTerms => _t('signupTerms');
   String get signupTermsPrefix => _t('signupTermsPrefix');
   String get signupTermsAnd => _t('signupTermsAnd');
@@ -859,6 +888,7 @@ class AppStrings {
   String get importFallbackAskUma => _t('importFallbackAskUma');
   String get importFallbackManualEntry => _t('importFallbackManualEntry');
   String get actionDelete => _t('actionDelete');
+  String get actionBack => _t('actionBack');
   String get proactiveHealthyCta => _t('proactiveHealthyCta');
   String get connectedAccountsEmptyBody => _t('connectedAccountsEmptyBody');
   String get scanFallbackAction => _t('scanFallbackAction');

@@ -142,7 +142,7 @@ const Map<String, String> _arStrings = {
       'مفتاح Gemini API غير موجود أو تعذر تحليل كشف الحساب. يُرجى إدخال المعاملات يدويًا.',
   'statementFallbackAction': 'تعذر على الذكاء القراءة — إدخال يدوي',
   'thisMonthsAiPlan': 'خطة الذكاء الاصطناعي لهذا الشهر',
-  'aiPlanFooter': 'اقتراح Uma — طبّقه عبر بنكك، وVera تحتفظ بالسجل.',
+  'aiPlanFooter': 'أفكار استثمارية مدعومة بـGemini — القرار لك.',
   'applyAtBank': 'تطبيق عبر بنكي',
   'securityVeraSideBanner':
       'Vera ليست طبقة الأمان للبنك. ترصد الشذوذ في بياناتك وتنبهك؛ القرار يكون بينك وبنكك.',
@@ -280,6 +280,7 @@ const Map<String, String> _arStrings = {
   'actionAdd': 'إضافة',
   'actionUpdate': 'تحديث',
   'actionDelete': 'حذف',
+  'actionBack': 'رجوع',
   'actionManual': 'يدوي',
   'addBillTitle': 'إضافة فاتورة جديدة',
   'editBillTitle': 'تعديل الفاتورة',

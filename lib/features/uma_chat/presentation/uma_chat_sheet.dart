@@ -8,14 +8,17 @@ import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/responsive.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_audit_event.dart';
-import '../domain/uma_feedback.dart';
 import '../domain/uma_message.dart';
 import '../state/uma_controller.dart';
 import 'widgets/uma_message_bubble.dart';
 import 'widgets/uma_order_card.dart';
 
 class UmaChatSheet extends ConsumerStatefulWidget {
-  const UmaChatSheet({super.key});
+  const UmaChatSheet({this.initialPrompt, super.key});
+
+  /// Optional prompt to send automatically once the sheet has been opened and
+  /// the conversation has been reset to a fresh greeting.
+  final String? initialPrompt;
 
   @override
   ConsumerState<UmaChatSheet> createState() => _UmaChatSheetState();
@@ -25,6 +28,21 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
   final _scrollController = ScrollController();
   final _inputController = TextEditingController();
   bool _showSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Always start a fresh conversation each time Uma opens, then dispatch
+      // the optional initial prompt so it lands in the clean transcript.
+      ref.read(umaControllerProvider.notifier).resetConversation();
+      final prompt = widget.initialPrompt?.trim();
+      if (prompt != null && prompt.isNotEmpty) {
+        ref.read(umaControllerProvider.notifier).send(prompt);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -48,32 +66,6 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
     if (text.trim().isEmpty) return;
     ref.read(umaControllerProvider.notifier).send(text);
     _inputController.clear();
-  }
-
-  Future<void> _openFeedbackSheet(
-    BuildContext context,
-    int messageIndex,
-    UmaMessage message,
-    UmaFeedbackVote vote,
-  ) async {
-    final controller =
-        TextEditingController(text: message.feedback?.note ?? '');
-    final note = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _FeedbackNoteSheet(
-        controller: controller,
-        vote: vote,
-      ),
-    );
-    controller.dispose();
-    if (!mounted || note == null) return;
-    await ref.read(umaControllerProvider.notifier).setFeedback(
-          messageIndex,
-          vote,
-          note: note,
-        );
   }
 
   @override
@@ -159,23 +151,6 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
                                     onDismiss: () => ref
                                         .read(umaControllerProvider.notifier)
                                         .dismissOrder(i),
-                                  ),
-                                ),
-                              if (message.role == UmaRole.uma)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth: messageMaxWidth,
-                                    ),
-                                    child: _FeedbackBar(
-                                      message: message,
-                                      onVote: (vote) => ref
-                                          .read(umaControllerProvider.notifier)
-                                          .setFeedback(i, vote),
-                                      onAddNote: (vote) => _openFeedbackSheet(
-                                          context, i, message, vote),
-                                    ),
                                   ),
                                 ),
                             ],
@@ -363,7 +338,8 @@ class _Header extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onClose,
-                icon: Icon(Icons.close, color: t.ink2, size: 20),
+                icon: Icon(Icons.arrow_back_rounded, color: t.ink2, size: 20),
+                tooltip: l10n.actionBack,
                 style: IconButton.styleFrom(
                   padding: const EdgeInsets.all(8),
                   minimumSize: const Size(36, 36),
@@ -831,274 +807,6 @@ class _Toast extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FeedbackBar extends StatelessWidget {
-  const _FeedbackBar({
-    required this.message,
-    required this.onVote,
-    required this.onAddNote,
-  });
-
-  final UmaMessage message;
-  final ValueChanged<UmaFeedbackVote> onVote;
-  final ValueChanged<UmaFeedbackVote> onAddNote;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    final l10n = context.l10n;
-    final selectedVote = message.feedback?.vote;
-    final note = message.feedback?.note?.trim();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: t.bgSoft,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: t.line),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.umaFeedbackLabel,
-            style: TextStyle(
-              color: t.muted,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              _FeedbackChip(
-                icon: Icons.thumb_up_alt_outlined,
-                label: l10n.umaFeedbackHelpful,
-                selected: selectedVote == UmaFeedbackVote.helpful,
-                onTap: () => onVote(UmaFeedbackVote.helpful),
-              ),
-              _FeedbackChip(
-                icon: Icons.thumb_down_alt_outlined,
-                label: l10n.umaFeedbackNotHelpful,
-                selected: selectedVote == UmaFeedbackVote.notHelpful,
-                onTap: () => onVote(UmaFeedbackVote.notHelpful),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: TextButton.icon(
-                  onPressed: () => onAddNote(
-                    selectedVote ?? UmaFeedbackVote.notHelpful,
-                  ),
-                  style: TextButton.styleFrom(
-                    foregroundColor: t.uma,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    minimumSize: const Size(0, 0),
-                  ),
-                  icon: const Icon(Icons.edit_note, size: 16),
-                  label: Text(
-                    note == null || note.isEmpty
-                        ? l10n.umaFeedbackAddNote
-                        : l10n.umaFeedbackEditNote,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              if (note != null && note.isNotEmpty) ...[
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    note,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: t.ink2,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeedbackChip extends StatelessWidget {
-  const _FeedbackChip({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? t.card : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: selected ? t.uma : t.line),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: selected ? t.uma : t.muted),
-            const SizedBox(width: 5),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: selected ? t.uma : t.muted,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FeedbackNoteSheet extends StatelessWidget {
-  const _FeedbackNoteSheet({
-    required this.controller,
-    required this.vote,
-  });
-
-  final TextEditingController controller;
-  final UmaFeedbackVote vote;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    final l10n = context.l10n;
-    return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Container(
-        decoration: BoxDecoration(
-          color: t.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: t.line,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  vote == UmaFeedbackVote.helpful
-                      ? l10n.umaFeedbackHelpfulTitle
-                      : l10n.umaFeedbackNotHelpfulTitle,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: t.ink,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.umaFeedbackNoteHint,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: t.muted,
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: controller,
-                  minLines: 3,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: l10n.umaFeedbackPlaceholder,
-                    filled: true,
-                    fillColor: t.card,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: t.line),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: t.line),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: t.uma, width: 1.4),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () =>
-                            Navigator.of(context).pop(controller.text.trim()),
-                        child: Text(l10n.umaFeedbackSave),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () => Navigator.of(context).pop(''),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: t.brand,
-                          foregroundColor: t.brandFG,
-                        ),
-                        child: Text(l10n.umaFeedbackSkipNote),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

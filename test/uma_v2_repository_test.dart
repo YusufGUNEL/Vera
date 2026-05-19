@@ -202,6 +202,7 @@ ProviderContainer _buildContainer({
                 category: 'Video',
                 monthlyPrice: 229,
                 previousPrice: 199,
+                occurrences: 3,
                 status: SubscriptionStatus.healthy,
                 renewalLabel: '12 June',
                 lastUsedLabel: 'Yesterday',

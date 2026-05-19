@@ -24,7 +24,7 @@ val hasReleaseKeystore = keystorePropertiesFile.exists().also { exists ->
 android {
     namespace = "com.vera.vera"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         applicationId = "com.vera.vera"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

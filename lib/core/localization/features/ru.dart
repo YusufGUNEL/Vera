@@ -143,7 +143,7 @@ const Map<String, String> _ruStrings = {
       'Ключ Gemini API отсутствует или выписку не удалось разобрать. Пожалуйста, введите операции вручную.',
   'statementFallbackAction': 'ИИ не сработал — ввести вручную',
   'thisMonthsAiPlan': 'План ИИ на этот месяц',
-  'aiPlanFooter': 'Совет Uma — выполните в своём банке; Vera ведёт учёт.',
+  'aiPlanFooter': 'Инвест-идеи от Gemini — решение за вами.',
   'applyAtBank': 'Сделать в банке',
   'securityVeraSideBanner':
       'Vera не является службой безопасности банка. Она замечает аномалии в ваших данных и предупреждает вас; блокировку вы решаете вместе с банком.',
@@ -282,6 +282,7 @@ const Map<String, String> _ruStrings = {
   'actionAdd': 'Добавить',
   'actionUpdate': 'Обновить',
   'actionDelete': 'Удалить',
+  'actionBack': 'Назад',
   'actionManual': 'Вручную',
   'addBillTitle': 'Добавить новый счёт',
   'editBillTitle': 'Редактировать счёт',

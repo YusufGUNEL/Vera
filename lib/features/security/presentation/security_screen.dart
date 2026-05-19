@@ -6,7 +6,7 @@ import '../../../core/theme/app_tokens.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/vera_card.dart';
-import '../../profile_settings/presentation/profile_settings_sheet.dart';
+import '../../statement_import/presentation/statement_import_sheet.dart';
 import '../data/security_check.dart';
 import '../state/security_controller.dart';
 
@@ -90,28 +90,12 @@ class SecurityScreen extends ConsumerWidget {
             SectionTitle(title: l10n.securityTipsSection),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Column(
-                children: [
-                  _ProtectionTip(
-                    icon: Icons.account_balance_outlined,
-                    title: l10n.securityTipBankTitle,
-                    body: l10n.securityTipBankBody,
-                  ),
-                  const SizedBox(height: 10),
-                  _ProtectionTip(
-                    icon: Icons.fingerprint,
-                    title: l10n.securityTipPinTitle,
-                    body: l10n.securityTipPinBody,
-                    onTap: () => _openProfile(context),
-                    actionLabel: l10n.profileAndSettings,
-                  ),
-                  const SizedBox(height: 10),
-                  _ProtectionTip(
-                    icon: Icons.upload_file_outlined,
-                    title: l10n.securityTipAlertsTitle,
-                    body: l10n.securityTipAlertsBody,
-                  ),
-                ],
+              child: _ProtectionTip(
+                icon: Icons.upload_file_outlined,
+                title: l10n.securityTipAlertsTitle,
+                body: l10n.securityTipAlertsBody,
+                onTap: () => _openStatementImport(context),
+                actionLabel: l10n.securityTipAlertsAction,
               ),
             ),
           ],
@@ -120,13 +104,13 @@ class SecurityScreen extends ConsumerWidget {
     );
   }
 
-  void _openProfile(BuildContext context) {
+  void _openStatementImport(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.45),
-      builder: (_) => const ProfileSettingsSheet(),
+      builder: (_) => const StatementImportSheet(),
     );
   }
 }

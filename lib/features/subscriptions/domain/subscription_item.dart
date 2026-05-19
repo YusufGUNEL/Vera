@@ -10,6 +10,7 @@ class SubscriptionItem {
     required this.category,
     required this.monthlyPrice,
     required this.previousPrice,
+    required this.occurrences,
     required this.renewalLabel,
     required this.lastUsedLabel,
     required this.status,
@@ -23,6 +24,7 @@ class SubscriptionItem {
   final String category;
   final double monthlyPrice;
   final double previousPrice;
+  final int occurrences;
   final String renewalLabel;
   final String lastUsedLabel;
   final SubscriptionStatus status;
@@ -39,6 +41,7 @@ class SubscriptionItem {
       'category': category,
       'monthlyPrice': monthlyPrice,
       'previousPrice': previousPrice,
+      'occurrences': occurrences,
       'renewalLabel': renewalLabel,
       'lastUsedLabel': lastUsedLabel,
       'status': status.name,
@@ -57,6 +60,7 @@ class SubscriptionItem {
       category: map['category'] as String? ?? '',
       monthlyPrice: (map['monthlyPrice'] as num?)?.toDouble() ?? 0,
       previousPrice: (map['previousPrice'] as num?)?.toDouble() ?? 0,
+      occurrences: (map['occurrences'] as num?)?.toInt() ?? 1,
       renewalLabel: map['renewalLabel'] as String? ?? '',
       lastUsedLabel: map['lastUsedLabel'] as String? ?? '',
       status: SubscriptionStatus.values.firstWhere(

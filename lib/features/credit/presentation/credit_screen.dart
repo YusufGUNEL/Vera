@@ -7,6 +7,7 @@ import '../../../core/routing/routes.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/vera_card.dart';
+import '../domain/bank_loan_offer.dart';
 import '../state/credit_controller.dart';
 
 class CreditScreen extends ConsumerWidget {
@@ -199,7 +200,354 @@ class CreditScreen extends ConsumerWidget {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: _CreditEstimateCard(state: state),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _CreditEstimateCard extends ConsumerWidget {
+  const _CreditEstimateCard({required this.state});
+
+  final CreditState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    final controller = ref.read(creditControllerProvider.notifier);
+    final estimate = state.estimate;
+
+    return VeraCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.creditEstimateTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: t.ink,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.creditEstimateSubtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: t.muted,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (controller.geminiAvailable)
+                FilledButton.tonalIcon(
+                  onPressed: state.estimateLoading
+                      ? null
+                      : controller.requestEstimate,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: t.umaSoft,
+                    foregroundColor: t.uma,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                  icon: state.estimateLoading
+                      ? SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: t.uma,
+                          ),
+                        )
+                      : const Icon(Icons.auto_awesome, size: 16),
+                  label: Text(
+                    estimate == null
+                        ? l10n.creditEstimateAction
+                        : l10n.creditEstimateRefresh,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          if (!controller.geminiAvailable)
+            _PlaceholderText(text: l10n.creditEstimateUnavailable)
+          else if (estimate != null)
+            _EstimateBody(estimate: estimate)
+          else if (state.estimateError)
+            _PlaceholderText(text: l10n.creditEstimateError)
+          else
+            _PlaceholderText(text: l10n.creditEstimatePrompt),
+          const SizedBox(height: 12),
+          Text(
+            l10n.creditEstimateDisclaimer,
+            style: TextStyle(fontSize: 11, color: t.muted, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EstimateBody extends StatelessWidget {
+  const _EstimateBody({required this.estimate});
+
+  final CreditEstimate estimate;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    final bandColor = _bandColor(estimate.score, t);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: bandColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: bandColor.withValues(alpha: 0.25)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: bandColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${estimate.score}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: bandColor,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.creditEstimateScoreLabel,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: t.muted,
+                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      estimate.band.isEmpty
+                          ? l10n.creditEstimateScoreLabel
+                          : estimate.band,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: bandColor,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    if (estimate.summary.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        estimate.summary,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: t.ink2,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (estimate.offers.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            l10n.creditEstimateOffersTitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: t.muted,
+              letterSpacing: 0.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final offer in estimate.offers) ...[
+            _OfferTile(offer: offer),
+            const SizedBox(height: 8),
+          ],
+        ],
+      ],
+    );
+  }
+
+  Color _bandColor(int score, AppTokens t) {
+    if (score >= 1500) return t.green;
+    if (score >= 1100) return t.brand;
+    if (score >= 700) return t.gold;
+    return t.red;
+  }
+}
+
+class _OfferTile extends StatelessWidget {
+  const _OfferTile({required this.offer});
+
+  final BankLoanOffer offer;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    final aprText = '${(offer.estimatedApr * 100).toStringAsFixed(1)}%';
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  offer.bankName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: t.brand.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  aprText,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: t.brand,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.creditResultMonthlyPayment,
+                style: TextStyle(fontSize: 11.5, color: t.muted),
+              ),
+              Text(
+                fmtTL(offer.monthlyPayment),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: t.ink,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.creditResultTotalCost,
+                style: TextStyle(fontSize: 11.5, color: t.muted),
+              ),
+              Text(
+                fmtTL(offer.totalCost),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: t.ink2,
+                ),
+              ),
+            ],
+          ),
+          if (offer.note.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              offer.note,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: t.muted,
+                height: 1.35,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PlaceholderText extends StatelessWidget {
+  const _PlaceholderText({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 12, color: t.ink2, height: 1.45),
       ),
     );
   }

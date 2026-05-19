@@ -38,7 +38,13 @@ class StatementImportSheet extends ConsumerWidget {
           );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      final l10n = context.l10n;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.filePickFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -98,9 +104,15 @@ class StatementImportSheet extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back_rounded, color: t.muted),
+                            onPressed: () => Navigator.of(context).pop(),
+                            tooltip: l10n.actionBack,
+                          ),
+                          const SizedBox(width: 4),
                           Container(
                             width: 36,
                             height: 36,
@@ -140,10 +152,6 @@ class StatementImportSheet extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close_rounded, color: t.muted),
-                            onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
                       ),
@@ -482,7 +490,7 @@ class StatementImportSheet extends ConsumerWidget {
         Icon(Icons.warning_amber_rounded, color: t.gold, size: 36),
         const SizedBox(height: 10),
         Text(
-          l10n.statementFallbackWarning,
+          l10n.statementImportFailed,
           textAlign: TextAlign.center,
           style: TextStyle(color: t.ink2, fontSize: 13, height: 1.4),
         ),

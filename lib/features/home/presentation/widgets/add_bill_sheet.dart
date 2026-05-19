@@ -38,7 +38,7 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
         ? _BillKind.card
         : _BillKind.values.firstWhere(
             (k) => k.iconCode == initial.iconCode,
-            orElse: () => _BillKind.card,
+            orElse: () => _BillKind.other,
           );
   }
 
@@ -60,8 +60,10 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
   }
 
   Future<void> _save() async {
-    final name = _name.text.trim();
     final amount = double.tryParse(_amount.text.trim().replaceAll(',', '.')) ?? 0;
+    final name = _kind == _BillKind.other
+        ? _name.text.trim()
+        : _kind.label(context.l10n);
     if (name.isEmpty || amount <= 0) return;
     final bill = UpcomingBill(
       id: widget.initial?.id ??
@@ -119,35 +121,29 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                  isEdit ? l10n.editBillTitle : l10n.addBillTitle,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: t.ink,
-                    letterSpacing: -0.3,
-                  ),
-                    ),
                     IconButton(
-                      icon: Icon(Icons.close_rounded, color: t.muted),
+                      icon: Icon(Icons.arrow_back_rounded, color: t.muted),
                       onPressed: () => Navigator.of(context).pop(),
+                      tooltip: l10n.actionBack,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        isEdit ? l10n.editBillTitle : l10n.addBillTitle,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: t.ink,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                _Field(
-                  label: l10n.fieldName,
-                  child: TextField(
-                    controller: _name,
-                    style: TextStyle(fontSize: 14, color: t.ink),
-                    decoration: _inputDecoration(t, hint: l10n.addBillNameHint),
-                  ),
-                ),
-                const SizedBox(height: 12),
                 _Field(
                   label: l10n.fieldAmountTl,
                   child: TextField(
@@ -202,7 +198,10 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                         final kind = _BillKind.values[i];
                         final selected = kind == _kind;
                         return InkWell(
-                          onTap: () => setState(() => _kind = kind),
+                          onTap: () => setState(() {
+                            _kind = kind;
+                            if (kind != _BillKind.other) _name.clear();
+                          }),
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -238,6 +237,19 @@ class _AddBillSheetState extends ConsumerState<AddBillSheet> {
                     ),
                   ),
                 ),
+                if (_kind == _BillKind.other) ...[
+                  const SizedBox(height: 12),
+                  _Field(
+                    label: l10n.fieldName,
+                    child: TextField(
+                      controller: _name,
+                      autofocus: widget.initial == null,
+                      style: TextStyle(fontSize: 14, color: t.ink),
+                      decoration:
+                          _inputDecoration(t, hint: l10n.addBillNameHint),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 Row(
                   children: [

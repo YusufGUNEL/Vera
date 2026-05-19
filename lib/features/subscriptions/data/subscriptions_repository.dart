@@ -30,23 +30,80 @@ class SubscriptionsRepository {
 
     if (_gemini.isAvailable) {
       try {
-        final prompt = '''
-You are an expert financial assistant analyzing bank transactions to detect recurring subscriptions.
-Here is a list of candidate subscriptions detected by simple keyword matching:
-\${candidates.map((c) => '- ID: \${c.id}, Name: \${c.name}, Monthly Price: \${c.monthlyPrice} TL, Vendor: \${c.vendor}, Category: \${c.category}').join('\\n')}
+        final candidateLines = candidates
+            .map(
+              (c) =>
+                  '- ID: ${c.id} | Name: ${c.name} | Vendor: ${c.vendor} | '
+                  'Category: ${c.category} | Current: ${c.monthlyPrice.toStringAsFixed(2)} TL | '
+                  'Previous: ${c.previousPrice.toStringAsFixed(2)} TL | '
+                  'Occurrences: ${c.occurrences}',
+            )
+            .join('\n');
 
-Analyze these candidates and determine which ones are actual recurring subscriptions (like software licenses, streaming services, gym memberships, utilities, SaaS, cloud storage, etc.) and which ones are likely NOT subscriptions (like one-off retail purchases of hardware, personal money transfers, rent/bills, one-off hotel/flight bookings, salary, etc.).
+        // Pull the matching raw transactions for each candidate so Gemini can
+        // verify whether the merchant truly looks recurring. We cap the per-
+        // candidate sample so the prompt stays small.
+        final txnSnippets = candidates
+            .map((c) {
+              final matches = userTxns
+                  .where(
+                    (txn) =>
+                        txn.amount < 0 &&
+                        txn.name.toLowerCase().contains(
+                              c.vendor.toLowerCase(),
+                            ),
+                  )
+                  .take(6)
+                  .map(
+                    (txn) =>
+                        '    · ${txn.name} | ${txn.amount.toStringAsFixed(2)} TL | ${txn.when}',
+                  )
+                  .join('\n');
+              return matches.isEmpty
+                  ? '${c.id}: (no matching raw transaction lines)'
+                  : '${c.id}:\n$matches';
+            })
+            .join('\n');
 
-Output only a valid JSON array containing the IDs of the VALID subscriptions to keep, for example:
-["detected_netflix", "detected_spotify"]
+        final prompt =
+            'You are a financial assistant filtering a candidate list of '
+            'recurring subscriptions extracted from a user\'s bank statement.\n\n'
+            'KEEP only entries that look like real recurring services: '
+            'streaming (Netflix, Spotify, YouTube Premium, Disney+, Exxen, '
+            'BluTV, Gain, tabii), cloud storage (iCloud, Google One, Dropbox), '
+            'SaaS / AI tools (GitHub, OpenAI, Anthropic/Claude, Notion, '
+            'Figma), gym & fitness memberships, software licenses, telco / '
+            'internet / TV plans, insurance.\n\n'
+            'REJECT anything that looks like a one-off purchase or everyday '
+            'spending: grocery stores (Migros, BIM, A101, ŞOK, Carrefour, '
+            'Macrocenter, neighborhood markets like "MUSTAFA AYTUMUR"), '
+            'restaurants, cafes, fast food, gas stations (Shell, OPET, BP, '
+            'Petrol Ofisi), pharmacies, hospitals, hotels, flights, ATM '
+            'withdrawals, transfers (EFT/Havale/FAST), salary credits, rent '
+            'payments, one-off retail.\n\n'
+            'Candidates (each line is one candidate):\n$candidateLines\n\n'
+            'Raw transaction lines for each candidate:\n$txnSnippets\n\n'
+            'Return ONLY a JSON array containing the IDs of the entries you '
+            'want to KEEP — no markdown, no commentary, no code fences. '
+            'Example: ["detected_netflix","detected_spotify"]. If none are '
+            'real subscriptions, return [].';
 
-Do not include markdown code blocks, do not include any other text, just the raw JSON array.
-''';
         final responseText = await _gemini.generateText(prompt);
-        final cleanText = responseText.replaceAll('```json', '').replaceAll('```', '').trim();
+        final cleanText = responseText
+            .replaceAll('```json', '')
+            .replaceAll('```', '')
+            .trim();
+        if (cleanText.isEmpty) return candidates;
         final List<dynamic> validIds = jsonDecode(cleanText);
         final validSet = validIds.map((id) => id.toString()).toSet();
-        return candidates.where((c) => validSet.contains(c.id)).toList();
+        final filtered =
+            candidates.where((c) => validSet.contains(c.id)).toList();
+        // If Gemini returned something obviously broken (e.g. dropped
+        // everything but the heuristic said multiple are likely real), keep
+        // the heuristic result so we never show an empty Plans list when the
+        // user clearly has subscriptions.
+        if (filtered.isEmpty && candidates.length >= 2) return candidates;
+        return filtered;
       } catch (_) {
         return candidates;
       }

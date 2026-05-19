@@ -84,6 +84,21 @@ const Map<String, String> _enStrings = {
   'creditResultTotalCost': 'Total repayment',
   'creditResultPaymentLoad': 'Payment / income',
   'creditResultDtiAfter': 'Debt ratio after loan',
+  'creditEstimateTitle': 'AI-estimated credit profile',
+  'creditEstimateSubtitle':
+      'Gemini estimates a Findeks-style band and typical Turkish bank offers from your inputs.',
+  'creditEstimateAction': 'Estimate with AI',
+  'creditEstimateRefresh': 'Refresh',
+  'creditEstimatePrompt':
+      'Tap "Estimate" — Vera will ask Gemini to project a Findeks-style band and typical bank offers for your inputs.',
+  'creditEstimateUnavailable':
+      'The AI estimate needs an active Gemini backend. Configure the proxy or .env API key to enable it.',
+  'creditEstimateError':
+      'Could not get an estimate from Gemini. Try again in a moment.',
+  'creditEstimateDisclaimer':
+      'Estimates are informational and do not replace a real bank assessment or your actual Findeks score.',
+  'creditEstimateScoreLabel': 'ESTIMATED FINDEKS',
+  'creditEstimateOffersTitle': 'TYPICAL BANK OFFERS',
   'creditResultGuidance':
       'Use this screen to compare scenarios before you open a real bank flow. Lower payment load and lower debt ratio usually mean a safer plan.',
   'subsRenewalLabel': 'Renewal',
@@ -182,16 +197,11 @@ const Map<String, String> _enStrings = {
   'fraudAlertTitle': 'New spending insight',
   'spendingInsightAlertTitle': 'New spending insight',
   'securityInsightsSection': 'Spending insights',
-  'securityTipsSection': 'Protect yourself at the bank',
-  'securityTipBankTitle': 'Confirm in your bank app',
-  'securityTipBankBody':
-      'Vera only advises. Complete transfers, payments, and card actions inside your real banking app.',
-  'securityTipPinTitle': 'PIN & biometrics',
-  'securityTipPinBody':
-      'Enable Face ID and fraud alerts in Profile — Vera will notify you about unusual patterns.',
+  'securityTipsSection': 'Keep data fresh',
   'securityTipAlertsTitle': 'Keep data fresh',
   'securityTipAlertsBody':
       'Import statements or scan receipts — insights are only as accurate as the data you bring in.',
+  'securityTipAlertsAction': 'Import statement',
   'fraudReasonOutlier':
       'This expense is well above your median spend of {median} TL and is {ratio}x larger than usual.',
   'fraudNameRoundTransfer': 'Round transfer · {amount} TL',
@@ -218,6 +228,7 @@ const Map<String, String> _enStrings = {
   'vibeBold': 'Bold',
   'language': 'Language',
   'signOut': 'Sign out',
+  'signOutFailed': 'Sign out failed. Please try again.',
   'umaTone': 'Uma tone',
   'toneConcise': 'Concise',
   'toneCoach': 'Coach',
@@ -237,6 +248,8 @@ const Map<String, String> _enStrings = {
   'scanNoTotal': "Couldn't read the amount, scan again.",
   'parsedByAi': 'AI',
   'parsedFallback': 'DEMO',
+  'filePickFailed': 'Couldn\'t select the file. Please try again.',
+  'scanFailed': 'We couldn\'t scan the receipt. Please try again.',
   'scanFallbackWarning':
       'The AI service was unavailable or the receipt could not be parsed. Please enter it manually.',
   'scanFallbackAction': 'AI failed — enter manually',
@@ -259,6 +272,7 @@ const Map<String, String> _enStrings = {
   'statementImportAgain': 'Import again',
   'statementImported': 'Added to your transactions',
   'statementNoTransactions': 'No transactions could be extracted.',
+  'statementImportFailed': 'Statement upload failed. Please try again.',
   'importToVera': 'Import to Vera',
   'importFallbackNextTitle': 'Next best step',
   'importFallbackNextBody':
@@ -275,7 +289,10 @@ const Map<String, String> _enStrings = {
   'keep': 'Keep',
   'thisMonthsAiPlan': "This month's AI plan",
   'aiPlanFooter':
-      "Uma's suggestion — apply it inside your bank; Vera keeps the record.",
+      'Gemini-backed investment ideas — the decision is yours.',
+  'recommendationTypeEquity': 'Equity',
+  'recommendationTypeCommodity': 'Commodities',
+  'recommendationTypeCrypto': 'Crypto',
   'applyAtBank': 'Apply at my bank',
   'securityVeraSideBanner':
       'Vera is not a bank or payment institution. It cannot access your account or freeze your card — only advise from data you import.',
@@ -629,6 +646,7 @@ const Map<String, String> _enStrings = {
   'actionAdd': 'Add',
   'actionUpdate': 'Update',
   'actionDelete': 'Delete',
+  'actionBack': 'Back',
   'actionManual': 'Manual',
   'addBillTitle': 'Add new bill',
   'editBillTitle': 'Edit bill',
@@ -748,6 +766,7 @@ const Map<String, String> _enStrings = {
   'loginContinueEmail': 'Continue with email',
   'loginEmailPasswordRequired': 'Email and password are required.',
   'loginFirebaseError': 'Firebase sign-in failed: {code}.',
+  'loginGenericError': 'Sign-in failed. Please try again.',
   'loginFirebaseReadyFooter':
       'Firebase auth is connected. Demo mode is still available for hackathon flows.',
   'loginCreateAccount': 'Create account',
@@ -771,6 +790,7 @@ const Map<String, String> _enStrings = {
   'signupErrorPasswordMismatch': 'Passwords do not match.',
   'signupErrorAcceptTerms': 'Please accept the terms to continue.',
   'signupFailedTemplate': 'Account creation failed: {code}.',
+  'signupGenericError': 'Account creation failed. Please try again.',
   'signupTerms': 'I accept Vera terms and the local demo data policy.',
   'signupTermsPrefix': 'I accept ',
   'signupTermsAnd': ' and the ',

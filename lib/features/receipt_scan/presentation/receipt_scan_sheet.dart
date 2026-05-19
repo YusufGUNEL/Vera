@@ -44,8 +44,12 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
           );
     } catch (e) {
       if (!mounted) return;
+      final l10n = context.l10n;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
+        SnackBar(
+          content: Text(l10n.filePickFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
@@ -77,8 +81,12 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
           );
     } catch (e) {
       if (!mounted) return;
+      final l10n = context.l10n;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e')),
+        SnackBar(
+          content: Text(l10n.filePickFailed),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
@@ -125,9 +133,15 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back_rounded, color: t.muted),
+                            onPressed: () => Navigator.of(context).pop(),
+                            tooltip: l10n.actionBack,
+                          ),
+                          const SizedBox(width: 4),
                           Container(
                             width: 36,
                             height: 36,
@@ -167,10 +181,6 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close_rounded, color: t.muted),
-                            onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
                       ),
@@ -514,10 +524,18 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
         Icon(Icons.error_outline, color: t.red, size: 36),
         const SizedBox(height: 10),
         Text(
-          error,
+          l10n.scanFailed,
           textAlign: TextAlign.center,
           style: TextStyle(color: t.ink2, fontSize: 13),
         ),
+        if (kDebugMode && error.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: t.muted, fontSize: 11),
+          ),
+        ],
         const SizedBox(height: 14),
         OutlinedButton(
           onPressed: () => ref.read(receiptControllerProvider.notifier).reset(),

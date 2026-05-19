@@ -86,6 +86,21 @@ const Map<String, String> _trStrings = {
   'creditResultDtiAfter': 'Kredi sonrası borç oranı',
   'creditResultGuidance':
       'Gerçek banka akışına geçmeden önce senaryoları burada karşılaştır. Daha düşük taksit yükü ve daha düşük borç oranı genelde daha güvenli bir plan sunar.',
+  'creditEstimateTitle': 'AI destekli kredi profili',
+  'creditEstimateSubtitle':
+      'Gemini, girdiklerine göre Findeks bandını ve tipik banka tekliflerini tahmin eder.',
+  'creditEstimateAction': 'AI ile tahmin et',
+  'creditEstimateRefresh': 'Yenile',
+  'creditEstimatePrompt':
+      'Tahmin et\'e dokun — Vera, Gemini\'ye girdilerin için tahmini Findeks bandını ve tipik banka tekliflerini sorar.',
+  'creditEstimateUnavailable':
+      'AI tahmini için aktif bir Gemini bağlantısı gerekir. Proxy veya .env API anahtarını yapılandırarak etkinleştir.',
+  'creditEstimateError':
+      'Gemini\'den tahmin alınamadı. Birazdan tekrar dene.',
+  'creditEstimateDisclaimer':
+      'Tahminler yalnızca bilgi amaçlıdır; gerçek banka değerlendirmesinin veya Findeks puanının yerine geçmez.',
+  'creditEstimateScoreLabel': 'TAHMİNİ FINDEKS',
+  'creditEstimateOffersTitle': 'TİPİK BANKA TEKLİFLERİ',
   'subsRenewalLabel': 'Yenileme',
   'subsActivityLabel': 'Aktivite',
   'profileDailyBriefing': 'Günlük AI özeti',
@@ -183,16 +198,11 @@ const Map<String, String> _trStrings = {
   'fraudAlertTitle': 'Yeni harcama öngörüsü',
   'spendingInsightAlertTitle': 'Yeni harcama öngörüsü',
   'securityInsightsSection': 'Harcama öngörüleri',
-  'securityTipsSection': 'Bankanda seni koru',
-  'securityTipBankTitle': 'İşlemi bankanda onayla',
-  'securityTipBankBody':
-      'Vera yalnızca öneri verir. Transfer, ödeme ve kart işlemlerini her zaman kendi banka uygulaman üzerinden tamamla.',
-  'securityTipPinTitle': 'PIN ve biyometri',
-  'securityTipPinBody':
-      'Profil ayarlarından Face ID ve fraud bildirimlerini aç; Vera şüpheli örüntüleri sana bildirir.',
+  'securityTipsSection': 'Veriyi güncel tut',
   'securityTipAlertsTitle': 'Veri kaynağını güncel tut',
   'securityTipAlertsBody':
-      'Ekstre veya fiş yükle, manuel işlem ekle — öngörüler ne kadar güncel verin varsa o kadar isabetli olur.',
+      'Ekstre veya fiş yükle — öngörüler ne kadar güncel verin varsa o kadar isabetli olur.',
+  'securityTipAlertsAction': 'Ekstre yükle',
   'fraudReasonOutlier':
       'Bu harcama {median} TL seviyesindeki tipik tutarının belirgin şekilde üstünde ve alışılmış düzenin {ratio} katı.',
   'fraudNameRoundTransfer': 'Yuvarlak transfer · {amount} TL',
@@ -219,6 +229,7 @@ const Map<String, String> _trStrings = {
   'vibeBold': 'Cesur',
   'language': 'Dil',
   'signOut': 'Çıkış yap',
+  'signOutFailed': 'Çıkış yapılamadı. Lütfen tekrar dene.',
   'umaTone': 'Uma tonu',
   'toneConcise': 'Kısa',
   'toneCoach': 'Koç',
@@ -239,6 +250,8 @@ const Map<String, String> _trStrings = {
   'scanNoTotal': 'Tutar okunamadı, fişi tekrar tara.',
   'parsedByAi': 'AI',
   'parsedFallback': 'DEMO',
+  'filePickFailed': 'Dosya seçilemedi. Lütfen tekrar dene.',
+  'scanFailed': 'Fiş okunamadı. Lütfen tekrar dene.',
   'scanFallbackWarning':
       'AI servisine ulaşılamadı veya fiş çözümlenemedi. Lütfen işlemi manuel gir.',
   'scanFallbackAction': 'AI çalışmadı — manuel gir',
@@ -261,6 +274,7 @@ const Map<String, String> _trStrings = {
   'statementImportAgain': 'Yeniden yükle',
   'statementImported': 'Ekstre işlemlerine eklendi',
   'statementNoTransactions': 'Ekstreden işlem çıkarılamadı.',
+  'statementImportFailed': 'Ekstre yüklenemedi. Lütfen tekrar dene.',
   'importToVera': "Vera'ya aktar",
   'statementFallbackWarning':
       'AI servisine ulaşılamadı veya ekstre çözümlenemedi. Lütfen işlemleri manuel gir.',
@@ -276,7 +290,10 @@ const Map<String, String> _trStrings = {
   'forwardedToBank': "{bank}'a yönlendirildi · Vera takip ediyor",
   'keep': 'Vazgeç',
   'thisMonthsAiPlan': 'Bu ayın AI önerisi',
-  'aiPlanFooter': "Uma'nın önerisi — bankanda uygula, Vera kaydını tutar.",
+  'aiPlanFooter': "Gemini destekli yatırım fikirleri — karar senin.",
+  'recommendationTypeEquity': 'Hisse',
+  'recommendationTypeCommodity': 'Emtia',
+  'recommendationTypeCrypto': 'Kripto',
   'applyAtBank': 'Bankamda uygula',
   'securityVeraSideBanner':
       'Vera bir banka veya ödeme kuruluşu değildir. Hesabına erişemez, kartını durduramaz; yalnızca getirdiğin verilerle harcama öngörüsü sunar.',
@@ -617,6 +634,7 @@ const Map<String, String> _trStrings = {
   'actionAdd': 'Ekle',
   'actionUpdate': 'Güncelle',
   'actionDelete': 'Sil',
+  'actionBack': 'Geri',
   'actionManual': 'Manuel',
   'addBillTitle': 'Yeni fatura ekle',
   'editBillTitle': 'Faturayı düzenle',
@@ -736,6 +754,7 @@ const Map<String, String> _trStrings = {
   'loginContinueEmail': 'E-posta ile devam et',
   'loginEmailPasswordRequired': 'E-posta ve şifre gerekli.',
   'loginFirebaseError': 'Firebase girişi başarısız: {code}.',
+  'loginGenericError': 'Giriş yapılamadı. Lütfen tekrar dene.',
   'loginFirebaseReadyFooter':
       'Firebase auth bağlı. Demo modu hackathon akışları için açık.',
   'loginCreateAccount': 'Hesap oluştur',
@@ -759,6 +778,7 @@ const Map<String, String> _trStrings = {
   'signupErrorPasswordMismatch': 'Şifreler eşleşmiyor.',
   'signupErrorAcceptTerms': 'Devam etmek için koşulları onayla.',
   'signupFailedTemplate': 'Hesap oluşturulamadı: {code}.',
+  'signupGenericError': 'Hesap oluşturulamadı. Lütfen tekrar dene.',
   'signupTerms':
       'Vera koşullarını ve yerel demo veri politikasını kabul ediyorum.',
   'signupTermsPrefix': '',

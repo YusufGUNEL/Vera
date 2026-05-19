@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               email: email,
             );
       } catch (error) {
-        setState(() => _error = '$error');
+        setState(() => _error = l10n.loginGenericError);
       } finally {
         if (mounted) setState(() => _busy = false);
       }
@@ -80,14 +80,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             password: password,
           );
     } on FirebaseAuthException catch (error) {
-      final message = error.message?.trim();
       setState(() {
-        _error = message == null || message.isEmpty
-            ? l10n.loginFirebaseError(error.code)
-            : message;
+        _error = l10n.loginFirebaseError(error.code);
       });
     } catch (error) {
-      setState(() => _error = '$error');
+      setState(() => _error = l10n.loginGenericError);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -113,11 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref.read(authControllerProvider.notifier).signInWithGoogle();
     } on FirebaseAuthException catch (error) {
-      final message = error.message?.trim();
       setState(() {
-        _error = message == null || message.isEmpty
-            ? l10n.loginFirebaseError(error.code)
-            : message;
+        _error = l10n.loginFirebaseError(error.code);
       });
     } on PlatformException catch (error) {
       setState(() {
@@ -128,7 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       });
     } catch (error) {
-      setState(() => _error = '$error');
+      setState(() => _error = l10n.loginGenericError);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

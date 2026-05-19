@@ -104,14 +104,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             );
       }
     } on FirebaseAuthException catch (error) {
-      final message = error.message?.trim();
       setState(() {
-        _error = message == null || message.isEmpty
-            ? l10n.signupFailedTemplate(error.code)
-            : message;
+        _error = l10n.signupFailedTemplate(error.code);
       });
     } catch (error) {
-      setState(() => _error = '$error');
+      setState(() => _error = l10n.signupGenericError);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -134,11 +131,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     try {
       await ref.read(authControllerProvider.notifier).signInWithGoogle();
     } on FirebaseAuthException catch (error) {
-      final message = error.message?.trim();
       setState(() {
-        _error = message == null || message.isEmpty
-            ? l10n.signupFailedTemplate(error.code)
-            : message;
+        _error = l10n.signupFailedTemplate(error.code);
       });
     } on PlatformException catch (error) {
       setState(() {
@@ -149,7 +143,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         );
       });
     } catch (error) {
-      setState(() => _error = '$error');
+      setState(() => _error = l10n.signupGenericError);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -311,9 +305,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         AuthField(
                           label: l10n.signupFieldFullName,
                           controller: _nameController,
-                          hintText: l10n.signupHintFullName,
-                          prefixIcon: Icons.person_outline,
-                          autofillHints: const [AutofillHints.name],
+                          hintText: l10n.signupFieldFullName,
                           textInputAction: TextInputAction.next,
                         ),
                         const SizedBox(height: 14),

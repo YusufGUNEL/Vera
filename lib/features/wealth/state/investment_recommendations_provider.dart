@@ -25,12 +25,12 @@ You are a financial advisor assistant for the Vera app.
 The user has the following asset allocations:
 $allocationsStr
 
-Generate exactly 10 diverse investment recommendations matching these conditions or balancing their portfolio (mix of Turkish stocks/mutual funds, precious metals/commodities, crypto/stablecoins, index funds, global equities).
+Generate exactly 10 diverse investment recommendations matching these conditions or balancing their portfolio (mix of Turkish stocks/mutual funds, precious metals/commodities, crypto/stablecoins, index funds, global equities). Ensure a balanced mix with at least 3 equities, 3 commodities (precious metals/commodities), and 3 crypto/stablecoins.
 
 Output a valid JSON array of exactly 10 recommendations. Each recommendation must have:
 - "title": a human readable title in Turkish (e.g. "BIST 100 Temettü Endeksi" or "Altın Hesabı")
 - "symbol": a short ticker or asset symbol (e.g. "EREGL", "GOLD", "BTC", "USDT")
-- "type": "equity", "commodity", or "crypto"
+- "type": exactly one of "equity", "commodity", or "crypto"
 - "trend": "Yükseliş Beklentisi" / "Pozitif" / "Dengeli"
 - "returnRate": Expected annual/periodic yield estimate (e.g. "%28 Yıllık", "%15 Yıllık")
 - "explanation": A detailed explanation in Turkish why this asset is recommended and what it represents.

@@ -22,10 +22,22 @@ class CreditRuleEngine {
 
   double _estimatedMonthlyPayment(LoanApplication application) {
     if (application.amount <= 0 || application.months <= 0) return 0;
-    // Rough TR consumer-loan ballpark: ~16% annual cost-of-funds spread over
-    // term + ~1% per year of term as a smoothing factor. Real lender quotes
-    // will differ; this is for planning only.
-    final interestMultiplier = 1.16 + (application.months / 100);
-    return (application.amount * interestMultiplier) / application.months;
+    // Standard amortization formula M = P*i*(1+i)^n / ((1+i)^n - 1).
+    // The annual rate is a planning ballpark — TR consumer loans currently
+    // sit in roughly the 40–55% APR band; Gemini fills in real per-bank
+    // quotes elsewhere.
+    const annualRate = 0.45;
+    final monthlyRate = annualRate / 12.0;
+    final n = application.months;
+    final growth = _pow(1 + monthlyRate, n);
+    return application.amount * monthlyRate * growth / (growth - 1);
+  }
+
+  double _pow(double base, int exp) {
+    var result = 1.0;
+    for (var i = 0; i < exp; i++) {
+      result *= base;
+    }
+    return result;
   }
 }
