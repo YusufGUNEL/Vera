@@ -42,7 +42,8 @@ class UmaState {
 
 class UmaController extends StateNotifier<UmaState> {
   UmaController(this._repository, this._strings, String greeting)
-      : super(
+      : _greeting = greeting,
+        super(
           UmaState(
             messages: [
               UmaMessage(
@@ -58,6 +59,7 @@ class UmaController extends StateNotifier<UmaState> {
 
   final UmaRepository _repository;
   final AppStrings _strings;
+  final String _greeting;
 
   Future<void> send(String text) async {
     if (text.trim().isEmpty || state.thinking) return;
@@ -211,6 +213,21 @@ class UmaController extends StateNotifier<UmaState> {
 
   void setAutoExec(AutoExecMode mode) {
     state = state.copyWith(autoExec: mode);
+  }
+
+  void resetConversation() {
+    state = UmaState(
+      autoExec: state.autoExec,
+      messages: [
+        UmaMessage(
+          id: _newId('uma'),
+          role: UmaRole.uma,
+          text: _greeting,
+          createdAt: DateTime.now(),
+          kind: UmaMessageKind.system,
+        ),
+      ],
+    );
   }
 
   void _clearToastLater() {

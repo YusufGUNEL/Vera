@@ -6,6 +6,7 @@ class AuthField extends StatelessWidget {
   const AuthField({
     required this.label,
     required this.controller,
+    this.hintText,
     this.keyboardType,
     this.obscure = false,
     this.prefixIcon,
@@ -18,6 +19,7 @@ class AuthField extends StatelessWidget {
 
   final String label;
   final TextEditingController controller;
+  final String? hintText;
   final TextInputType? keyboardType;
   final bool obscure;
   final IconData? prefixIcon;
@@ -67,6 +69,7 @@ class AuthField extends StatelessWidget {
               isDense: false,
               filled: true,
               fillColor: t.card,
+              hintText: hintText,
               hintStyle: TextStyle(color: t.muted, fontSize: 14),
               prefixIcon: prefixIcon != null
                   ? Icon(prefixIcon, size: 19, color: t.muted)

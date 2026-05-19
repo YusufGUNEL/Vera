@@ -29,9 +29,7 @@ class ProactiveInsightCard extends ConsumerWidget {
     final bills = ref.watch(upcomingBillsControllerProvider);
     final transactions = ref.watch(homeControllerProvider).transactions;
 
-    final urgentBill = bills
-        .where((b) => b.daysUntilDue <= 3)
-        .toList()
+    final urgentBill = bills.where((b) => b.daysUntilDue <= 3).toList()
       ..sort((a, b) => a.daysUntilDue.compareTo(b.daysUntilDue));
 
     final priceIncreased = subs
@@ -39,9 +37,8 @@ class ProactiveInsightCard extends ConsumerWidget {
         .toList()
       ..sort((a, b) => b.priceDelta.compareTo(a.priceDelta));
 
-    final unused = subs
-        .where((s) => s.status == SubscriptionStatus.unused)
-        .toList();
+    final unused =
+        subs.where((s) => s.status == SubscriptionStatus.unused).toList();
 
     String title;
     String body;
@@ -79,7 +76,8 @@ class ProactiveInsightCard extends ConsumerWidget {
       accent = t.uma;
       onTap = () => Navigator.of(context).pushNamed(Routes.subscriptions);
     } else {
-      final hasData = transactions.isNotEmpty || bills.isNotEmpty || subs.isNotEmpty;
+      final hasData =
+          transactions.isNotEmpty || bills.isNotEmpty || subs.isNotEmpty;
       if (hasData) {
         title = l10n.proactiveHealthyTitle;
         body = l10n.proactiveHealthyBody;
@@ -123,101 +121,79 @@ class ProactiveInsightCard extends ConsumerWidget {
         );
       },
       child: Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(t.vibe.radius),
-        child: InkWell(
-          onTap: onTap,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Material(
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(t.vibe.radius),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(t.vibe.radius),
-              gradient: LinearGradient(
-                begin: const Alignment(-1, -1),
-                end: const Alignment(1, 1),
-                colors: [
-                  accent.withValues(alpha: 0.10),
-                  t.uma.withValues(alpha: 0.10),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(t.vibe.radius),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: t.card,
+                borderRadius: BorderRadius.circular(t.vibe.radius),
+                border: Border.all(color: t.line),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(icon, color: accent, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: t.ink,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          body,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: t.ink2,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              cta,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: accent,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward, size: 14, color: accent),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-              border: Border.all(color: accent.withValues(alpha: 0.24)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: accent,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(icon, color: Colors.white, size: 16),
-                    ),
-                    const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: t.uma,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        l10n.proactiveBadge,
-                        style: const TextStyle(
-                          fontSize: 9,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: t.ink,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: t.ink2,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text(
-                      cta,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: accent,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward, size: 14, color: accent),
-                  ],
-                ),
-              ],
             ),
           ),
         ),
-      ),
       ),
     );
   }

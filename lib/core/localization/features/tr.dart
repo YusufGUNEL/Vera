@@ -78,6 +78,14 @@ const Map<String, String> _trStrings = {
   'creditFieldTerm': 'Vade',
   'creditFieldIncome': 'Aylık gelir',
   'creditFieldDebt': 'Aylık borç',
+  'creditScoreDisclaimer':
+      'Bu ekran gelir, borç yükü ve seçilen vadeye göre hazırlanmış demo uygunluk görünümüdür. Banka onayı yerine geçmez.',
+  'creditResultMonthlyPayment': 'Tahmini aylık taksit',
+  'creditResultTotalCost': 'Toplam geri ödeme',
+  'creditResultPaymentLoad': 'Taksit / gelir',
+  'creditResultDtiAfter': 'Kredi sonrası borç oranı',
+  'creditResultGuidance':
+      'Gerçek banka akışına geçmeden önce senaryoları burada karşılaştır. Daha düşük taksit yükü ve daha düşük borç oranı genelde daha güvenli bir plan sunar.',
   'subsRenewalLabel': 'Yenileme',
   'subsActivityLabel': 'Aktivite',
   'profileDailyBriefing': 'Günlük AI özeti',
@@ -126,6 +134,8 @@ const Map<String, String> _trStrings = {
   'creditSubtitle': 'Gerçek gelirine göre borçlanma.',
   'creditScoreLabel': 'KREDİ PUANI',
   'openCredit': 'Krediyi aç',
+  'creditSummaryCardSubtitle':
+      'Başvuru öncesi taksit, toplam geri ödeme ve borç yükünü modelle.',
   'wealthTitle': 'Servet',
   'wealthSubtitle': 'Paranız otonom çalışıyor.',
   'portfolio': 'PORTFÖY',
@@ -169,9 +179,20 @@ const Map<String, String> _trStrings = {
   'securityPillBlocked': 'AI BLOKE ETTİ',
   'securityPillKept': 'BLOKE TUTULDU',
   'securityPillApproved': 'SEN ONAYLADIN',
+  'fraudAlertTitle': 'Şüpheli hareket algılandı',
+  'fraudReasonOutlier':
+      'Bu harcama {median} TL seviyesindeki tipik tutarının belirgin şekilde üstünde ve alışılmış düzenin {ratio} katı.',
+  'fraudNameRoundTransfer': 'Yuvarlak transfer · {amount} TL',
+  'fraudReasonRoundTransfer':
+      'Yüksek ve yuvarlak tutarlı transferler çoğu zaman normaldir, ancak Vera hızlı onay için bunları öne çıkarır.',
+  'fraudNameBurst': '{merchant} kısa sürede {count} kez geçti',
+  'fraudLocationBurstTotal': 'Toplam harcama {total} TL',
+  'fraudReasonBurst':
+      'Aynı iş yeri kısa bir aralıkta {count} kez göründü. Beklenen bir hareket olup olmadığını kontrol et.',
   'profileAndSettings': 'Profil & Ayarlar',
   'sectionAppearance': 'GÖRÜNÜM & TEMA',
   'sectionAi': 'YAPAY ZEKA TERCİHLERİ',
+  'sectionNotifications': 'BİLDİRİMLER',
   'sectionConnected': 'BAĞLI KURUMLAR',
   'sectionAccount': 'HESAP',
   'sectionLanguage': 'DİL',
@@ -194,7 +215,7 @@ const Map<String, String> _trStrings = {
   'scanReceiptSubtitle':
       'Fiş, fatura veya banka ekranını okutup işleme dönüştür.',
   'scanHint':
-      'AI fişi okur, kategori ve toplamı çıkarır, gerekirse onayına sunar.',
+      'Net bir fotoğraf kullan. Vera iş yeri, toplam ve satırları çıkarır.',
   'takePhoto': 'Fotoğraf çek',
   'pickFromGallery': 'Galeriden seç',
   'scanReading': 'AI okuyor...',
@@ -220,7 +241,7 @@ const Map<String, String> _trStrings = {
       'PDF veya görsel olarak ekstreni yükle, AI işlemleri çıkarsın.',
   'pickStatementFile': 'Dosya seç (PDF / görsel)',
   'statementImportHint':
-      'Bankan ekstreyi PDF olarak indirir; Vera bunu Açık Bankacılık olmadan da okur.',
+      'PDF veya görsel yükle. Vera bakiye ve hareketleri cihaz üzerinde okur.',
   'statementParsing': 'AI ekstreyi okuyor...',
   'closingBalance': 'Kapanış bakiyesi',
   'detectedTransactions': '{n} işlem tespit edildi',
@@ -289,6 +310,7 @@ const Map<String, String> _trStrings = {
   'accountTileSecurity': 'Güvenlik & PIN',
   'accountTileStorage': 'Veri saklama',
   'accountTileHelp': 'Yardım & destek',
+  'accountTileHelpValue': 'SSS, destek ve hata bildirimi',
   'infoDisplayName': 'Görünen ad',
   'infoMember': 'Üyelik',
   'infoMemberDescription':
@@ -356,6 +378,7 @@ const Map<String, String> _trStrings = {
       '{summary} hazır. İstersen bunu sohbet içinden onaylayıp uygulayayım.',
   'umaThinking': 'Uma düşünüyor...',
   'umaAskHint': "Uma'ya sor...",
+  'umaNewChat': 'Yeni sohbet',
   'umaStatusOnline': 'AI asistan · çevrimiçi',
   'umaStatusLocalOnly': 'Yerel mod · sınırlı AI',
   'umaStatusNeedsData': 'Hazır · veri bekliyor',
@@ -478,6 +501,10 @@ const Map<String, String> _trStrings = {
   'notifTitle': 'Bildirimler',
   'notifSubtitle': '{n} sinyal Uma tarafından izleniyor',
   'notifEmpty': 'Her şey yolunda. Uma sessizce izlemeye devam ediyor.',
+  'notifMarkAllRead': 'Tümünü okudum',
+  'notifClear': 'Temizle',
+  'notifRead': 'Okundu',
+  'notifDismiss': 'Kaldır',
   'notifBlockedDefault': 'Vera bu işlemi anomali olarak işaretledi.',
   'notifPriceIncreaseTitle': '{name} zamlandı',
   'notifPriceIncreaseBody':
@@ -504,11 +531,11 @@ const Map<String, String> _trStrings = {
   'proactiveUnusedCta': 'Aboneliklere git',
   'proactiveHealthyTitle': 'Şimdilik kritik bir sinyal yok',
   'proactiveHealthyBody':
-      'Yaklaşan fatura, fiyat artışı veya boşa akan abonelik görünmüyor. İstersen Uma bu dönemi hızlıca yorumlasın.',
+      'Şu anda öne çıkan bir fatura, fiyat artışı veya boşa giden abonelik görünmüyor.',
   'proactiveHealthyCta': 'Uma yorumlasın',
   'proactiveEmptyTitle': 'Vera henüz izlenecek sinyal bulmadı',
   'proactiveEmptyBody':
-      'Bir ekstre yüklediğinde Vera yaklaşan ödemeleri, abonelikleri ve küçük riskleri bu alanda öne çıkarır.',
+      'Bir ekstre yüklediğinde yaklaşan ödemeler, abonelikler ve küçük riskler burada görünür.',
   'proactiveEmptyCta': 'Ekstre yükle',
   'exportTile': 'Verilerimi dışa aktar',
   'exportTileValue': 'JSON · cihaza özel',
@@ -699,6 +726,10 @@ const Map<String, String> _trStrings = {
   'signupFieldEmail': 'E-posta',
   'signupFieldPassword': 'Şifre',
   'signupFieldConfirmPassword': 'Şifreyi tekrarla',
+  'signupHintFullName': 'Vera profilinde görünecek isim',
+  'signupHintEmail': 'ornek@eposta.com',
+  'signupHintPassword': 'En az 6 karakter kullan',
+  'signupHintConfirmPassword': 'Aynı şifreyi tekrar gir',
   'signupErrorNameRequired': 'Lütfen ad soyad gir.',
   'signupErrorInvalidEmail': 'Lütfen geçerli bir e-posta gir.',
   'signupErrorShortPassword': 'Şifre en az 6 karakter olmalı.',
@@ -707,6 +738,16 @@ const Map<String, String> _trStrings = {
   'signupFailedTemplate': 'Hesap oluşturulamadı: {code}.',
   'signupTerms':
       'Vera koşullarını ve yerel demo veri politikasını kabul ediyorum.',
+  'signupTermsPrefix': '',
+  'signupTermsAnd': ' ve ',
+  'signupTermsVera': 'Vera koşullarını',
+  'signupTermsPolicy': 'veri politikasını kabul ediyorum',
+  'signupTermsTitle': 'Vera Koşulları',
+  'signupTermsBody':
+      'Vera demo içinde yalnızca açıkça başlattığın işlemleri hazırlar veya yönlendirir. Hesap bilgileri, yüklediğin fişler ve ekstre verileri bu cihazda tutulur.',
+  'signupPolicyTitle': 'Veri Politikası',
+  'signupPolicyBody':
+      'Onboarding, bildirimler, fişler ve Uma bağlamı uygulama yeniden açılsa da bu cihazda kalır. İstersen ayarlardan yerel verileri temizleyebilirsin.',
   'signupStrengthWeak': 'Zayıf',
   'signupStrengthMedium': 'Orta',
   'signupStrengthStrong': 'Güçlü',

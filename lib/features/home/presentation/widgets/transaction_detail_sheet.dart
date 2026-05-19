@@ -82,7 +82,9 @@ class TransactionDetailSheet extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      '${txn.isCredit ? '+' : '-'}${fmtTL(txn.amount.abs())}',
+                      fmtSignedTL(
+                        txn.isCredit ? txn.amount.abs() : -txn.amount.abs(),
+                      ),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,

@@ -118,7 +118,7 @@ flutter build appbundle --release
 
 ## 6. Icon ve splash üretimi
 
-Üretilen görselleri `assets/branding/` altına koy (1024×1024 ana ikon + adaptive bg/fg + 768×768 splash). `flutter pub run flutter_launcher_icons` ve `flutter pub run flutter_native_splash:create` komutlarıyla bağla.
+Branding için tek kaynak klasör `assets/branding/`. Repo içindeki güncel üretim scripti `tool/gen_branding.py`; eski `tool/generate_icon.py` referans amaçlı duruyor ama ana kaynak değil.
 
 ```
 assets/branding/
@@ -131,11 +131,19 @@ assets/branding/
 Sonra:
 
 ```bash
+python tool/gen_branding.py
 dart run flutter_launcher_icons
 dart run flutter_native_splash:create
 ```
 
-`pubspec.yaml` içindeki `flutter_launcher_icons:` ve `flutter_native_splash:` blokları zaten yapılandırılmış.
+Web splash `web/index.html` içindeki branding ile aynı asset ailesini kullanır. Asset güncelledikten sonra:
+
+```bash
+flutter clean
+flutter pub get
+```
+
+`pubspec.yaml` içindeki `flutter_launcher_icons:` ve `flutter_native_splash:` blokları zaten yapılandırılmış; Android launcher icon, Android 12 splash ve web splash bu dört dosyadan üretilir.
 
 ---
 

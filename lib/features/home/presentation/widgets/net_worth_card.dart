@@ -121,7 +121,7 @@ class NetWorthCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '${monthDelta >= 0 ? '+' : '-'}${fmtTL(monthDelta.abs())}',
+                        fmtSignedTL(monthDelta),
                         style: TextStyle(
                           color: monthDelta >= 0 ? t.accentPop : t.red,
                           fontSize: 13,

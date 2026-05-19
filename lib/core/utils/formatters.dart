@@ -10,3 +10,17 @@ String fmtTL(num value) {
   }
   return '${buf.toString()} TL';
 }
+
+/// Signed TL format with sign first and currency suffix last.
+/// Examples: "+1.250 TL", "-420 TL".
+String fmtSignedTL(
+  num value, {
+  bool showPlus = true,
+}) {
+  final rounded = value.round();
+  if (rounded == 0) {
+    return showPlus ? '+${fmtTL(0)}' : fmtTL(0);
+  }
+  final sign = rounded > 0 ? (showPlus ? '+' : '') : '-';
+  return '$sign${fmtTL(rounded.abs())}';
+}

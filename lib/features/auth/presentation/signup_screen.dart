@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,8 @@ import '../../../core/firebase/firebase_bootstrap.dart';
 import '../../../core/localization/app_strings.dart';
 import '../../../core/routing/routes.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/utils/responsive.dart';
+import 'auth_error_messages.dart';
 import '../state/auth_controller.dart';
 import 'widgets/auth_field.dart';
 
@@ -139,11 +142,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       });
     } on PlatformException catch (error) {
       setState(() {
-        _error = error.code == 'sign_in_failed'
-            ? l10n.googleSignInConfigMissing
-            : (error.message?.trim().isNotEmpty == true
-                ? error.message!
-                : l10n.signupFailedTemplate(error.code));
+        _error = googleSignInErrorMessage(
+          l10n: l10n,
+          error: error,
+          fallback: l10n.signupFailedTemplate(error.code),
+        );
       });
     } catch (error) {
       setState(() => _error = '$error');
@@ -189,277 +192,330 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          onPressed: () => context.canPop()
-              ? context.pop()
-              : context.go(Routes.login),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(Routes.login),
           icon: Icon(Icons.arrow_back, color: t.ink),
           tooltip: l10n.signupSignIn,
         ),
       ),
       body: SafeArea(
         top: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    center: const Alignment(-0.4, -0.4),
-                    colors: [t.umaLight, t.uma],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final responsive = context.responsive;
+            final outerPadding = EdgeInsets.fromLTRB(
+              responsive.pageGutter,
+              4,
+              responsive.pageGutter,
+              28,
+            );
+            return SingleChildScrollView(
+              padding: outerPadding,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - outerPadding.vertical,
+                    maxWidth: responsive.authMaxWidth,
                   ),
-                ),
-                alignment: Alignment.center,
-                child: const Icon(
-                  Icons.auto_awesome,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.signupTitle,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  color: t.ink,
-                  letterSpacing: -0.6,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                firebase.ready
-                    ? l10n.signupSubtitleFirebase
-                    : l10n.signupSubtitleLocal,
-                style: TextStyle(fontSize: 13.5, color: t.muted, height: 1.5),
-              ),
-              if (!firebase.ready) ...[
-                const SizedBox(height: 14),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: t.gold.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: t.gold.withValues(alpha: 0.35)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        size: 18,
-                        color: t.gold,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          l10n.loginDemoHint('a', 'b'),
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            color: t.ink,
-                            height: 1.45,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              const SizedBox(height: 24),
-
-              // ── Form fields ──────────────────────────────────────────
-              AuthField(
-                label: l10n.signupFieldFullName,
-                controller: _nameController,
-                prefixIcon: Icons.person_outline,
-                autofillHints: const [AutofillHints.name],
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: 14),
-              AuthField(
-                label: l10n.signupFieldEmail,
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icons.mail_outline,
-                autofillHints: const [AutofillHints.email],
-                textInputAction: TextInputAction.next,
-              ),
-              const SizedBox(height: 14),
-              AuthField(
-                label: l10n.signupFieldPassword,
-                controller: _passwordController,
-                obscure: _obscure,
-                prefixIcon: Icons.lock_outline,
-                autofillHints: const [AutofillHints.newPassword],
-                textInputAction: TextInputAction.next,
-                suffix: IconButton(
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                  icon: Icon(
-                    _obscure
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    size: 20,
-                    color: t.muted,
-                  ),
-                ),
-              ),
-              // Strength meter — only when the user has typed something.
-              AnimatedSize(
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOut,
-                alignment: Alignment.topCenter,
-                child: password.isEmpty
-                    ? const SizedBox(width: double.infinity, height: 0)
-                    : Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(999),
-                                child: LinearProgressIndicator(
-                                  value: strength,
-                                  minHeight: 5,
-                                  backgroundColor: t.bgSoft,
-                                  valueColor:
-                                      AlwaysStoppedAnimation(strengthColor),
-                                ),
+                  child: Container(
+                    padding: EdgeInsets.all(responsive.isDesktop ? 28 : 0),
+                    decoration: responsive.isDesktop
+                        ? BoxDecoration(
+                            color: t.card,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: t.line),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              _strengthLabel(strength, l10n),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: strengthColor,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 14),
-              AuthField(
-                label: l10n.signupFieldConfirmPassword,
-                controller: _confirmController,
-                obscure: _obscure,
-                prefixIcon: Icons.lock_outline,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _busy ? null : _signUp(),
-              ),
-              const SizedBox(height: 18),
-
-              // ── Terms ────────────────────────────────────────────────
-              _TermsRow(
-                accepted: _accepted,
-                text: l10n.signupTerms,
-                onToggle: () => setState(() => _accepted = !_accepted),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                _ErrorBanner(message: _error!),
-              ],
-              const SizedBox(height: 22),
-
-              // ── Primary CTA ──────────────────────────────────────────
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _busy ? null : _signUp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: t.brand,
-                    foregroundColor: t.brandFG,
-                    disabledBackgroundColor: t.brand.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _busy
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.2,
-                            color: t.brandFG,
-                          ),
-                        )
-                      : Text(
-                          firebase.ready
-                              ? l10n.signupCtaCreate
-                              : l10n.signupCtaContinueLocal,
-                          style: const TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: OutlinedButton.icon(
-                  onPressed: _busy ? null : _signInWithGoogle,
-                  icon: Icon(
-                    Icons.g_mobiledata_rounded,
-                    size: 24,
-                    color: t.brand,
-                  ),
-                  label: Text(
-                    l10n.continueWithGoogle,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: t.brand,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: t.line),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // ── "Already have an account? Sign in" ───────────────────
-              Center(
-                child: TextButton(
-                  onPressed: () => context.canPop()
-              ? context.pop()
-              : context.go(Routes.login),
-                  style: TextButton.styleFrom(
-                    foregroundColor: t.brand,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        color: t.muted,
-                        height: 1.4,
-                      ),
+                            ],
+                          )
+                        : null,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextSpan(text: l10n.signupAlreadyHaveAccount),
-                        TextSpan(
-                          text: l10n.signupSignIn,
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              center: const Alignment(-0.4, -0.4),
+                              colors: [t.umaLight, t.uma],
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.signupTitle,
                           style: TextStyle(
-                            color: t.brand,
+                            fontSize: 26,
                             fontWeight: FontWeight.w700,
+                            color: t.ink,
+                            letterSpacing: -0.6,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          firebase.ready
+                              ? l10n.signupSubtitleFirebase
+                              : l10n.signupSubtitleLocal,
+                          style: TextStyle(
+                              fontSize: 13.5, color: t.muted, height: 1.5),
+                        ),
+                        if (!firebase.ready) ...[
+                          const SizedBox(height: 14),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: t.gold.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                  color: t.gold.withValues(alpha: 0.35)),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  size: 18,
+                                  color: t.gold,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    l10n.loginDemoHint('a', 'b'),
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: t.ink,
+                                      height: 1.45,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+
+                        // ── Form fields ──────────────────────────────────────────
+                        AuthField(
+                          label: l10n.signupFieldFullName,
+                          controller: _nameController,
+                          hintText: l10n.signupHintFullName,
+                          prefixIcon: Icons.person_outline,
+                          autofillHints: const [AutofillHints.name],
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 14),
+                        AuthField(
+                          label: l10n.signupFieldEmail,
+                          controller: _emailController,
+                          hintText: l10n.signupHintEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: Icons.mail_outline,
+                          autofillHints: const [AutofillHints.email],
+                          textInputAction: TextInputAction.next,
+                        ),
+                        const SizedBox(height: 14),
+                        AuthField(
+                          label: l10n.signupFieldPassword,
+                          controller: _passwordController,
+                          hintText: l10n.signupHintPassword,
+                          obscure: _obscure,
+                          prefixIcon: Icons.lock_outline,
+                          autofillHints: const [AutofillHints.newPassword],
+                          textInputAction: TextInputAction.next,
+                          suffix: IconButton(
+                            onPressed: () =>
+                                setState(() => _obscure = !_obscure),
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              size: 20,
+                              color: t.muted,
+                            ),
+                          ),
+                        ),
+                        // Strength meter — only when the user has typed something.
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 160),
+                          curve: Curves.easeOut,
+                          alignment: Alignment.topCenter,
+                          child: password.isEmpty
+                              ? const SizedBox(
+                                  width: double.infinity, height: 0)
+                              : Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(999),
+                                          child: LinearProgressIndicator(
+                                            value: strength,
+                                            minHeight: 5,
+                                            backgroundColor: t.bgSoft,
+                                            valueColor: AlwaysStoppedAnimation(
+                                                strengthColor),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        _strengthLabel(strength, l10n),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: strengthColor,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                        const SizedBox(height: 14),
+                        AuthField(
+                          label: l10n.signupFieldConfirmPassword,
+                          controller: _confirmController,
+                          hintText: l10n.signupHintConfirmPassword,
+                          obscure: _obscure,
+                          prefixIcon: Icons.lock_outline,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _busy ? null : _signUp(),
+                        ),
+                        const SizedBox(height: 18),
+
+                        // ── Terms ────────────────────────────────────────────────
+                        _TermsRow(
+                          accepted: _accepted,
+                          onToggle: () =>
+                              setState(() => _accepted = !_accepted),
+                          onOpenTerms: () => _openPolicySheet(
+                            title: l10n.signupTermsTitle,
+                            body: l10n.signupTermsBody,
+                          ),
+                          onOpenPolicy: () => _openPolicySheet(
+                            title: l10n.signupPolicyTitle,
+                            body: l10n.signupPolicyBody,
+                          ),
+                        ),
+                        if (_error != null) ...[
+                          const SizedBox(height: 12),
+                          _ErrorBanner(message: _error!),
+                        ],
+                        const SizedBox(height: 22),
+
+                        // ── Primary CTA ──────────────────────────────────────────
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: _busy ? null : _signUp,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: t.brand,
+                              foregroundColor: t.brandFG,
+                              disabledBackgroundColor:
+                                  t.brand.withValues(alpha: 0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _busy
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      color: t.brandFG,
+                                    ),
+                                  )
+                                : Text(
+                                    firebase.ready
+                                        ? l10n.signupCtaCreate
+                                        : l10n.signupCtaContinueLocal,
+                                    style: const TextStyle(
+                                      fontSize: 15.5,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: _busy ? null : _signInWithGoogle,
+                            icon: Icon(
+                              Icons.g_mobiledata_rounded,
+                              size: 24,
+                              color: t.brand,
+                            ),
+                            label: Text(
+                              l10n.continueWithGoogle,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: t.brand,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: t.line),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+
+                        // ── "Already have an account? Sign in" ───────────────────
+                        Center(
+                          child: TextButton(
+                            onPressed: () => context.canPop()
+                                ? context.pop()
+                                : context.go(Routes.login),
+                            style: TextButton.styleFrom(
+                              foregroundColor: t.brand,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                            ),
+                            child: Text.rich(
+                              TextSpan(
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  color: t.muted,
+                                  height: 1.4,
+                                ),
+                                children: [
+                                  TextSpan(text: l10n.signupAlreadyHaveAccount),
+                                  TextSpan(
+                                    text: l10n.signupSignIn,
+                                    style: TextStyle(
+                                      color: t.brand,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -467,7 +523,77 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                 ),
               ),
-            ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openPolicySheet({
+    required String title,
+    required String body,
+  }) {
+    final t = context.tokens;
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: t.bg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: t.line,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  body,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: t.ink2,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: t.brand,
+                      foregroundColor: t.brandFG,
+                    ),
+                    child: Text(context.l10n.close),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -478,13 +604,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 class _TermsRow extends StatelessWidget {
   const _TermsRow({
     required this.accepted,
-    required this.text,
     required this.onToggle,
+    required this.onOpenTerms,
+    required this.onOpenPolicy,
   });
 
   final bool accepted;
-  final String text;
   final VoidCallback onToggle;
+  final VoidCallback onOpenTerms;
+  final VoidCallback onOpenPolicy;
 
   @override
   Widget build(BuildContext context) {
@@ -517,12 +645,33 @@ class _TermsRow extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: t.ink2,
-                  height: 1.5,
+              child: Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: t.ink2,
+                    height: 1.5,
+                  ),
+                  children: [
+                    TextSpan(text: context.l10n.signupTermsPrefix),
+                    TextSpan(
+                      text: context.l10n.signupTermsVera,
+                      style: TextStyle(
+                        color: t.brand,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = onOpenTerms,
+                    ),
+                    TextSpan(text: context.l10n.signupTermsAnd),
+                    TextSpan(
+                      text: context.l10n.signupTermsPolicy,
+                      style: TextStyle(
+                        color: t.brand,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      recognizer: TapGestureRecognizer()..onTap = onOpenPolicy,
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -5,6 +5,7 @@ import '../../../../core/localization/app_strings.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../auth/state/auth_controller.dart';
 import '../../../profile_settings/presentation/profile_settings_sheet.dart';
+import '../../state/notification_center_controller.dart';
 
 class TopBar extends ConsumerWidget {
   const TopBar({
@@ -33,6 +34,9 @@ class TopBar extends ConsumerWidget {
     final t = context.tokens;
     final l10n = context.l10n;
     final auth = ref.watch(authControllerProvider);
+    final unreadCount = ref.watch(
+      notificationCenterControllerProvider.select((state) => state.unreadCount),
+    );
     final name = auth.displayName ?? l10n.defaultUserName;
     final initials = auth.initials;
 
@@ -139,19 +143,32 @@ class TopBar extends ConsumerWidget {
                   alignment: Alignment.center,
                   children: [
                     Icon(Icons.notifications_outlined, color: t.ink, size: 19),
-                    Positioned(
-                      top: 9,
-                      right: 11,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: t.uma,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                    if (unreadCount > 0)
+                      Positioned(
+                        top: 6,
+                        right: 5,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: t.uma,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            unreadCount > 99 ? '99+' : '$unreadCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

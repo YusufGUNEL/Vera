@@ -90,12 +90,19 @@ class AppStrings {
   String get creditFieldTerm => _t('creditFieldTerm');
   String get creditFieldIncome => _t('creditFieldIncome');
   String get creditFieldDebt => _t('creditFieldDebt');
+  String get creditScoreDisclaimer => _t('creditScoreDisclaimer');
+  String get creditResultMonthlyPayment => _t('creditResultMonthlyPayment');
+  String get creditResultTotalCost => _t('creditResultTotalCost');
+  String get creditResultPaymentLoad => _t('creditResultPaymentLoad');
+  String get creditResultDtiAfter => _t('creditResultDtiAfter');
+  String get creditResultGuidance => _t('creditResultGuidance');
 
   // ---- Credit card on home ----
   String get creditTitle => _t('creditTitle');
   String get creditSubtitle => _t('creditSubtitle');
   String get creditScoreLabel => _t('creditScoreLabel');
   String get openCredit => _t('openCredit');
+  String get creditSummaryCardSubtitle => _t('creditSummaryCardSubtitle');
 
   // ---- Wealth screen ----
   String get wealthTitle => _t('wealthTitle');
@@ -194,11 +201,26 @@ class AppStrings {
   String get securityPillBlocked => _t('securityPillBlocked');
   String get securityPillKept => _t('securityPillKept');
   String get securityPillApproved => _t('securityPillApproved');
+  String get fraudAlertTitle => _t('fraudAlertTitle');
+  String fraudReasonOutlier(String median, String ratio) => _t(
+        'fraudReasonOutlier',
+      ).replaceAll('{median}', median).replaceAll('{ratio}', ratio);
+  String fraudNameRoundTransfer(String amount) =>
+      _t('fraudNameRoundTransfer').replaceAll('{amount}', amount);
+  String get fraudReasonRoundTransfer => _t('fraudReasonRoundTransfer');
+  String fraudNameBurst(String merchant, int count) => _t(
+        'fraudNameBurst',
+      ).replaceAll('{merchant}', merchant).replaceAll('{count}', '$count');
+  String fraudLocationBurstTotal(String total) =>
+      _t('fraudLocationBurstTotal').replaceAll('{total}', total);
+  String fraudReasonBurst(int count) =>
+      _t('fraudReasonBurst').replaceAll('{count}', '$count');
 
   // ---- Profile sheet ----
   String get profileAndSettings => _t('profileAndSettings');
   String get sectionAppearance => _t('sectionAppearance');
   String get sectionAi => _t('sectionAi');
+  String get sectionNotifications => _t('sectionNotifications');
   String get sectionConnected => _t('sectionConnected');
   String get sectionAccount => _t('sectionAccount');
   String get sectionLanguage => _t('sectionLanguage');
@@ -320,6 +342,7 @@ class AppStrings {
   String get accountTileSecurity => _t('accountTileSecurity');
   String get accountTileStorage => _t('accountTileStorage');
   String get accountTileHelp => _t('accountTileHelp');
+  String get accountTileHelpValue => _t('accountTileHelpValue');
   String get deleteAccountTile => _t('deleteAccountTile');
   String get deleteAccountTileValue => _t('deleteAccountTileValue');
   String get deleteAccountDemoTileValue => _t('deleteAccountDemoTileValue');
@@ -393,6 +416,7 @@ class AppStrings {
   // ---- UMA chat misc ----
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
+  String get umaNewChat => _t('umaNewChat');
   String get umaStatusOnline => _t('umaStatusOnline');
   String get umaStatusLocalOnly => _t('umaStatusLocalOnly');
   String get umaStatusNeedsData => _t('umaStatusNeedsData');
@@ -555,6 +579,10 @@ class AppStrings {
   String get notifTitle => _t('notifTitle');
   String notifSubtitle(int n) => _t('notifSubtitle').replaceAll('{n}', '$n');
   String get notifEmpty => _t('notifEmpty');
+  String get notifMarkAllRead => _t('notifMarkAllRead');
+  String get notifClear => _t('notifClear');
+  String get notifRead => _t('notifRead');
+  String get notifDismiss => _t('notifDismiss');
   String get notifBlockedDefault => _t('notifBlockedDefault');
   String notifPriceIncreaseTitle(String name) =>
       _t('notifPriceIncreaseTitle').replaceAll('{name}', name);
@@ -669,6 +697,10 @@ class AppStrings {
   String get signupFieldEmail => _t('signupFieldEmail');
   String get signupFieldPassword => _t('signupFieldPassword');
   String get signupFieldConfirmPassword => _t('signupFieldConfirmPassword');
+  String get signupHintFullName => _t('signupHintFullName');
+  String get signupHintEmail => _t('signupHintEmail');
+  String get signupHintPassword => _t('signupHintPassword');
+  String get signupHintConfirmPassword => _t('signupHintConfirmPassword');
   String get signupErrorNameRequired => _t('signupErrorNameRequired');
   String get signupErrorInvalidEmail => _t('signupErrorInvalidEmail');
   String get signupErrorShortPassword => _t('signupErrorShortPassword');
@@ -677,6 +709,14 @@ class AppStrings {
   String signupFailedTemplate(String code) =>
       _t('signupFailedTemplate').replaceAll('{code}', code);
   String get signupTerms => _t('signupTerms');
+  String get signupTermsPrefix => _t('signupTermsPrefix');
+  String get signupTermsAnd => _t('signupTermsAnd');
+  String get signupTermsVera => _t('signupTermsVera');
+  String get signupTermsPolicy => _t('signupTermsPolicy');
+  String get signupTermsTitle => _t('signupTermsTitle');
+  String get signupTermsBody => _t('signupTermsBody');
+  String get signupPolicyTitle => _t('signupPolicyTitle');
+  String get signupPolicyBody => _t('signupPolicyBody');
   String get signupStrengthWeak => _t('signupStrengthWeak');
   String get signupStrengthMedium => _t('signupStrengthMedium');
   String get signupStrengthStrong => _t('signupStrengthStrong');

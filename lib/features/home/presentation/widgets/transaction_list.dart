@@ -86,8 +86,8 @@ class _EmptyTransactionsCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.receipt_long_outlined,
-                    color: t.uma, size: 18),
+                child:
+                    Icon(Icons.receipt_long_outlined, color: t.uma, size: 18),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -105,7 +105,8 @@ class _EmptyTransactionsCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       l10n.noTransactionsBody,
-                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                      style:
+                          TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],
                 ),
@@ -211,8 +212,7 @@ class _TransactionGroup extends StatelessWidget {
     final l10n = context.l10n;
     final net = group.transactions.fold<double>(
       0,
-      (sum, txn) =>
-          sum + (txn.isCredit ? txn.amount.abs() : -txn.amount.abs()),
+      (sum, txn) => sum + (txn.isCredit ? txn.amount.abs() : -txn.amount.abs()),
     );
 
     return Column(
@@ -239,7 +239,7 @@ class _TransactionGroup extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                net >= 0 ? '+${fmtTL(net)}' : '-${fmtTL(net.abs())}',
+                fmtSignedTL(net),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -275,80 +275,49 @@ class _TxnTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: txn.color.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(12),
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: txn.color.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Icon(txn.icon, color: txn.color, size: 18),
             ),
-            alignment: Alignment.center,
-            child: Icon(txn.icon, color: txn.color, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  txn.name,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: t.ink,
-                    fontWeight: FontWeight.w500,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    txn.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: t.ink,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  '${txn.category} · ${_timeLabel(txn.when)}',
-                  style: TextStyle(fontSize: 12, color: t.muted),
-                ),
-              ],
+                  const SizedBox(height: 1),
+                  Text(
+                    '${txn.category} · ${_timeLabel(txn.when)}',
+                    style: TextStyle(fontSize: 12, color: t.muted),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '${txn.isCredit ? '+' : '-'}${fmtTL(txn.amount.abs())}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: txn.isCredit ? t.green : t.ink,
-              letterSpacing: -0.2,
+            Text(
+              fmtSignedTL(txn.isCredit ? txn.amount.abs() : -txn.amount.abs()),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: txn.isCredit ? t.green : t.ink,
+                letterSpacing: -0.2,
+              ),
             ),
-          ),
-        ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryPill extends StatelessWidget {
-  const _SummaryPill({
-    required this.label,
-    required this.color,
-    required this.background,
-  });
-
-  final String label;
-  final Color color;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: color,
+          ],
         ),
       ),
     );

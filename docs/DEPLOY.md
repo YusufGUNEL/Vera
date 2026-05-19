@@ -1,7 +1,8 @@
-# Vera Deploy Rehberi
+# Vera Release Rehberi
 
-Bu dokuman, sprint sonunda canli link ve release dogrulamasini tek akista
-tamamlamak icin hazirlandi.
+Bu dokuman deploy kararindan bagimsiz olarak release dogrulamasini tek akista
+tamamlamak icin hazirlandi. Bu turda odak canli platform secmek degil,
+Flutter web ve Android ciktilarini teslime hazir hale getirmektir.
 
 ## 1. Ortam hazirligi
 
@@ -12,8 +13,7 @@ cp .env.example .env
 
 - `.env` icinde en az `GEMINI_API_KEY` doldur.
 - Firebase env fallback kullanacaksan `FIREBASE_*` alanlarini da doldur.
-- Web hedefi icin production build komutu her zaman `--no-tree-shake-icons`
-  ile alinmali.
+- Web production build komutu her zaman `--no-tree-shake-icons` ile alinmali.
 
 ## 2. Release oncesi dogrulama
 
@@ -21,7 +21,7 @@ cp .env.example .env
 flutter analyze
 flutter test
 flutter build web --release --no-tree-shake-icons
-flutter build apk --debug
+flutter build apk --debug --no-tree-shake-icons
 ```
 
 Mumkunse ek olarak:
@@ -30,43 +30,36 @@ Mumkunse ek olarak:
 flutter build apk --release
 ```
 
-Manuel smoke checklist:
+## 3. Manuel smoke checklist
 
 - `.env` tam iken login, signup, home ve profile aciliyor.
-- `.env` eksikken uygulama aciliyor, local/demo yonlendirmesi gorunuyor.
+- `.env` eksikken uygulama aciliyor ve local/demo yonlendirmesi gorunuyor.
 - Demo hesap (`a` / `b`) seeded home ile aciliyor.
-- Receipt scan ve statement import fallback halinde sari uyari gosteriyor ve
-  import CTA disable kaliyor.
+- Login ve signup ekranlari mobil, tablet ve desktop genisliklerinde kirilmiyor.
+- Home dashboard desktop'ta buyutulmus mobil ekran gibi gorunmuyor.
+- Notification badge sayisi dogru ve sheet aksiyonlari calisiyor.
+- Receipt scan ve statement import fallback halinde uyari gosteriyor ve import
+  CTA disabled kaliyor.
+- UMA icinde `Yeni sohbet` akisi ve voice input acilabiliyor.
 - Profile icindeki hesap silme akisi demo ve gercek hesapta farkli metin
   gosteriyor.
 
-## 3. Web deploy
+## 4. Android ozel not
 
-Repo icinde `vercel.json` bulundugu icin varsayilan canli link akisi Vercel
-uzerinden alinabilir:
+Google Sign-In cihazda hata veriyorsa once Firebase Console tarafindaki SHA-1
+fingerprint ayarini kontrol et. Bu adim repo disidir; ayrintili notlar
+`docs/HACKATHON_NOTLARI.md` ve `docs/YAPILACAKLAR.md` icindedir.
 
-```bash
-flutter build web --release --no-tree-shake-icons
-vercel --prod build/web
-```
-
-Kontrol et:
-
-- Acilis sayfasi yukleniyor.
-- Login / signup ekranlari aciliyor.
-- Home navigation bozulmuyor.
-- Responsive temel akis masaustu ve mobil genislikte kirilmiyor.
-
-## 4. Android teslim paketi
+## 5. Android teslim paketi
 
 ```bash
 flutter build appbundle --release
 ```
 
-Eger Play Store icin imzali bundle gerekiyorsa `docs/YAPILACAKLAR.md`
-icindeki `android/key.properties` ve upload keystore adimlarini uygula.
+Play Store icin imzali bundle gerekiyorsa `docs/YAPILACAKLAR.md` icindeki
+keystore ve `android/key.properties` adimlarini uygula.
 
-## 5. Sorun aninda hizli triage
+## 6. Sorun aninda hizli triage
 
 1. `flutter clean && flutter pub get`
 2. `.env` ve `FIREBASE_*` alanlarini kontrol et

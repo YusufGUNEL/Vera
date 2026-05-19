@@ -135,8 +135,7 @@ class WealthScreen extends ConsumerWidget {
               const SizedBox(height: 10),
               Text(
                 insight,
-                style:
-                    TextStyle(fontSize: 13, color: t.ink2, height: 1.5),
+                style: TextStyle(fontSize: 13, color: t.ink2, height: 1.5),
               ),
             ],
           ),
@@ -205,10 +204,9 @@ class WealthScreen extends ConsumerWidget {
                                   ? 0
                                   : (delta / state.total * 100);
                               final color = delta >= 0 ? t.green : t.red;
-                              final sign = delta >= 0 ? '+' : '-';
                               final pctStr = pct.abs().toStringAsFixed(1);
                               return Text(
-                                '$sign${fmtTL(delta.abs())} ($pctStr%) ${l10n.today}',
+                                '${fmtSignedTL(delta)} ($pctStr%) ${l10n.today}',
                                 style: TextStyle(color: color, fontSize: 13),
                               );
                             }),
@@ -257,7 +255,8 @@ class WealthScreen extends ConsumerWidget {
                     children: [
                       for (final p in portfolio)
                         InkWell(
-                          onTap: () => _openHoldingActions(context, ref, p.label),
+                          onTap: () =>
+                              _openHoldingActions(context, ref, p.label),
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -393,7 +392,8 @@ class WealthScreen extends ConsumerWidget {
                       Expanded(
                         child: _PolicyChip(
                           label: l10n.approval,
-                          value: _approvalLabel(state.policy.approvalMode, l10n),
+                          value:
+                              _approvalLabel(state.policy.approvalMode, l10n),
                         ),
                       ),
                     ],
@@ -551,7 +551,8 @@ class _EmptyWealthCard extends StatelessWidget {
                       hasHoldings
                           ? context.l10n.noWealthActionsBody
                           : context.l10n.startPortfolioBody,
-                      style: TextStyle(fontSize: 12, color: t.muted, height: 1.3),
+                      style:
+                          TextStyle(fontSize: 12, color: t.muted, height: 1.3),
                     ),
                   ],
                 ),

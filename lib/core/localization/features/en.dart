@@ -78,6 +78,14 @@ const Map<String, String> _enStrings = {
   'creditFieldTerm': 'Term',
   'creditFieldIncome': 'Monthly income',
   'creditFieldDebt': 'Monthly debt',
+  'creditScoreDisclaimer':
+      'This is a demo affordability view based on your income, debt load, and selected term. It is not a bank approval decision.',
+  'creditResultMonthlyPayment': 'Estimated monthly payment',
+  'creditResultTotalCost': 'Total repayment',
+  'creditResultPaymentLoad': 'Payment / income',
+  'creditResultDtiAfter': 'Debt ratio after loan',
+  'creditResultGuidance':
+      'Use this screen to compare scenarios before you open a real bank flow. Lower payment load and lower debt ratio usually mean a safer plan.',
   'subsRenewalLabel': 'Renewal',
   'subsActivityLabel': 'Activity',
   'profileDailyBriefing': 'Daily AI briefing',
@@ -125,6 +133,8 @@ const Map<String, String> _enStrings = {
   'creditSubtitle': 'Borrowing built around your real income.',
   'creditScoreLabel': 'CREDIT SCORE',
   'openCredit': 'Open credit',
+  'creditSummaryCardSubtitle':
+      'Model installment, total repayment, and debt load before you apply.',
   'wealthTitle': 'Wealth',
   'wealthSubtitle': 'Your money, working autonomously.',
   'portfolio': 'PORTFOLIO',
@@ -168,9 +178,20 @@ const Map<String, String> _enStrings = {
   'securityPillBlocked': 'BLOCKED BY AI',
   'securityPillKept': 'KEPT BLOCKED',
   'securityPillApproved': 'APPROVED BY YOU',
+  'fraudAlertTitle': 'Suspicious activity detected',
+  'fraudReasonOutlier':
+      'This expense is well above your median spend of {median} TL and is {ratio}x larger than usual.',
+  'fraudNameRoundTransfer': 'Round transfer · {amount} TL',
+  'fraudReasonRoundTransfer':
+      'Large round-number transfers are often legitimate, but Vera surfaces them for a quick confirmation.',
+  'fraudNameBurst': '{merchant} repeated {count} times',
+  'fraudLocationBurstTotal': 'Total spend {total} TL',
+  'fraudReasonBurst':
+      'The same merchant appeared {count} times in a short window. Review to confirm it was expected.',
   'profileAndSettings': 'Profile & Settings',
   'sectionAppearance': 'APPEARANCE & THEMING',
   'sectionAi': 'AI PREFERENCES',
+  'sectionNotifications': 'NOTIFICATIONS',
   'sectionConnected': 'CONNECTED INSTITUTIONS',
   'sectionAccount': 'ACCOUNT',
   'sectionLanguage': 'LANGUAGE',
@@ -192,8 +213,7 @@ const Map<String, String> _enStrings = {
   'scanReceiptTitle': 'Scan receipt or screen',
   'scanReceiptSubtitle':
       'Capture a receipt, bill, or bank screen and turn it into a transaction.',
-  'scanHint':
-      'AI reads the receipt, extracts category and total, then asks for your approval.',
+  'scanHint': 'Use a clear photo. Vera pulls the merchant, total, and items.',
   'takePhoto': 'Take photo',
   'pickFromGallery': 'Pick from gallery',
   'scanReading': 'AI is reading...',
@@ -219,7 +239,7 @@ const Map<String, String> _enStrings = {
       'Upload a PDF or image of your statement; AI extracts the transactions.',
   'pickStatementFile': 'Pick file (PDF / image)',
   'statementImportHint':
-      'Your bank exports statements as PDF — Vera reads them without Open Banking access.',
+      'Upload a PDF or image export. Vera reads balances and transactions on-device.',
   'statementParsing': 'AI is reading the statement...',
   'closingBalance': 'Closing balance',
   'detectedTransactions': '{n} transactions detected',
@@ -288,6 +308,7 @@ const Map<String, String> _enStrings = {
   'accountTileSecurity': 'Security & PIN',
   'accountTileStorage': 'Storage policy',
   'accountTileHelp': 'Help & support',
+  'accountTileHelpValue': 'FAQs, support, and issue reporting',
   'infoDisplayName': 'Display name',
   'infoMember': 'Membership',
   'infoMemberDescription':
@@ -355,6 +376,7 @@ const Map<String, String> _enStrings = {
       '{summary} is ready. If you want, confirm it here and I will apply it.',
   'umaThinking': 'Uma is thinking...',
   'umaAskHint': 'Ask Uma anything...',
+  'umaNewChat': 'New chat',
   'umaStatusOnline': 'AI assistant · online',
   'umaConfidenceLabel': 'Confidence {pct}%',
   'umaConfirmAction': 'Confirm action',
@@ -494,6 +516,10 @@ const Map<String, String> _enStrings = {
   'notifTitle': 'Notifications',
   'notifSubtitle': '{n} signals Uma is watching',
   'notifEmpty': 'You\'re all clear. Uma keeps watching quietly.',
+  'notifMarkAllRead': 'Mark all read',
+  'notifClear': 'Clear',
+  'notifRead': 'Mark read',
+  'notifDismiss': 'Remove',
   'notifBlockedDefault': 'Vera flagged this transaction as an anomaly.',
   'notifPriceIncreaseTitle': '{name} just raised the price',
   'notifPriceIncreaseBody':
@@ -517,11 +543,11 @@ const Map<String, String> _enStrings = {
   'proactiveUnusedCta': 'Open subscriptions',
   'proactiveHealthyTitle': 'No critical signal right now',
   'proactiveHealthyBody':
-      'There is no urgent bill, price spike, or obviously wasted subscription at the moment. Uma can still give this period a quick read if you want.',
+      'No urgent bill, price spike, or idle subscription stands out right now.',
   'proactiveHealthyCta': 'Ask Uma for a read',
   'proactiveEmptyTitle': 'Vera has not found a signal to watch yet',
   'proactiveEmptyBody':
-      'Once you import a statement, Vera surfaces upcoming payments, subscriptions, and small risks here.',
+      'Import a statement to surface upcoming payments, subscriptions, and small risks here.',
   'proactiveEmptyCta': 'Import a statement',
   'exportTile': 'Export my data',
   'exportTileValue': 'JSON · device-only',
@@ -712,6 +738,10 @@ const Map<String, String> _enStrings = {
   'signupFieldEmail': 'Email',
   'signupFieldPassword': 'Password',
   'signupFieldConfirmPassword': 'Confirm password',
+  'signupHintFullName': 'Name shown on your Vera profile',
+  'signupHintEmail': 'name@example.com',
+  'signupHintPassword': 'Use at least 6 characters',
+  'signupHintConfirmPassword': 'Enter the same password again',
   'signupErrorNameRequired': 'Please enter your full name.',
   'signupErrorInvalidEmail': 'Please enter a valid email.',
   'signupErrorShortPassword': 'Password must be at least 6 characters.',
@@ -719,6 +749,16 @@ const Map<String, String> _enStrings = {
   'signupErrorAcceptTerms': 'Please accept the terms to continue.',
   'signupFailedTemplate': 'Account creation failed: {code}.',
   'signupTerms': 'I accept Vera terms and the local demo data policy.',
+  'signupTermsPrefix': 'I accept ',
+  'signupTermsAnd': ' and the ',
+  'signupTermsVera': 'Vera terms',
+  'signupTermsPolicy': 'data policy',
+  'signupTermsTitle': 'Vera Terms',
+  'signupTermsBody':
+      'Vera only performs actions you explicitly trigger in the demo. Account details, imported receipts, and statement data stay on this device unless you choose a connected sign-in flow.',
+  'signupPolicyTitle': 'Data Policy',
+  'signupPolicyBody':
+      'Demo data is stored locally so onboarding, receipts, notifications, and Uma context survive app restarts. You can clear this device data at any time from settings.',
   'signupStrengthWeak': 'Weak',
   'signupStrengthMedium': 'Medium',
   'signupStrengthStrong': 'Strong',
