@@ -199,14 +199,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Brand glyph — mirrors the login screen for continuity.
               Container(
-                width: 64,
-                height: 64,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
@@ -218,17 +217,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 child: const Icon(
                   Icons.auto_awesome,
                   color: Colors.white,
-                  size: 28,
+                  size: 24,
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               Text(
                 l10n.signupTitle,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 26,
                   fontWeight: FontWeight.w700,
                   color: t.ink,
-                  letterSpacing: -0.8,
+                  letterSpacing: -0.6,
                 ),
               ),
               const SizedBox(height: 6),
@@ -236,9 +235,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 firebase.ready
                     ? l10n.signupSubtitleFirebase
                     : l10n.signupSubtitleLocal,
-                style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
+                style: TextStyle(fontSize: 13.5, color: t.muted, height: 1.5),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 24),
 
               // ── Form fields ──────────────────────────────────────────
               AuthField(

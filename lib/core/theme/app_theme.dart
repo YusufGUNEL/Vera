@@ -48,6 +48,11 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: t.ink),
       dividerTheme: DividerThemeData(color: t.line, thickness: 1, space: 1),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: t.uma,
+        selectionColor: t.uma.withValues(alpha: 0.30),
+        selectionHandleColor: t.uma,
+      ),
     );
   }
 }

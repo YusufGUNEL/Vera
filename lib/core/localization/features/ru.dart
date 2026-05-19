@@ -85,6 +85,7 @@ const Map<String, String> _ruStrings = {
   'sectionConnected': 'ПОДКЛЮЧЁННЫЕ ОРГАНИЗАЦИИ',
   'sectionAccount': 'АККАУНТ',
   'sectionLanguage': 'ЯЗЫК',
+  'sectionNotifications': 'УВЕДОМЛЕНИЯ И БЕЗОПАСНОСТЬ',
   'brandPalette': 'Палитра бренда',
   'mood': 'Тема',
   'moodLight': 'Светлая',
@@ -179,6 +180,7 @@ const Map<String, String> _ruStrings = {
   'accountTileSecurity': 'Безопасность и PIN',
   'accountTileStorage': 'Политика хранения',
   'accountTileHelp': 'Помощь и поддержка',
+  'accountTileHelpValue': 'FAQ, контакт',
   'infoDisplayName': 'Отображаемое имя',
   'infoMember': 'Членство',
   'infoMemberDescription':

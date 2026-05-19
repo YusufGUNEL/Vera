@@ -37,7 +37,7 @@ class CreditScreen extends ConsumerWidget {
     return SafeArea(
       bottom: false,
       child: ListView(
-        padding: const EdgeInsets.only(top: 8, bottom: 130),
+        padding: const EdgeInsets.only(top: 8, bottom: 140),
         children: [
           _Header(),
           Padding(

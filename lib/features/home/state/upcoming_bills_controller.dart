@@ -11,27 +11,38 @@ class UpcomingBillsController extends StateNotifier<List<UpcomingBill>> {
   final UpcomingBillsStore _store;
 
   Future<void> _bootstrap() async {
-    state = await _store.load();
+    final loaded = await _store.load();
+    if (!mounted) return;
+    state = loaded;
   }
 
   Future<void> refresh() async {
-    state = await _store.load();
+    final loaded = await _store.load();
+    if (!mounted) return;
+    state = loaded;
   }
 
   Future<void> add(UpcomingBill bill) async {
-    state = await _store.add(bill);
+    final next = await _store.add(bill);
+    if (!mounted) return;
+    state = next;
   }
 
   Future<void> update(UpcomingBill bill) async {
-    state = await _store.update(bill);
+    final next = await _store.update(bill);
+    if (!mounted) return;
+    state = next;
   }
 
   Future<void> remove(String id) async {
-    state = await _store.remove(id);
+    final next = await _store.remove(id);
+    if (!mounted) return;
+    state = next;
   }
 
   Future<void> clear() async {
     await _store.clear();
+    if (!mounted) return;
     state = const [];
   }
 }

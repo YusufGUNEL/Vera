@@ -158,6 +158,7 @@ const Map<String, String> _trStrings = {
   'sectionConnected': 'BAĞLI KURUMLAR',
   'sectionAccount': 'HESAP',
   'sectionLanguage': 'DİL',
+  'sectionNotifications': 'BİLDİRİM & GÜVENLİK',
   'brandPalette': 'Marka paleti',
   'mood': 'Mod',
   'moodLight': 'Açık',
@@ -258,6 +259,7 @@ const Map<String, String> _trStrings = {
   'accountTileSecurity': 'Güvenlik & PIN',
   'accountTileStorage': 'Veri saklama',
   'accountTileHelp': 'Yardım & destek',
+  'accountTileHelpValue': 'SSS, iletişim',
   'infoDisplayName': 'Görünen ad',
   'infoMember': 'Üyelik',
   'infoMemberDescription':
@@ -624,26 +626,26 @@ const Map<String, String> _trStrings = {
   'demoTxnTransfer': 'EFT — Tasarruf hesabı',
   'demoTxnFamilyIncoming': 'Gelen EFT — Aile',
   'demoTxnAtm': 'ATM nakit çekim',
-  'deleteAccount': 'HesabÄ± sil',
-  'deleteAccountTile': 'HesabÄ± sil',
-  'deleteAccountTileValue': 'Bulut verisini kaldÄ±r ve Ã§Ä±kÄ±ÅŸ yap',
+  'deleteAccount': 'Hesabı sil',
+  'deleteAccountTile': 'Hesabı sil',
+  'deleteAccountTileValue': 'Bulut verisini kaldır ve çıkış yap',
   'deleteAccountDemoTileValue': 'Bu cihazdaki demo verisini temizle',
   'deleteAccountTitle': 'Hesap silinsin mi?',
   'deleteAccountBody':
-      'Vera hesabÄ±n, senkronize verilerin ve bu cihazdaki yerel Ã¶nbellek kalÄ±cÄ± olarak silinecek. Bu iÅŸlem geri alÄ±namaz.',
+      'Vera hesabın, senkronize verilerin ve bu cihazdaki yerel önbellek kalıcı olarak silinecek. Bu işlem geri alınamaz.',
   'deleteAccountDemoBody':
-      'Demo hesabÄ± ve bu cihazdaki yerel veriler temizlenecek. Bu iÅŸlem geri alÄ±namaz.',
-  'deleteAccountConfirm': 'Hesabi sil',
-  'deleteAccountCancel': 'Vazgec',
+      'Demo hesabı ve bu cihazdaki yerel veriler temizlenecek. Bu işlem geri alınamaz.',
+  'deleteAccountConfirm': 'Hesabı sil',
+  'deleteAccountCancel': 'Vazgeç',
   'deleteAccountProcessing': 'Hesap siliniyor...',
   'deleteAccountDone': 'Hesap silindi.',
   'deleteAccountError':
-      'Hesap silinemedi. Lutfen tekrar giris yapip yeniden dene.',
+      'Hesap silinemedi. Lütfen tekrar giriş yapıp yeniden dene.',
   'deleteAccountRecentLogin':
-      'Guvenlik nedeniyle hesabi silmeden once tekrar giris yapman gerekiyor.',
+      'Güvenlik nedeniyle hesabı silmeden önce tekrar giriş yapman gerekiyor.',
   'continueWithGoogle': 'Google ile devam et',
   'googleSignInUnavailable':
-      'Google ile giris icin bu buildde Firebase yapilandirilmis olmali.',
+      'Google ile giriş için bu derlemede Firebase yapılandırılmış olmalı.',
   'umaAuditTrailSubtitle':
       "Uma'nın yanıtlarının cihazına imzalanmış yerel kaydı.",
   'umaAuditTrailEmptyState':

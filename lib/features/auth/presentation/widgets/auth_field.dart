@@ -42,41 +42,52 @@ class AuthField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          obscureText: obscure,
-          keyboardType: keyboardType,
-          autofillHints: autofillHints,
-          textInputAction: textInputAction,
-          onSubmitted: onSubmitted,
+        DefaultSelectionStyle(
           cursorColor: t.uma,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontSize: 15, color: t.ink),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: t.card,
-            hintStyle: TextStyle(color: t.muted),
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, size: 19, color: t.muted)
-                : null,
-            suffixIcon: suffix,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 14,
+          selectionColor: t.uma.withValues(alpha: 0.30),
+          child: TextField(
+            controller: controller,
+            obscureText: obscure,
+            keyboardType: keyboardType,
+            autofillHints: autofillHints,
+            textInputAction: textInputAction,
+            onSubmitted: onSubmitted,
+            enableSuggestions: !obscure,
+            autocorrect: !obscure && keyboardType != TextInputType.emailAddress,
+            cursorColor: t.uma,
+            cursorWidth: 2,
+            style: TextStyle(
+              fontSize: 16,
+              color: t.ink,
+              fontWeight: FontWeight.w500,
+              height: 1.25,
+              decoration: TextDecoration.none,
             ),
-            border: OutlineInputBorder(
-              borderRadius: radius,
-              borderSide: BorderSide(color: t.line),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: radius,
-              borderSide: BorderSide(color: t.line),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: radius,
-              borderSide: BorderSide(color: t.uma, width: 1.4),
+            decoration: InputDecoration(
+              isDense: false,
+              filled: true,
+              fillColor: t.card,
+              hintStyle: TextStyle(color: t.muted, fontSize: 14),
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, size: 19, color: t.muted)
+                  : null,
+              suffixIcon: suffix,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: radius,
+                borderSide: BorderSide(color: t.line),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: radius,
+                borderSide: BorderSide(color: t.line),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: radius,
+                borderSide: BorderSide(color: t.uma, width: 1.4),
+              ),
             ),
           ),
         ),

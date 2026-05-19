@@ -177,6 +177,7 @@ class AppStrings {
   String get sectionConnected => _t('sectionConnected');
   String get sectionAccount => _t('sectionAccount');
   String get sectionLanguage => _t('sectionLanguage');
+  String get sectionNotifications => _t('sectionNotifications');
   String get brandPalette => _t('brandPalette');
   String get mood => _t('mood');
   String get moodLight => _t('moodLight');
@@ -284,6 +285,7 @@ class AppStrings {
   String get accountTileSecurity => _t('accountTileSecurity');
   String get accountTileStorage => _t('accountTileStorage');
   String get accountTileHelp => _t('accountTileHelp');
+  String get accountTileHelpValue => _t('accountTileHelpValue');
   String get deleteAccountTile => _t('deleteAccountTile');
   String get deleteAccountTileValue => _t('deleteAccountTileValue');
   String get deleteAccountDemoTileValue => _t('deleteAccountDemoTileValue');

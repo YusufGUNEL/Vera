@@ -84,6 +84,7 @@ const Map<String, String> _arStrings = {
   'sectionConnected': 'المؤسسات المتصلة',
   'sectionAccount': 'الحساب',
   'sectionLanguage': 'اللغة',
+  'sectionNotifications': 'الإشعارات والأمان',
   'brandPalette': 'لوحة الألوان',
   'mood': 'الوضع',
   'moodLight': 'فاتح',
@@ -178,6 +179,7 @@ const Map<String, String> _arStrings = {
   'accountTileSecurity': 'الأمان وPIN',
   'accountTileStorage': 'سياسة التخزين',
   'accountTileHelp': 'مساعدة ودعم',
+  'accountTileHelpValue': 'الأسئلة الشائعة، التواصل',
   'infoDisplayName': 'الاسم المعروض',
   'infoMember': 'العضوية',
   'infoMemberDescription':

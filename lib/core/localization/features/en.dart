@@ -157,6 +157,7 @@ const Map<String, String> _enStrings = {
   'sectionConnected': 'CONNECTED INSTITUTIONS',
   'sectionAccount': 'ACCOUNT',
   'sectionLanguage': 'LANGUAGE',
+  'sectionNotifications': 'NOTIFICATIONS & SECURITY',
   'brandPalette': 'Brand palette',
   'mood': 'Mood',
   'moodLight': 'Light',
@@ -258,6 +259,7 @@ const Map<String, String> _enStrings = {
   'accountTileSecurity': 'Security & PIN',
   'accountTileStorage': 'Storage policy',
   'accountTileHelp': 'Help & support',
+  'accountTileHelpValue': 'FAQ, contact',
   'infoDisplayName': 'Display name',
   'infoMember': 'Membership',
   'infoMemberDescription':

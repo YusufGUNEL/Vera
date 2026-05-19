@@ -24,7 +24,7 @@ class SecurityScreen extends ConsumerWidget {
         onRefresh: () =>
             ref.read(securityControllerProvider.notifier).refresh(),
         child: ListView(
-          padding: const EdgeInsets.only(top: 8, bottom: 130),
+          padding: const EdgeInsets.only(top: 8, bottom: 140),
           children: [
             _Header(
               lastUpdatedLabel: state.lastUpdatedTime == null
@@ -270,7 +270,7 @@ class _Header extends StatelessWidget {
     final t = context.tokens;
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

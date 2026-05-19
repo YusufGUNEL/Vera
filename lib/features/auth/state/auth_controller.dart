@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/firebase/analytics_service.dart';
 import '../../../core/firebase/firebase_bootstrap.dart';
-import '../../onboarding/state/onboarding_controller.dart';
 import '../../profile_settings/data/firebase_profile_service.dart';
 import '../data/auth_storage.dart';
 import '../data/firebase_auth_service.dart';
@@ -17,7 +16,6 @@ class AuthController extends StateNotifier<AuthSession> {
     this._firebaseAuthService,
     this._firebaseProfileService,
     this._analytics,
-    this._ref,
   ) : super(const AuthSession(status: AuthStatus.loading)) {
     _restore();
   }
@@ -26,7 +24,6 @@ class AuthController extends StateNotifier<AuthSession> {
   final FirebaseAuthService _firebaseAuthService;
   final FirebaseProfileService _firebaseProfileService;
   final AnalyticsService _analytics;
-  final Ref _ref;
 
   Future<void> _restore() async {
     final firebaseSession = _firebaseAuthService.currentSession;
@@ -128,7 +125,6 @@ class AuthController extends StateNotifier<AuthSession> {
     await _firebaseAuthService.signOut();
     await _storage.clearSession();
     await _clearLocalCaches();
-    await _ref.read(onboardingControllerProvider.notifier).reset();
     state = const AuthSession(status: AuthStatus.signedOut);
   }
 
@@ -136,7 +132,6 @@ class AuthController extends StateNotifier<AuthSession> {
     await _firebaseAuthService.deleteAccount();
     await _storage.clearSession();
     await _clearLocalCaches();
-    await _ref.read(onboardingControllerProvider.notifier).reset();
     state = const AuthSession(status: AuthStatus.signedOut);
   }
 
@@ -166,7 +161,6 @@ class AuthController extends StateNotifier<AuthSession> {
       'profile.daily_briefing',
       'profile.data_sync_mode',
       'profile.auto_approve_limit',
-      'onboarding.completed',
     ];
     for (final k in keys) {
       await prefs.remove(k);
@@ -182,6 +176,5 @@ final authControllerProvider =
     ref.watch(firebaseAuthServiceProvider),
     ref.watch(firebaseProfileServiceProvider),
     ref.watch(analyticsServiceProvider),
-    ref,
   );
 });

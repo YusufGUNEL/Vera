@@ -313,13 +313,15 @@ class _Field extends StatelessWidget {
           keyboardType: keyboardType,
           obscureText: obscure,
           cursorColor: t.uma,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(color: t.ink),
+          style: TextStyle(
+            fontSize: 15,
+            color: t.ink,
+            fontWeight: FontWeight.w500,
+            height: 1.2,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: t.muted),
+            hintStyle: TextStyle(color: t.muted, fontSize: 14),
             filled: true,
             fillColor: t.card,
             border: OutlineInputBorder(

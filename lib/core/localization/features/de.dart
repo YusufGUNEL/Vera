@@ -85,6 +85,7 @@ const Map<String, String> _deStrings = {
   'sectionConnected': 'VERBUNDENE INSTITUTE',
   'sectionAccount': 'KONTO',
   'sectionLanguage': 'SPRACHE',
+  'sectionNotifications': 'BENACHRICHTIGUNGEN & SICHERHEIT',
   'brandPalette': 'Markenpalette',
   'mood': 'Stimmung',
   'moodLight': 'Hell',
@@ -181,6 +182,7 @@ const Map<String, String> _deStrings = {
   'accountTileSecurity': 'Sicherheit & PIN',
   'accountTileStorage': 'Datenspeicherung',
   'accountTileHelp': 'Hilfe & Support',
+  'accountTileHelpValue': 'FAQ, Kontakt',
   'infoDisplayName': 'Anzeigename',
   'infoMember': 'Mitgliedschaft',
   'infoMemberDescription':

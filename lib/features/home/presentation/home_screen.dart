@@ -136,13 +136,14 @@ class HomeScreen extends ConsumerWidget {
       child: RefreshIndicator(
         onRefresh: () => ref.read(homeControllerProvider.notifier).refresh(),
         child: ListView(
-          padding: const EdgeInsets.only(top: 6, bottom: 130),
+          padding: const EdgeInsets.only(top: 6, bottom: 140),
           children: [
             TopBar(
               onScanTap: () => _openScanner(context),
               onImportTap: () => _openStatementImport(context),
               onNotificationsTap: () => _openNotifications(context),
             ),
+            const SizedBox(height: 4),
             NetWorthCard(
               balance: state.banks.isEmpty
                   ? 0
@@ -200,6 +201,7 @@ class HomeScreen extends ConsumerWidget {
               onTap: () =>
                   openUma(context, ref, prompt: l10n.umaPromptAnalyze),
             ),
+            const SizedBox(height: 4),
             const CreditSummaryCard(),
             SectionTitle(
               title: l10n.recentTransactions,
