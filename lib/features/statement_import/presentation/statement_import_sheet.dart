@@ -6,6 +6,7 @@ import '../../../core/localization/app_strings.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../shared/widgets/drag_drop_zone.dart';
 import '../../../shared/widgets/pill.dart';
 import '../../home/data/firebase_import_artifacts_service.dart';
 import '../../home/data/imported_transactions_store.dart';
@@ -164,10 +165,24 @@ class StatementImportSheet extends ConsumerWidget {
 
   Widget _picker(
       BuildContext context, WidgetRef ref, AppTokens t, AppStrings l10n) {
-    return Column(
-      children: [
-        Material(
-          color: t.brand,
+    return DragDropZone(
+      onFileDropped: (bytes, filename) {
+        String mimeType = 'application/octet-stream';
+        final ext = filename.split('.').last.toLowerCase();
+        if (ext == 'pdf') mimeType = 'application/pdf';
+        if (ext == 'png') mimeType = 'image/png';
+        if (ext == 'jpg' || ext == 'jpeg') mimeType = 'image/jpeg';
+        
+        ref.read(statementControllerProvider.notifier).parse(
+              bytes: bytes,
+              mimeType: mimeType,
+              fileName: filename,
+            );
+      },
+      child: Column(
+        children: [
+          Material(
+            color: t.brand,
           borderRadius: BorderRadius.circular(t.vibe.radius - 2),
           child: InkWell(
             onTap: () => _pickFile(context, ref),
@@ -217,8 +232,9 @@ class StatementImportSheet extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 

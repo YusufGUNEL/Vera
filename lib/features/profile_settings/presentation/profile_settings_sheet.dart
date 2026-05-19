@@ -97,7 +97,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   _ProfileCard(
                     initials: auth.initials,
                     name: auth.displayName ?? l10n.defaultUserName,
-                    email: auth.email ?? 'demo@vera.app',
+                    email: auth.email ?? l10n.notSet,
                     aiTone: profile.aiTone,
                   ),
                   const SizedBox(height: 28),
@@ -184,7 +184,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   _AccountTile(
                     icon: Icons.person_outline,
                     label: l10n.accountTilePersonal,
-                    value: auth.displayName ?? l10n.demoUser,
+                    value: auth.displayName ?? l10n.defaultUserName,
                     onTap: () => _openInfo(
                       context,
                       _personalInfo(l10n, auth),
@@ -193,7 +193,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   _AccountTile(
                     icon: Icons.email_outlined,
                     label: l10n.accountTileEmail,
-                    value: auth.email ?? 'demo@vera.app',
+                    value: auth.email ?? l10n.notSet,
                     onTap: () => _openInfo(context, _emailInfo(l10n, auth)),
                   ),
                   _AccountTile(
@@ -211,8 +211,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
                   _AccountTile(
                     icon: Icons.delete_outline,
                     label: l10n.deleteAccountTile,
-                    value: auth.userId == 'demo-user' ||
-                            auth.authMethod == 'demo vault'
+                    value: auth.isAnonymous
                         ? l10n.deleteAccountDemoTileValue
                         : l10n.deleteAccountTileValue,
                     onTap: () => _confirmDeleteAccount(context, ref, auth),
@@ -349,8 +348,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
   ) async {
     final l10n = context.l10n;
     final t = context.tokens;
-    final isDemo =
-        auth.userId == 'demo-user' || auth.authMethod == 'demo vault';
+    final isDemo = auth.isAnonymous;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -433,7 +431,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
       sections: [
         AccountInfoSection(
           label: l10n.infoDisplayName,
-          body: auth.displayName ?? l10n.demoUser,
+          body: auth.displayName ?? l10n.defaultUserName,
         ),
         AccountInfoSection(
           label: l10n.infoMember,
@@ -454,7 +452,7 @@ class ProfileSettingsSheet extends ConsumerWidget {
       sections: [
         AccountInfoSection(
           label: l10n.infoEmailLabel,
-          body: auth.email ?? 'demo@vera.app',
+          body: auth.email ?? l10n.notSet,
         ),
         AccountInfoSection(
           label: l10n.infoEmailUsage,
@@ -1180,6 +1178,6 @@ String _authMethodLabel(AppStrings l10n, AuthSession auth) {
 }
 
 String _emailUsageDescription(AppStrings l10n, AuthSession auth) {
-  final isDemo = auth.userId == 'demo-user' || auth.authMethod == 'demo vault';
+  final isDemo = auth.isAnonymous;
   return isDemo ? l10n.infoEmailDescription : l10n.infoEmailDescriptionLive;
 }

@@ -71,6 +71,9 @@ dependencies:
   speech_to_text: ^7.0.0
   cloud_functions: ^5.6.2
 
+  # Drag-and-drop file upload (web + desktop)
+  desktop_drop: ^0.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

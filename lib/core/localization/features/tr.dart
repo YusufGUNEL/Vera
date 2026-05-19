@@ -350,6 +350,10 @@ const Map<String, String> _trStrings = {
       'OCR ve ekstre import deterministic fallback ile çalışır (DEMO rozeti görünür). UMA chat heuristic intent router ile cevap verir. Tüm akış çalışır, sadece AI parsing canlı değildir.',
   'helpContact': 'İletişim',
   'demoUser': 'Demo kullanıcı',
+  'notSet': 'Belirtilmedi',
+  'dragDropHint': 'Dosyayı buraya sürükle bırak',
+  'dragDropActive': 'Dosyayı bırak',
+  'dragDropOr': 'veya',
   'umaGreeting':
       'Merhaba {name}. İçe aktardığın işlemleri okudum. Kart faturası ödeyebilir, transfer hazırlayabilir veya altın fiyatına bakabiliriz. Para hareketi hep senin bankanda olur; ben hazırlığı yapar, sonucu takip ederim.',
   'umaReplyBuyGold':

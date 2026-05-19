@@ -348,6 +348,10 @@ const Map<String, String> _enStrings = {
       'OCR and statement import run a deterministic fallback (DEMO badge appears). UMA chat replies via a heuristic intent router. The whole flow still works — only the live AI parsing is off.',
   'helpContact': 'Contact',
   'demoUser': 'Demo user',
+  'notSet': 'Not set',
+  'dragDropHint': 'Drag and drop file here',
+  'dragDropActive': 'Drop file',
+  'dragDropOr': 'or',
   'umaGreeting':
       "Hi {name}. I read your imported statements. I can help you pay a card bill, plan a transfer, or look at gold pricing. The action happens in your bank app; I prepare it and track the result.",
   'umaReplyBuyGold':

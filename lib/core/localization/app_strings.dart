@@ -385,6 +385,12 @@ class AppStrings {
   String get helpFaqA3 => _t('helpFaqA3');
   String get helpContact => _t('helpContact');
   String get demoUser => _t('demoUser');
+  String get notSet => _t('notSet');
+
+  // ---- Drag-drop upload ----
+  String get dragDropHint => _t('dragDropHint');
+  String get dragDropActive => _t('dragDropActive');
+  String get dragDropOr => _t('dragDropOr');
 
   // ---- UMA greeting ----
   String umaGreeting(String name) =>

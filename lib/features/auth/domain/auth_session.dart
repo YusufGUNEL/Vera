@@ -7,7 +7,7 @@ class AuthSession {
     this.displayName,
     this.email,
     this.signedInAt,
-    this.authMethod = 'demo vault',
+    this.authMethod = 'none',
   });
 
   final AuthStatus status;
@@ -16,6 +16,10 @@ class AuthSession {
   final String? email;
   final DateTime? signedInAt;
   final String authMethod;
+
+  /// True when the user is signed in via the local demo vault (no Firebase UID).
+  bool get isAnonymous =>
+      userId == 'demo-user' || authMethod == 'demo vault' || authMethod == 'none' && status == AuthStatus.signedIn;
 
   String get initials {
     final name = displayName?.trim();
@@ -41,7 +45,7 @@ class AuthSession {
       displayName: clearIdentity ? null : (displayName ?? this.displayName),
       email: clearIdentity ? null : (email ?? this.email),
       signedInAt: clearIdentity ? null : (signedInAt ?? this.signedInAt),
-      authMethod: clearIdentity ? 'demo vault' : (authMethod ?? this.authMethod),
+      authMethod: clearIdentity ? 'none' : (authMethod ?? this.authMethod),
     );
   }
 }
