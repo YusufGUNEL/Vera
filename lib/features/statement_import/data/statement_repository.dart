@@ -30,12 +30,9 @@ class StatementRepository {
     } on MissingGeminiBackendException catch (_) {
       return _fallback();
     } on GeminiBusyException catch (_) {
-      // Gemini servisi geçici olarak yoğun — manuel moda düş, kullanıcıyı
-      // korkutucu bir hata diyaloguyla durdurma.
       return _fallback();
-    } catch (e) {
-      // Anything else: surface the real error so we can see it in dev.
-      throw Exception('Gemini ekstre çözümleyemedi: $e');
+    } catch (_) {
+      return _fallback();
     }
   }
 
