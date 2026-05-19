@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../domain/uma_response.dart';
 import '../../../core/utils/formatters.dart';
 import '../../home/data/imported_transactions_store.dart';
 import '../../home/data/transaction.dart';
@@ -99,6 +100,97 @@ class UmaToolOutcome {
   final String toolName;
   final bool success;
   final String confirmation;
+}
+
+class UmaToolPolicy {
+  const UmaToolPolicy({
+    required this.status,
+    required this.reason,
+    required this.summary,
+  });
+
+  final UmaToolPolicyStatus status;
+  final String reason;
+  final String summary;
+}
+
+UmaToolPolicy evaluateUmaToolPolicy({
+  required String name,
+  required Map<String, Object?> args,
+  required AppStrings l10n,
+  required bool requireConfirmation,
+  required String strictness,
+}) {
+  final isStrict = strictness != 'relaxed';
+  switch (name) {
+    case UmaToolNames.createSavingsGoal:
+      final target = _asDouble(args['target_amount_tl']);
+      if (target == null || target <= 0) {
+        return UmaToolPolicy(
+          status: UmaToolPolicyStatus.missingContext,
+          reason: l10n.umaPolicyMissingContext,
+          summary: l10n.umaPolicyGoalSummaryUnknown,
+        );
+      }
+      return UmaToolPolicy(
+        status: isStrict && requireConfirmation
+            ? UmaToolPolicyStatus.needsConfirmation
+            : UmaToolPolicyStatus.allowed,
+        reason: isStrict && requireConfirmation
+            ? l10n.umaPolicyNeedsConfirmation
+            : l10n.umaPolicyReady,
+        summary: l10n.umaPolicyGoalSummary(fmtTL(target)),
+      );
+    case UmaToolNames.addUpcomingBill:
+      final nameArg = (args['name'] as String?)?.trim();
+      final amount = _asDouble(args['amount_tl']);
+      final days = _asInt(args['due_in_days']);
+      if (nameArg == null ||
+          nameArg.isEmpty ||
+          amount == null ||
+          amount <= 0 ||
+          days == null) {
+        return UmaToolPolicy(
+          status: UmaToolPolicyStatus.missingContext,
+          reason: l10n.umaPolicyMissingContext,
+          summary: l10n.umaPolicyBillSummaryUnknown,
+        );
+      }
+      return UmaToolPolicy(
+        status: isStrict && requireConfirmation
+            ? UmaToolPolicyStatus.needsConfirmation
+            : UmaToolPolicyStatus.allowed,
+        reason: isStrict && requireConfirmation
+            ? l10n.umaPolicyNeedsConfirmation
+            : l10n.umaPolicyReady,
+        summary: l10n.umaPolicyBillSummary(nameArg, days),
+      );
+    case UmaToolNames.addExpense:
+      final nameArg = (args['name'] as String?)?.trim();
+      final amount = _asDouble(args['amount_tl']);
+      if (nameArg == null || nameArg.isEmpty || amount == null || amount <= 0) {
+        return UmaToolPolicy(
+          status: UmaToolPolicyStatus.missingContext,
+          reason: l10n.umaPolicyMissingContext,
+          summary: l10n.umaPolicyExpenseSummaryUnknown,
+        );
+      }
+      return UmaToolPolicy(
+        status: isStrict && requireConfirmation
+            ? UmaToolPolicyStatus.needsConfirmation
+            : UmaToolPolicyStatus.allowed,
+        reason: isStrict && requireConfirmation
+            ? l10n.umaPolicyNeedsConfirmation
+            : l10n.umaPolicyReady,
+        summary: l10n.umaPolicyExpenseSummary(nameArg, fmtTL(amount)),
+      );
+    default:
+      return UmaToolPolicy(
+        status: UmaToolPolicyStatus.blocked,
+        reason: l10n.umaPolicyBlocked,
+        summary: l10n.umaPolicyBlocked,
+      );
+  }
 }
 
 /// Dispatches a Gemini function call to the right controller. Returns the

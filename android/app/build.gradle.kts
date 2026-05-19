@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         applicationId = "com.vera.vera"
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

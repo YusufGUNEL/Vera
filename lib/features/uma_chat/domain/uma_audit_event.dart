@@ -1,5 +1,11 @@
 enum UmaAuditAction {
   replyGenerated,
+  orderForwarded,
+  orderDismissed,
+  feedbackHelpful,
+  feedbackNotHelpful,
+  memoryUpdated,
+  confidenceReduced,
 }
 
 class UmaAuditEvent {

@@ -237,6 +237,39 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     : l10n.signupSubtitleLocal,
                 style: TextStyle(fontSize: 13.5, color: t.muted, height: 1.5),
               ),
+              if (!firebase.ready) ...[
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: t.gold.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: t.gold.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        size: 18,
+                        color: t.gold,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          l10n.loginDemoHint('a', 'b'),
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: t.ink,
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
 
               // ── Form fields ──────────────────────────────────────────

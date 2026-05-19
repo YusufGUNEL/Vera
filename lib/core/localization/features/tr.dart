@@ -214,6 +214,11 @@ const Map<String, String> _trStrings = {
   'importToVera': "Vera'ya aktar",
   'statementFallbackWarning':
       'Gemini API key yok veya ekstre çözümlenemedi. Lütfen işlemleri manuel gir.',
+  'importFallbackNextTitle': 'Sonraki en iyi adım',
+  'importFallbackNextBody':
+      'İstersen işlemleri manuel ekleyebilir veya Uma\'dan bunu senin adına kaydetmesini isteyebilirsin.',
+  'importFallbackAskUma': 'Uma\'dan kaydetmesini iste',
+  'importFallbackManualEntry': 'Manuel işlem ekle',
   'statementFallbackAction': 'AI çalışmadı — manuel gir',
   'thisMonthsAiPlan': 'Bu ayın AI önerisi',
   'aiPlanFooter': "Uma'nın önerisi — bankanda uygula, Vera kaydını tutar.",
@@ -328,10 +333,91 @@ const Map<String, String> _trStrings = {
       'O transferi işaretledim çünkü alıcı bir kez daha görünmüştü ve cihaz konumu olağan örüntünle eşleşmedi. Vera bankanı bloklamaz — uyarır, kararı sen verirsin.',
   'umaReplyFallback':
       'Bunu da yapabilirim. İstersen kısa bir finansal değerlendirme veya güvenli bir sonraki adım hazırlayayım.',
+  'umaReplyNeedsData':
+      'Henüz yeterli kullanıcı verisi görünmüyor. Ekstre yükle, fiş tara, manuel işlem ekle veya bir hedef kur; sonra sana daha net yardımcı olayım.',
+  'umaReplyLocalOnly':
+      'Şu anda yerel moddayım. Banka aksiyonları başlatamam ama hedef kurma, manuel işlem kaydetme ve veri düzenleme konularında yine yardımcı olabilirim.',
+  'umaReplyToolNeedsDetails':
+      'Bunu tamamlamak için bir iki ayrıntı daha gerekiyor. Tutar, ad veya vade bilgisini biraz daha net yazar mısın?',
+  'umaToolProposal':
+      '{summary} hazır. İstersen bunu sohbet içinden onaylayıp uygulayayım.',
   'umaThinking': 'Uma düşünüyor...',
   'umaAskHint': "Uma'ya sor...",
   'umaStatusOnline': 'AI asistan · çevrimiçi',
   'umaNewChat': 'Yeni sohbet',
+  'umaStatusLocalOnly': 'Yerel mod · sınırlı AI',
+  'umaStatusNeedsData': 'Hazır · veri bekliyor',
+  'umaAssistantBadge': 'UMA',
+  'umaToolBadge': 'AKSİYON TAMAMLANDI',
+  'umaFallbackBadge': 'SONRAKİ ADIM',
+  'umaSystemBadge': 'SİSTEM',
+  'umaConfidenceLabel': 'Güven %{pct}',
+  'umaConfirmAction': 'Aksiyonu onayla',
+  'umaActionConfirmedToast': 'Uma aksiyonu uyguladı',
+  'umaSourceReadiness': 'Sistem durumu',
+  'umaSourceMemory': 'Kullanıcı hafızası',
+  'umaWhyGoldPlan':
+      'Bağlı hesap ve mevcut birikim akışına göre bu altın aksiyonu uygun görünüyor.',
+  'umaWhyBillPlan':
+      'Yaklaşan ödeme ve mevcut hesap bağlamı bu fatura aksiyonunu destekliyor.',
+  'umaWhyGoalPlan':
+      'Mevcut hedef ilerlemen ve nakit ritmine göre bu birikim adımı anlamlı görünüyor.',
+  'umaWhySubscriptions':
+      'Abonelik listesi ve son tekrar eden işlemlerine dayanarak bu özeti ürettim.',
+  'umaWhySpending':
+      'Son işlemlerinden çıkan kategori dağılımına göre bu cevabı verdim.',
+  'umaWhyWealth':
+      'Portföy bucket dağılımı ve son varlık girişlerine dayanıyorum.',
+  'umaWhyLoan':
+      'Gelir, gider ve borç ritmine dair mevcut sinyalleri kullanarak yorumluyorum.',
+  'umaWhySecurity':
+      'Uyarı dili, görülen anomali ve kullanıcı kontrolü ilkesine göre sade tutuldu.',
+  'umaWhyInsufficientData':
+      'Yeterli veri veya kaynak kapsamı olmadığı için kesin konuşmuyorum.',
+  'umaWhyLocalOnly':
+      'Firebase veya Gemini tarafı hazır olmadığında yalnızca yerel bağlama dayanıyorum.',
+  'umaWhyGroundedAnswer':
+      'Bu cevap uygulama içindeki mevcut veri kaynaklarına dayalı olarak üretildi.',
+  'umaWhyFallbackSoft':
+      'Daha emin konuşmak için biraz daha veri girişi iyi olur.',
+  'umaWhyFallbackDirect':
+      'Bu konuda emin olmak için veri kapsamı yeterli değil; tahmin yürütmüyorum.',
+  'umaWhyMissingContext':
+      'Eksik bağlamı tamamladığında bunu daha güvenli şekilde yapabilirim.',
+  'umaToolExecutedWhy':
+      'Onayının ardından bu eylem uygulama içindeki veriye kaydedildi.',
+  'umaPolicyNeedsConfirmation':
+      'Bu eylem verini değiştireceği için önce onayını istiyorum.',
+  'umaPolicyMissingContext':
+      'Bu eylemi güvenle yapmak için birkaç kritik bilgi eksik.',
+  'umaPolicyReady': 'Bağlam yeterli görünüyor, eylem hazır.',
+  'umaPolicyBlocked': 'Bu eylem şu an mevcut politika nedeniyle engellendi.',
+  'umaPolicyGoalSummary': '{amount} tutarında bir hedef oluşturma',
+  'umaPolicyGoalSummaryUnknown': 'Hedef oluşturma',
+  'umaPolicyBillSummary': '{name} faturasını {days} gün sonrası için ekleme',
+  'umaPolicyBillSummaryUnknown': 'Fatura ekleme',
+  'umaPolicyExpenseSummary': '{name} işlemini {amount} olarak kaydetme',
+  'umaPolicyExpenseSummaryUnknown': 'Manuel gider kaydetme',
+  'umaSuggestionBuyGold': '10g altın al',
+  'umaSuggestionMoveSavings': "2500 TL'yi birikime aktar",
+  'umaActionPolicy': 'EYLEM POLİTİKASI',
+  'umaActionPolicyDesc':
+      'Vera para hareketini bankanda yapar; sen her zaman onay verirsin.',
+  'umaAuditTrailTitle': 'Denetim izi',
+  'umaAuditTrailSubtitle':
+      'Uma yanıtları, bankaya yönlendirmeler ve geri bildirim kararların için imzalı yerel kayıt.',
+  'umaAuditTrailEmpty': 'Henüz imzalı Uma aksiyonu yok.',
+  'umaAuditTrailCount': 'Bu cihazda {count} imzalı aksiyon kaydı var.',
+  'umaAuditTrailEmptyDetail':
+      'Henüz imzalı aksiyon görünmüyor. Uma\'dan bir şey yapmasını iste; güven izi burada belirecek.',
+  'umaAuditNoteAttached': 'Not eklendi',
+  'umaAuditReplyGenerated': 'Yanıt üretildi',
+  'umaAuditForwarded': 'Bankaya yönlendirildi',
+  'umaAuditKeptForReview': 'İnceleme için tutuldu',
+  'umaAuditHelpfulFeedback': 'Yararlı geri bildirim',
+  'umaAuditCorrectionFeedback': 'Düzeltme geri bildirimi',
+  'umaAuditMemoryUpdated': 'Hafıza güncellendi',
+  'umaAuditConfidenceReduced': 'Düşük güvenli cevap',
   'categoryBudgetLabel': 'BU AYKİ HARCAMALAR',
   'categoryOther': 'Diğer',
   'receiptDefaultName': 'Fiş',

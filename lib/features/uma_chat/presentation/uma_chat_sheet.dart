@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/app_strings.dart';
+import '../../../core/orchestration/user_readiness.dart';
 import '../../../core/services/voice_input_service.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../data/uma_repository.dart';
 import '../domain/uma_audit_event.dart';
+import '../domain/uma_feedback.dart';
 import '../domain/uma_message.dart';
 import '../state/uma_controller.dart';
 import 'widgets/uma_message_bubble.dart';
+import 'widgets/uma_order_card.dart';
 
 class UmaChatSheet extends ConsumerStatefulWidget {
   const UmaChatSheet({super.key});
@@ -46,6 +49,32 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
     _inputController.clear();
   }
 
+  Future<void> _openFeedbackSheet(
+    BuildContext context,
+    int messageIndex,
+    UmaMessage message,
+    UmaFeedbackVote vote,
+  ) async {
+    final controller =
+        TextEditingController(text: message.feedback?.note ?? '');
+    final note = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _FeedbackNoteSheet(
+        controller: controller,
+        vote: vote,
+      ),
+    );
+    controller.dispose();
+    if (!mounted || note == null) return;
+    await ref.read(umaControllerProvider.notifier).setFeedback(
+          messageIndex,
+          vote,
+          note: note,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -68,11 +97,12 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
             _DragHandle(),
             _Header(
               showSettings: _showSettings,
+              readiness: ref.watch(userReadinessProvider),
               onToggleSettings: () =>
                   setState(() => _showSettings = !_showSettings),
               onClose: () => Navigator.of(context).pop(),
             ),
-            if (_showSettings) const _SettingsDrawer(),
+            if (_showSettings) _SettingsDrawer(state: state),
             Expanded(
               child: Stack(
                 children: [
@@ -88,7 +118,48 @@ class _UmaChatSheetState extends ConsumerState<UmaChatSheet> {
                             ? CrossAxisAlignment.end
                             : CrossAxisAlignment.start,
                         children: [
-                          UmaMessageBubble(message: message),
+                          UmaMessageBubble(
+                            message: message,
+                            onConfirmTool: message.envelope?.pendingToolCall == null
+                                ? null
+                                : () => ref
+                                    .read(umaControllerProvider.notifier)
+                                    .confirmPendingTool(i),
+                          ),
+                          if (message.card != null)
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.78,
+                              ),
+                              child: UmaOrderCard(
+                                card: message.card!,
+                                onForward: () => ref
+                                    .read(umaControllerProvider.notifier)
+                                    .forwardOrder(i),
+                                onDismiss: () => ref
+                                    .read(umaControllerProvider.notifier)
+                                    .dismissOrder(i),
+                              ),
+                            ),
+                          if (message.role == UmaRole.uma)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.78,
+                                ),
+                                child: _FeedbackBar(
+                                  message: message,
+                                  onVote: (vote) => ref
+                                      .read(umaControllerProvider.notifier)
+                                      .setFeedback(i, vote),
+                                  onAddNote: (vote) =>
+                                      _openFeedbackSheet(context, i, message, vote),
+                                ),
+                              ),
+                            ),
                         ],
                       );
                     },
@@ -144,17 +215,28 @@ class _DragHandle extends StatelessWidget {
 class _Header extends StatelessWidget {
   const _Header({
     required this.showSettings,
+    required this.readiness,
     required this.onToggleSettings,
     required this.onClose,
   });
 
   final bool showSettings;
+  final UserReadiness readiness;
   final VoidCallback onToggleSettings;
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final l10n = context.l10n;
+    final statusText = readiness.localOnly
+        ? l10n.umaStatusLocalOnly
+        : readiness.needsUserData
+            ? l10n.umaStatusNeedsData
+            : l10n.umaStatusOnline;
+    final statusColor = readiness.localOnly || readiness.needsUserData
+        ? t.gold
+        : t.green;
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 12, 12, 14),
       decoration: BoxDecoration(
@@ -196,14 +278,14 @@ class _Header extends StatelessWidget {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: t.green,
+                        color: statusColor,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      context.l10n.umaStatusOnline,
-                      style: TextStyle(fontSize: 11, color: t.green),
+                      statusText,
+                      style: TextStyle(fontSize: 11, color: statusColor),
                     ),
                   ],
                 ),
@@ -229,7 +311,8 @@ class _Header extends StatelessWidget {
 }
 
 class _SettingsDrawer extends ConsumerWidget {
-  const _SettingsDrawer();
+  const _SettingsDrawer({required this.state});
+  final UmaState state;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -244,6 +327,103 @@ class _SettingsDrawer extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            l10n.umaActionPolicy,
+            style: TextStyle(
+              fontSize: 11,
+              color: t.muted,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.4,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.umaActionPolicyDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: t.ink2,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final option in [
+            (
+              AutoExecMode.confirm,
+              l10n.requireConfirmation,
+              l10n.requireConfirmationDesc,
+            ),
+          ])
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: GestureDetector(
+                onTap: () => ref
+                    .read(umaControllerProvider.notifier)
+                    .setAutoExec(option.$1),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: t.card,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: state.autoExec == option.$1
+                          ? t.uma
+                          : Colors.transparent,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        margin: const EdgeInsets.only(top: 2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: state.autoExec == option.$1
+                                ? t.uma
+                                : const Color(0xFFC8C3B8),
+                            width: 2,
+                          ),
+                          color: state.autoExec == option.$1
+                              ? t.uma
+                              : Colors.transparent,
+                        ),
+                        alignment: Alignment.center,
+                        child: state.autoExec == option.$1
+                            ? const Icon(Icons.circle,
+                                color: Colors.white, size: 7)
+                            : null,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              option.$2,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: t.ink,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              option.$3,
+                              style: TextStyle(color: t.muted, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 8),
           FutureBuilder(
             future: ref.read(umaRepositoryProvider).loadAuditEvents(),
             builder: (context, snapshot) {
@@ -316,19 +496,30 @@ class _SettingsDrawer extends ConsumerWidget {
   }
 }
 
-class _SuggestionStrip extends StatelessWidget {
+class _SuggestionStrip extends ConsumerWidget {
   const _SuggestionStrip({required this.onTap, required this.disabled});
   final ValueChanged<String> onTap;
   final bool disabled;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final l10n = context.l10n;
-    final suggestions = [
-      l10n.umaSuggestionSubs,
-      l10n.umaSuggestionAnalyze,
-    ];
+    final readiness = ref.watch(userReadinessProvider);
+    final suggestions = readiness.needsUserData
+        ? [
+            l10n.umaInsightImportCta,
+            l10n.scanReceiptTitle,
+            l10n.addManualTxnTitle,
+            l10n.goalEmptyCta,
+          ]
+        : [
+            l10n.umaSuggestionBuyGold,
+            l10n.umaSuggestionPay,
+            l10n.umaSuggestionSubs,
+            l10n.umaSuggestionMoveSavings,
+            l10n.umaSuggestionAnalyze,
+          ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       child: SizedBox(
@@ -375,7 +566,7 @@ class _SuggestionStrip extends StatelessWidget {
   }
 }
 
-class _Input extends ConsumerWidget {
+class _Input extends ConsumerStatefulWidget {
   const _Input({
     required this.controller,
     required this.onSubmit,
@@ -388,7 +579,12 @@ class _Input extends ConsumerWidget {
   final bool busy;
   final ValueChanged<String> onVoiceResult;
 
-  void _toggleVoice(BuildContext context, WidgetRef ref, VoiceState voice) {
+  @override
+  ConsumerState<_Input> createState() => _InputState();
+}
+
+class _InputState extends ConsumerState<_Input> {
+  void _toggleVoice(BuildContext context, VoiceState voice) {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.maybeOf(context);
 
@@ -409,19 +605,27 @@ class _Input extends ConsumerWidget {
       return;
     }
     ref.read(voiceInputControllerProvider.notifier).start(
-          onFinalResult: onVoiceResult,
+          onFinalResult: widget.onVoiceResult,
         );
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = context.tokens;
     final l10n = context.l10n;
     final voice = ref.watch(voiceInputControllerProvider);
+    final readiness = ref.watch(userReadinessProvider);
     final listening = voice.status == VoiceStatus.listening;
     final hintText = listening
         ? l10n.umaVoiceListening
-        : (busy ? l10n.umaThinking : l10n.umaAskHint);
+        : (widget.busy ? l10n.umaThinking : l10n.umaAskHint);
+    final preview = voice.partialText.trim();
+    if (listening && preview.isNotEmpty && widget.controller.text != preview) {
+      widget.controller.value = TextEditingValue(
+        text: preview,
+        selection: TextSelection.collapsed(offset: preview.length),
+      );
+    }
 
     return SafeArea(
       top: false,
@@ -444,7 +648,9 @@ class _Input extends ConsumerWidget {
                 message:
                     listening ? l10n.umaVoiceStop : l10n.umaVoiceStart,
                 child: GestureDetector(
-                  onTap: busy ? null : () => _toggleVoice(context, ref, voice),
+                  onTap: widget.busy
+                      ? null
+                      : () => _toggleVoice(context, voice),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -466,10 +672,11 @@ class _Input extends ConsumerWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: TextField(
-                  controller: controller,
-                  enabled: !busy && !listening,
+                  controller: widget.controller,
+                  enabled: !widget.busy,
+                  readOnly: listening,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: onSubmit,
+                  onSubmitted: widget.onSubmit,
                   style: TextStyle(fontSize: 15, color: t.ink),
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -479,18 +686,27 @@ class _Input extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (!readiness.voiceAvailable)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Icon(Icons.mic_off_outlined, color: t.muted, size: 16),
+                ),
               const SizedBox(width: 4),
               GestureDetector(
-                onTap: busy ? null : () => onSubmit(controller.text),
+                onTap: widget.busy
+                    ? null
+                    : () => widget.onSubmit(widget.controller.text),
                 child: Container(
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: busy ? t.brand.withValues(alpha: 0.4) : t.brand,
+                    color: widget.busy
+                        ? t.brand.withValues(alpha: 0.4)
+                        : t.brand,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: busy
+                  child: widget.busy
                       ? SizedBox(
                           width: 14,
                           height: 14,
@@ -551,6 +767,261 @@ class _Toast extends StatelessWidget {
   }
 }
 
+class _FeedbackBar extends StatelessWidget {
+  const _FeedbackBar({
+    required this.message,
+    required this.onVote,
+    required this.onAddNote,
+  });
+
+  final UmaMessage message;
+  final ValueChanged<UmaFeedbackVote> onVote;
+  final ValueChanged<UmaFeedbackVote> onAddNote;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    final selectedVote = message.feedback?.vote;
+    final note = message.feedback?.note?.trim();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                l10n.umaFeedbackLabel,
+                style: TextStyle(
+                  color: t.muted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const Spacer(),
+              _FeedbackChip(
+                icon: Icons.thumb_up_alt_outlined,
+                label: l10n.umaFeedbackHelpful,
+                selected: selectedVote == UmaFeedbackVote.helpful,
+                onTap: () => onVote(UmaFeedbackVote.helpful),
+              ),
+              const SizedBox(width: 6),
+              _FeedbackChip(
+                icon: Icons.thumb_down_alt_outlined,
+                label: l10n.umaFeedbackNotHelpful,
+                selected: selectedVote == UmaFeedbackVote.notHelpful,
+                onTap: () => onVote(UmaFeedbackVote.notHelpful),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: () => onAddNote(
+                  selectedVote ?? UmaFeedbackVote.notHelpful,
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: t.uma,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  minimumSize: const Size(0, 0),
+                ),
+                icon: const Icon(Icons.edit_note, size: 16),
+                label: Text(
+                  note == null || note.isEmpty
+                      ? l10n.umaFeedbackAddNote
+                      : l10n.umaFeedbackEditNote,
+                ),
+              ),
+              if (note != null && note.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    note,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: t.ink2,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeedbackChip extends StatelessWidget {
+  const _FeedbackChip({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? t.card : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: selected ? t.uma : t.line),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 14, color: selected ? t.uma : t.muted),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: selected ? t.uma : t.muted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FeedbackNoteSheet extends StatelessWidget {
+  const _FeedbackNoteSheet({
+    required this.controller,
+    required this.vote,
+  });
+
+  final TextEditingController controller;
+  final UmaFeedbackVote vote;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final l10n = context.l10n;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: t.bg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: t.line,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  vote == UmaFeedbackVote.helpful
+                      ? l10n.umaFeedbackHelpfulTitle
+                      : l10n.umaFeedbackNotHelpfulTitle,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: t.ink,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.umaFeedbackNoteHint,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: t.muted,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: controller,
+                  minLines: 3,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    hintText: l10n.umaFeedbackPlaceholder,
+                    filled: true,
+                    fillColor: t.card,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: t.line),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: t.line),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: t.uma, width: 1.4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () =>
+                            Navigator.of(context).pop(controller.text.trim()),
+                        child: Text(l10n.umaFeedbackSave),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(context).pop(''),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: t.brand,
+                          foregroundColor: t.brandFG,
+                        ),
+                        child: Text(l10n.umaFeedbackSkipNote),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _AuditLogSheet extends ConsumerWidget {
   const _AuditLogSheet();
@@ -624,7 +1095,7 @@ class _AuditLogSheet extends ConsumerWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(24),
                         child: Text(
-                          l10n.umaAuditTrailEmptyState,
+                          l10n.umaAuditTrailEmptyDetail,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
@@ -662,8 +1133,7 @@ class _AuditTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final l10n = context.l10n;
-    final spec = _auditSpec(item.action, t, l10n);
+    final spec = _auditSpec(item.action, t, context.l10n);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -772,14 +1242,49 @@ class _AuditSpec {
   final Color soft;
 }
 
-_AuditSpec _auditSpec(
-    UmaAuditAction action, AppTokens t, AppStrings l10n) {
+_AuditSpec _auditSpec(UmaAuditAction action, AppTokens t, AppStrings l10n) {
   return switch (action) {
     UmaAuditAction.replyGenerated => _AuditSpec(
-        label: l10n.umaAuditActionReplyGenerated,
+        label: l10n.umaAuditReplyGenerated,
         icon: Icons.auto_awesome,
         color: t.uma,
         soft: t.umaSoft,
+      ),
+    UmaAuditAction.orderForwarded => _AuditSpec(
+        label: l10n.umaAuditForwarded,
+        icon: Icons.open_in_new,
+        color: t.green,
+        soft: t.green.withValues(alpha: 0.12),
+      ),
+    UmaAuditAction.orderDismissed => _AuditSpec(
+        label: l10n.umaAuditKeptForReview,
+        icon: Icons.pause_circle_outline,
+        color: t.gold,
+        soft: t.gold.withValues(alpha: 0.14),
+      ),
+    UmaAuditAction.feedbackHelpful => _AuditSpec(
+        label: l10n.umaAuditHelpfulFeedback,
+        icon: Icons.thumb_up_alt_outlined,
+        color: t.brand,
+        soft: t.brand.withValues(alpha: 0.12),
+      ),
+    UmaAuditAction.feedbackNotHelpful => _AuditSpec(
+        label: l10n.umaAuditCorrectionFeedback,
+        icon: Icons.thumb_down_alt_outlined,
+        color: t.red,
+        soft: t.red.withValues(alpha: 0.1),
+      ),
+    UmaAuditAction.memoryUpdated => _AuditSpec(
+        label: l10n.umaAuditMemoryUpdated,
+        icon: Icons.psychology_outlined,
+        color: t.uma,
+        soft: t.umaSoft,
+      ),
+    UmaAuditAction.confidenceReduced => _AuditSpec(
+        label: l10n.umaAuditConfidenceReduced,
+        icon: Icons.warning_amber_rounded,
+        color: t.gold,
+        soft: t.gold.withValues(alpha: 0.14),
       ),
   };
 }

@@ -18,6 +18,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  static const _demoEmail = 'a';
+  static const _demoPassword = 'b';
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _busy = false;
@@ -32,11 +35,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _signIn() async {
     final l10n = context.l10n;
+    final firebase = ref.read(firebaseBootstrapProvider);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
       setState(() => _error = l10n.loginEmailPasswordRequired);
+      return;
+    }
+
+    if (email == _demoEmail && password == _demoPassword) {
+      setState(() {
+        _busy = true;
+        _error = null;
+      });
+      try {
+        await ref.read(authControllerProvider.notifier).signInDemo(
+              displayName: l10n.demoUser,
+              email: email,
+            );
+      } catch (error) {
+        setState(() => _error = '$error');
+      } finally {
+        if (mounted) setState(() => _busy = false);
+      }
+      return;
+    }
+
+    if (!firebase.ready) {
+      setState(() => _error = l10n.loginFooter);
       return;
     }
 
@@ -109,6 +136,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final l10n = context.l10n;
+    final firebase = ref.watch(firebaseBootstrapProvider);
 
     return Scaffold(
       backgroundColor: t.bg,
@@ -155,6 +183,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Text(
                     l10n.loginSubtitle,
                     style: TextStyle(fontSize: 14, color: t.muted, height: 1.5),
+                  ),
+                  const SizedBox(height: 14),
+                  _AuthStatusBanner(
+                    message: firebase.ready
+                        ? l10n.loginFirebaseReadyFooter
+                        : '${l10n.loginFooter}\n${l10n.loginDemoHint(_demoEmail, _demoPassword)}',
+                    isWarning: !firebase.ready,
                   ),
                   const SizedBox(height: 24),
                   _Field(
@@ -273,6 +308,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AuthStatusBanner extends StatelessWidget {
+  const _AuthStatusBanner({
+    required this.message,
+    required this.isWarning,
+  });
+
+  final String message;
+  final bool isWarning;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final accent = isWarning ? t.gold : t.brand;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isWarning ? Icons.warning_amber_rounded : Icons.verified_outlined,
+            size: 18,
+            color: accent,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 12.5,
+                color: t.ink,
+                height: 1.45,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

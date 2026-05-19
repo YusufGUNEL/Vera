@@ -211,6 +211,11 @@ const Map<String, String> _enStrings = {
   'statementImported': 'Added to your transactions',
   'statementNoTransactions': 'No transactions could be extracted.',
   'importToVera': 'Import to Vera',
+  'importFallbackNextTitle': 'Next best step',
+  'importFallbackNextBody':
+      'You can add the transactions manually or ask Uma to log them for you.',
+  'importFallbackAskUma': 'Ask Uma to log it',
+  'importFallbackManualEntry': 'Add manual transaction',
   'statementFallbackWarning':
       'Gemini API key is missing or the statement could not be parsed. Please enter the transactions manually.',
   'statementFallbackAction': 'AI failed — enter manually',
@@ -328,10 +333,91 @@ const Map<String, String> _enStrings = {
       'I flagged that transfer because the recipient appeared once before and the device location did not match your usual pattern. Vera does not block at your bank — it warns you and you decide together.',
   'umaReplyFallback':
       'I can help with that. If you want, I can give you a quick financial read or prepare a safe next step.',
+  'umaReplyNeedsData':
+      'I do not see enough user data yet. Import a statement, scan a receipt, add a manual transaction, or create a goal and I can help with more context.',
+  'umaReplyLocalOnly':
+      'I am in local mode right now. I cannot start bank actions, but I can still help you create goals, log manual transactions, and organize your data.',
+  'umaReplyToolNeedsDetails':
+      'I need one or two more details to finish that. Please clarify the amount, name, or due date.',
+  'umaToolProposal':
+      '{summary} is ready. If you want, confirm it here and I will apply it.',
   'umaThinking': 'Uma is thinking...',
   'umaAskHint': 'Ask Uma anything...',
   'umaStatusOnline': 'AI assistant · online',
   'umaNewChat': 'New chat',
+  'umaConfidenceLabel': 'Confidence {pct}%',
+  'umaConfirmAction': 'Confirm action',
+  'umaActionConfirmedToast': 'Uma applied the action',
+  'umaSourceReadiness': 'System readiness',
+  'umaSourceMemory': 'User memory',
+  'umaWhyGoldPlan':
+      'This gold action looks aligned with the connected-account context and current savings posture.',
+  'umaWhyBillPlan':
+      'The upcoming payment signal and current account context support this bill action.',
+  'umaWhyGoalPlan':
+      'Your current goal progress and cash rhythm make this savings step look reasonable.',
+  'umaWhySubscriptions':
+      'This summary is grounded in your subscription list and recent recurring transactions.',
+  'umaWhySpending':
+      'This answer is based on the category mix I can see in your recent transactions.',
+  'umaWhyWealth':
+      'I am using your portfolio bucket allocation and recent asset inputs as context.',
+  'umaWhyLoan':
+      'I am grounding this on the income, expense, and debt rhythm visible in your data.',
+  'umaWhySecurity':
+      'The tone stays careful because this is a warning-oriented explanation, not a certainty.',
+  'umaWhyInsufficientData':
+      'I do not have enough source coverage yet to answer this with confidence.',
+  'umaWhyLocalOnly':
+      'When Firebase or Gemini is unavailable, I rely only on local context.',
+  'umaWhyGroundedAnswer':
+      'This answer was produced from the in-app data sources currently available.',
+  'umaWhyFallbackSoft':
+      'A little more data would let me answer this more confidently.',
+  'umaWhyFallbackDirect':
+      'The current data coverage is not strong enough for a confident answer, so I am avoiding guesses.',
+  'umaWhyMissingContext':
+      'Once the missing context is provided, I can do this more safely.',
+  'umaToolExecutedWhy':
+      'After your confirmation, this action was applied to Vera’s in-app data.',
+  'umaPolicyNeedsConfirmation':
+      'This action changes your data, so I want your confirmation first.',
+  'umaPolicyMissingContext':
+      'A few critical details are missing before I can do this safely.',
+  'umaPolicyReady': 'The context looks sufficient and the action is ready.',
+  'umaPolicyBlocked': 'This action is blocked by the current policy.',
+  'umaPolicyGoalSummary': 'Create a goal for {amount}',
+  'umaPolicyGoalSummaryUnknown': 'Create a goal',
+  'umaPolicyBillSummary': 'Add the {name} bill due in {days} days',
+  'umaPolicyBillSummaryUnknown': 'Add a bill',
+  'umaPolicyExpenseSummary': 'Log {name} for {amount}',
+  'umaPolicyExpenseSummaryUnknown': 'Log a manual expense',
+  'umaSuggestionBuyGold': 'Buy 10g of gold',
+  'umaSuggestionMoveSavings': 'Move 2500 TL to savings',
+  'umaActionPolicy': 'ACTION POLICY',
+  'umaActionPolicyDesc':
+      'Vera never moves money itself; every action opens your bank app for your approval.',
+  'umaStatusLocalOnly': 'Local mode · limited AI',
+  'umaStatusNeedsData': 'Ready · waiting for data',
+  'umaAssistantBadge': 'UMA',
+  'umaToolBadge': 'ACTION COMPLETED',
+  'umaFallbackBadge': 'NEXT STEP',
+  'umaSystemBadge': 'SYSTEM',
+  'umaAuditTrailTitle': 'Audit trail',
+  'umaAuditTrailSubtitle':
+      'Signed local log of Uma replies, forwarded bank actions, and your feedback decisions.',
+  'umaAuditTrailEmpty': 'No signed Uma actions yet.',
+  'umaAuditTrailCount': '{count} signed actions recorded on this device.',
+  'umaAuditTrailEmptyDetail':
+      'No signed actions yet. Ask Uma to do something and the trust trail will appear here.',
+  'umaAuditNoteAttached': 'Note attached',
+  'umaAuditReplyGenerated': 'Reply generated',
+  'umaAuditForwarded': 'Forwarded to bank',
+  'umaAuditKeptForReview': 'Kept for review',
+  'umaAuditHelpfulFeedback': 'Helpful feedback',
+  'umaAuditCorrectionFeedback': 'Correction feedback',
+  'umaAuditMemoryUpdated': 'Memory updated',
+  'umaAuditConfidenceReduced': 'Reduced-confidence answer',
   'categoryBudgetLabel': 'SPENDING THIS MONTH',
   'categoryOther': 'Other',
   'receiptDefaultName': 'Receipt',

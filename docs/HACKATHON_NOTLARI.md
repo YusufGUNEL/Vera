@@ -28,10 +28,10 @@ metinleri ve Google ürün entegrasyonu sinyaliyle çıkarıldı.
 | 6 dil + RTL, 24 tema kombinasyonu | ✅ |
 | Android release config (R8, ProGuard, signing) | ✅ |
 | Canlı web deployment | ❌ |
-| Hesap silme (Google Play zorunlu) | ❌ |
-| Gemini function calling / agentic davranış | ❌ |
-| Google Sign-In | ❌ |
-| Voice (Gemini Live / STT) | ❌ |
+| Hesap silme (Google Play zorunlu) | ✅ |
+| Gemini function calling / agentic davranış | ✅ kısıtlı tool policy + confirmation-first |
+| Google Sign-In | ✅ |
+| Voice (Gemini Live / STT) | ✅ STT tabanlı + partial transcript |
 | Google Maps entegrasyonu | ❌ |
 
 ---

@@ -106,6 +106,8 @@ flutter build web --release
 > vercel --prod build/web
 > ```
 
+Web deploy ve sprint sonu release checklist'i için: [DEPLOY.md](DEPLOY.md)
+
 ### App bundle (Play Store)
 
 ```bash
@@ -179,6 +181,7 @@ dart format lib/ docs/
 ```
 
 CI yoksa commit öncesi üçünü de çalıştır.
+Deploy öncesi tam akış için: [DEPLOY.md](DEPLOY.md)
 
 ---
 

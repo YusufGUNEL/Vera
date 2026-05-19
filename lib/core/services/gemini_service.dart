@@ -259,6 +259,7 @@ class GeminiService {
     return AgentResult(
       text: (response.text ?? '').trim(),
       calls: calls,
+      payload: data,
     );
   }
 
@@ -273,10 +274,15 @@ class GeminiService {
 }
 
 class AgentResult {
-  const AgentResult({required this.text, required this.calls});
+  const AgentResult({
+    required this.text,
+    required this.calls,
+    this.payload = const <String, Object?>{},
+  });
 
   final String text;
   final List<String> calls;
+  final Map<String, Object?> payload;
 }
 
 class MissingGeminiBackendException implements Exception {

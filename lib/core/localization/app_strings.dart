@@ -364,17 +364,65 @@ class AppStrings {
   String get umaReplyLoan => _t('umaReplyLoan');
   String get umaReplySecurity => _t('umaReplySecurity');
   String get umaReplyFallback => _t('umaReplyFallback');
+  String get umaReplyNeedsData => _t('umaReplyNeedsData');
+  String get umaReplyLocalOnly => _t('umaReplyLocalOnly');
+  String get umaReplyToolNeedsDetails => _t('umaReplyToolNeedsDetails');
+  String umaToolProposal(String summary) =>
+      _t('umaToolProposal').replaceAll('{summary}', summary);
 
   // ---- UMA chat misc ----
   String get umaThinking => _t('umaThinking');
   String get umaAskHint => _t('umaAskHint');
   String get umaStatusOnline => _t('umaStatusOnline');
   String get umaNewChat => _t('umaNewChat');
+  String get umaStatusLocalOnly => _t('umaStatusLocalOnly');
+  String get umaStatusNeedsData => _t('umaStatusNeedsData');
   String get umaVoiceStart => _t('umaVoiceStart');
   String get umaVoiceStop => _t('umaVoiceStop');
   String get umaVoiceListening => _t('umaVoiceListening');
   String get umaVoicePermissionDenied => _t('umaVoicePermissionDenied');
   String get umaVoiceUnavailable => _t('umaVoiceUnavailable');
+  String get umaAssistantBadge => _t('umaAssistantBadge');
+  String get umaToolBadge => _t('umaToolBadge');
+  String get umaFallbackBadge => _t('umaFallbackBadge');
+  String get umaSystemBadge => _t('umaSystemBadge');
+  String umaConfidenceLabel(String pct) =>
+      _t('umaConfidenceLabel').replaceAll('{pct}', pct);
+  String get umaConfirmAction => _t('umaConfirmAction');
+  String get umaActionConfirmedToast => _t('umaActionConfirmedToast');
+  String get umaSourceReadiness => _t('umaSourceReadiness');
+  String get umaSourceMemory => _t('umaSourceMemory');
+  String get umaWhyGoldPlan => _t('umaWhyGoldPlan');
+  String get umaWhyBillPlan => _t('umaWhyBillPlan');
+  String get umaWhyGoalPlan => _t('umaWhyGoalPlan');
+  String get umaWhySubscriptions => _t('umaWhySubscriptions');
+  String get umaWhySpending => _t('umaWhySpending');
+  String get umaWhyWealth => _t('umaWhyWealth');
+  String get umaWhyLoan => _t('umaWhyLoan');
+  String get umaWhySecurity => _t('umaWhySecurity');
+  String get umaWhyInsufficientData => _t('umaWhyInsufficientData');
+  String get umaWhyLocalOnly => _t('umaWhyLocalOnly');
+  String get umaWhyGroundedAnswer => _t('umaWhyGroundedAnswer');
+  String get umaWhyFallbackSoft => _t('umaWhyFallbackSoft');
+  String get umaWhyFallbackDirect => _t('umaWhyFallbackDirect');
+  String get umaWhyMissingContext => _t('umaWhyMissingContext');
+  String get umaToolExecutedWhy => _t('umaToolExecutedWhy');
+  String get umaPolicyNeedsConfirmation => _t('umaPolicyNeedsConfirmation');
+  String get umaPolicyMissingContext => _t('umaPolicyMissingContext');
+  String get umaPolicyReady => _t('umaPolicyReady');
+  String get umaPolicyBlocked => _t('umaPolicyBlocked');
+  String umaPolicyGoalSummary(String amount) =>
+      _t('umaPolicyGoalSummary').replaceAll('{amount}', amount);
+  String get umaPolicyGoalSummaryUnknown => _t('umaPolicyGoalSummaryUnknown');
+  String umaPolicyBillSummary(String name, int days) => _t(
+        'umaPolicyBillSummary',
+      ).replaceAll('{name}', name).replaceAll('{days}', '$days');
+  String get umaPolicyBillSummaryUnknown => _t('umaPolicyBillSummaryUnknown');
+  String umaPolicyExpenseSummary(String name, String amount) => _t(
+        'umaPolicyExpenseSummary',
+      ).replaceAll('{name}', name).replaceAll('{amount}', amount);
+  String get umaPolicyExpenseSummaryUnknown =>
+      _t('umaPolicyExpenseSummaryUnknown');
   String umaToolGoalCreated(String target) =>
       _t('umaToolGoalCreated').replaceAll('{target}', target);
   String umaToolBillAdded(String name, int days) => _t('umaToolBillAdded')
@@ -384,9 +432,38 @@ class AppStrings {
       _t('umaToolExpenseAdded')
           .replaceAll('{name}', name)
           .replaceAll('{amount}', amount);
+  String get umaSuggestionBuyGold => _t('umaSuggestionBuyGold');
+  String get umaSuggestionMoveSavings => _t('umaSuggestionMoveSavings');
+  String get umaActionPolicy => _t('umaActionPolicy');
+  String get umaActionPolicyDesc => _t('umaActionPolicyDesc');
+  String get umaFeedbackLabel => _t('umaFeedbackLabel');
+  String get umaFeedbackHelpful => _t('umaFeedbackHelpful');
+  String get umaFeedbackNotHelpful => _t('umaFeedbackNotHelpful');
+  String get umaFeedbackAddNote => _t('umaFeedbackAddNote');
+  String get umaFeedbackEditNote => _t('umaFeedbackEditNote');
+  String get umaFeedbackHelpfulTitle => _t('umaFeedbackHelpfulTitle');
+  String get umaFeedbackNotHelpfulTitle => _t('umaFeedbackNotHelpfulTitle');
+  String get umaFeedbackNoteHint => _t('umaFeedbackNoteHint');
+  String get umaFeedbackPlaceholder => _t('umaFeedbackPlaceholder');
+  String get umaFeedbackSave => _t('umaFeedbackSave');
+  String get umaFeedbackSkipNote => _t('umaFeedbackSkipNote');
+  String get umaFeedbackSaved => _t('umaFeedbackSaved');
+  String get umaFeedbackSavedWithNote => _t('umaFeedbackSavedWithNote');
+  String get umaAuditTrailTitle => _t('umaAuditTrailTitle');
   String get umaAuditTrailSubtitle => _t('umaAuditTrailSubtitle');
-  String get umaAuditTrailEmptyState => _t('umaAuditTrailEmptyState');
+  String get umaAuditTrailEmpty => _t('umaAuditTrailEmpty');
+  String umaAuditTrailCount(int count) =>
+      _t('umaAuditTrailCount').replaceAll('{count}', '$count');
+  String get umaAuditTrailEmptyDetail => _t('umaAuditTrailEmptyDetail');
   String get umaAuditNoteAttached => _t('umaAuditNoteAttached');
+  String get umaAuditReplyGenerated => _t('umaAuditReplyGenerated');
+  String get umaAuditForwarded => _t('umaAuditForwarded');
+  String get umaAuditKeptForReview => _t('umaAuditKeptForReview');
+  String get umaAuditHelpfulFeedback => _t('umaAuditHelpfulFeedback');
+  String get umaAuditCorrectionFeedback => _t('umaAuditCorrectionFeedback');
+  String get umaAuditMemoryUpdated => _t('umaAuditMemoryUpdated');
+  String get umaAuditConfidenceReduced => _t('umaAuditConfidenceReduced');
+  String get umaAuditTrailEmptyState => _t('umaAuditTrailEmptyState');
   String get umaAuditActionReplyGenerated =>
       _t('umaAuditActionReplyGenerated');
 
@@ -674,6 +751,10 @@ class AppStrings {
   String subsSeenInRecentTransactions(int n) =>
       _t('subsSeenInRecentTransactions').replaceAll('{n}', '$n');
   String get statementFallbackWarning => _t('statementFallbackWarning');
+  String get importFallbackNextTitle => _t('importFallbackNextTitle');
+  String get importFallbackNextBody => _t('importFallbackNextBody');
+  String get importFallbackAskUma => _t('importFallbackAskUma');
+  String get importFallbackManualEntry => _t('importFallbackManualEntry');
   String get actionDelete => _t('actionDelete');
   String get proactiveHealthyCta => _t('proactiveHealthyCta');
   String get connectedAccountsEmptyBody => _t('connectedAccountsEmptyBody');

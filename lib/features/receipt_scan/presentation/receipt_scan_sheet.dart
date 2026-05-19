@@ -287,6 +287,13 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
               ],
             ),
           ),
+          const SizedBox(height: 10),
+          _FallbackGuidanceCard(
+            title: l10n.importFallbackNextTitle,
+            body: l10n.importFallbackNextBody,
+            primaryLabel: l10n.importFallbackManualEntry,
+            secondaryLabel: l10n.importFallbackAskUma,
+          ),
           const SizedBox(height: 14),
         ],
         if (r.hasTotal)
@@ -452,6 +459,106 @@ class _ReceiptScanSheetState extends ConsumerState<ReceiptScanSheet> {
           child: Text(l10n.scanAgain),
         ),
       ],
+    );
+  }
+}
+
+class _FallbackGuidanceCard extends StatelessWidget {
+  const _FallbackGuidanceCard({
+    required this.title,
+    required this.body,
+    required this.primaryLabel,
+    required this.secondaryLabel,
+  });
+
+  final String title;
+  final String body;
+  final String primaryLabel;
+  final String secondaryLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bgSoft,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: t.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: t.ink,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            body,
+            style: TextStyle(
+              color: t.ink2,
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _FallbackChip(
+                label: primaryLabel,
+                icon: Icons.edit_outlined,
+              ),
+              _FallbackChip(
+                label: secondaryLabel,
+                icon: Icons.auto_awesome,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FallbackChip extends StatelessWidget {
+  const _FallbackChip({required this.label, required this.icon});
+
+  final String label;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: t.card,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: t.line),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: t.uma),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: t.ink2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

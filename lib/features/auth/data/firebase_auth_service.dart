@@ -36,6 +36,7 @@ class FirebaseAuthService {
     required String email,
     required String password,
   }) async {
+    _requireEnabled();
     final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -56,6 +57,7 @@ class FirebaseAuthService {
     required String email,
     required String password,
   }) async {
+    _requireEnabled();
     final credential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
@@ -90,7 +92,7 @@ class FirebaseAuthService {
   }
 
   Future<AuthSession?> signInWithGoogle() async {
-    if (!isEnabled) return null;
+    _requireEnabled();
 
     UserCredential credential;
     if (kIsWeb) {
@@ -122,6 +124,21 @@ class FirebaseAuthService {
       authMethod: 'google',
     );
   }
+
+  void _requireEnabled() {
+    if (isEnabled) return;
+    throw FirebaseAuthUnavailableException(_bootstrapState.summary);
+  }
+}
+
+class FirebaseAuthUnavailableException implements Exception {
+  const FirebaseAuthUnavailableException(this.details);
+
+  final String details;
+
+  @override
+  String toString() =>
+      'Firebase auth is unavailable for this session. Details: $details';
 }
 
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {

@@ -28,6 +28,7 @@ Detay için: [docs/URUN_VIZYONU.md](docs/URUN_VIZYONU.md), [docs/MIMARI.md](docs
 - **Credit** — score gauge, loan simulation (4 slider), risk faktörleri, alternatif teklif
 - **Security** — `FraudHeuristic` import edilen işlemleri analiz eder (outlier, yuvarlak büyük transfer, burst), feedback ile öğrenir
 - **UMA Chat** — kullanıcının gerçek bankaları/işlemleri/faturaları/hedefleri Gemini prompt'una verilir; "ne kadar param var" tipi sorulara gerçek cevap
+- **Uma v2 trust layer** — confidence etiketi, source chip'leri, confirmation-first tool önerileri ve hafıza destekli kişiselleşme
 - **AI auto-categorization** — manuel işlem girerken Uma kategori önerisi (heuristic + Gemini fallback)
 - **Goal AI advisor** — hedef belirleyince aylık gereken tutar + Gemini ile "şu kategoriden kıs" tavsiyesi
 - **Receipt OCR** — `image_picker` + Gemini multimodal parse
@@ -43,6 +44,7 @@ flutter run
 ```
 
 Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
+Canlıya çıkış ve release checklist: [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ## Dokümantasyon
 
@@ -53,6 +55,7 @@ Daha ayrıntılı kurulum: [docs/SETUP.md](docs/SETUP.md)
 | [docs/PROMPTS.md](docs/PROMPTS.md) | Vera içinde gerçekten Gemini'ye gönderilen prompt şablonları |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 90 saniyelik sahne senaryosu |
 | [docs/SETUP.md](docs/SETUP.md) | Geliştirici ortamı ve build rehberi |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | Web deploy + release doğrulama akışı |
 | [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) | Firebase bağlantı durumu, Storage kurulum adımları |
 | [docs/HACKATHON_NOTLARI.md](docs/HACKATHON_NOTLARI.md) | Hackathon'26 kapsama analizi ve önem sırasına göre yapılacaklar |
 | [docs/YAPILACAKLAR.md](docs/YAPILACAKLAR.md) | Demo öncesi yapılacaklar — adım adım rehber (arkadaşa atılabilir) |

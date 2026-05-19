@@ -10,21 +10,49 @@ class FirebaseBootstrapState {
   const FirebaseBootstrapState({
     required this.enabled,
     required this.initialized,
+    this.hasCoreConfig = false,
+    this.source = 'unconfigured',
+    this.debugMessage,
     this.error,
   });
 
   final bool enabled;
   final bool initialized;
+  final bool hasCoreConfig;
+  final String source;
+  final String? debugMessage;
   final Object? error;
 
   bool get ready => enabled && initialized && error == null;
+
+  bool get runningLocalOnly => !ready;
+
+  String get summary {
+    final parts = <String>[
+      'enabled=$enabled',
+      'initialized=$initialized',
+      'hasCoreConfig=$hasCoreConfig',
+      'source=$source',
+    ];
+    if (debugMessage != null && debugMessage!.isNotEmpty) {
+      parts.add('debug=$debugMessage');
+    }
+    if (error != null) {
+      parts.add('error=$error');
+    }
+    return parts.join(' ');
+  }
 }
 
 class FirebaseBootstrap {
   FirebaseBootstrap._();
 
   static FirebaseBootstrapState _state =
-      const FirebaseBootstrapState(enabled: false, initialized: false);
+      const FirebaseBootstrapState(
+        enabled: false,
+        initialized: false,
+        hasCoreConfig: false,
+      );
 
   static FirebaseBootstrapState get state => _state;
 
@@ -33,10 +61,16 @@ class FirebaseBootstrap {
 
     final options = _currentOptions;
     if (options == null) {
-      _state = const FirebaseBootstrapState(
+      _state = FirebaseBootstrapState(
         enabled: false,
         initialized: false,
+        hasCoreConfig: Env.hasFirebaseCoreConfig,
+        source: 'local-only',
+        debugMessage: Env.hasFirebaseCoreConfig
+            ? 'Firebase options are not available for this platform.'
+            : 'Firebase core config is missing; continuing in local-only mode.',
       );
+      debugPrint('[FirebaseBootstrap] ${_state.summary}');
       return _state;
     }
 
@@ -58,14 +92,22 @@ class FirebaseBootstrap {
       _state = const FirebaseBootstrapState(
         enabled: true,
         initialized: true,
+        hasCoreConfig: true,
+        source: 'firebase_options',
+        debugMessage: 'Firebase initialized successfully.',
       );
     } catch (error) {
       _state = FirebaseBootstrapState(
         enabled: true,
         initialized: false,
+        hasCoreConfig: true,
+        source: 'firebase_options',
+        debugMessage:
+            'Firebase initialization failed; app will continue in local-only mode.',
         error: error,
       );
     }
+    debugPrint('[FirebaseBootstrap] ${_state.summary}');
     return _state;
   }
 

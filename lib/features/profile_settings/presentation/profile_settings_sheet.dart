@@ -209,6 +209,15 @@ class ProfileSettingsSheet extends ConsumerWidget {
                     onTap: () => _openExport(context),
                   ),
                   _AccountTile(
+                    icon: Icons.delete_outline,
+                    label: l10n.deleteAccountTile,
+                    value: auth.userId == 'demo-user' ||
+                            auth.authMethod == 'demo vault'
+                        ? l10n.deleteAccountDemoTileValue
+                        : l10n.deleteAccountTileValue,
+                    onTap: () => _confirmDeleteAccount(context, ref, auth),
+                  ),
+                  _AccountTile(
                     icon: Icons.restart_alt,
                     label: l10n.demoResetTile,
                     value: l10n.demoResetTileValue,
